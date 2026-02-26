@@ -1,0 +1,110 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Fix Explorer client screen bug — navigation, layout, demo data, and FichePro access",
+  "requirements": [
+    {
+      "id": "REQ-49",
+      "summary": "Fix useAppState.ts to include 'explorer' in Screen type, set clientTab default to 'explorer', and ensure go('explorer') navigates correctly",
+      "acceptanceCriteria": [
+        "The Screen type includes 'explorer' as a valid literal",
+        "initialState.clientTab === 'explorer'",
+        "initialState.screen === 'login'",
+        "initialState.role === null",
+        "go('explorer') sets state.screen to 'explorer' without errors"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/state/useAppState.ts",
+          "operation": "modify",
+          "description": "Add 'explorer' to the Screen union type as a valid literal value. Update initialState to set clientTab: 'explorer' (not 'home' or any other value). Verify initialState.screen is 'login' and initialState.role is null. Ensure the go() action accepts 'explorer' and sets state.screen = 'explorer' without conditional guards that would prevent this transition."
+        }
+      ]
+    },
+    {
+      "id": "REQ-50",
+      "summary": "Fix App.tsx renderScreen() switch to include exact case 'explorer' that renders ExplorerScreen",
+      "acceptanceCriteria": [
+        "Switch has an exact case 'explorer' (lowercase)",
+        "ExplorerScreen receives go, state, and update props",
+        "No fallthrough from or to adjacent cases",
+        "Default case falls back to LoginScreen"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Add or fix the switch case for 'explorer' in the renderScreen() function. The case must be exactly: case 'explorer': return <ExplorerScreen go={go} state={state} update={update} />; with no typos, no capital letters, and no fallthrough. Verify the default case returns LoginScreen."
+        }
+      ]
+    },
+    {
+      "id": "REQ-51",
+      "summary": "Rewrite ExplorerScreen.tsx with mandatory layout (fixed header, scrollable content zone, TabBarClient in natural flex flow), hero/search/filter/pro cards, image fallbacks, empty state, and navigation wiring",
+      "acceptanceCriteria": [
+        "Root layout is flex column with overflow hidden",
+        "Header is absolutely positioned at top with height 56px and z-index 100",
+        "Scroll zone uses flex:1, overflowY:auto, paddingTop:72px, no forced height, no overflow:hidden",
+        "TabBarClient is in natural flex flow, never position:fixed",
+        "Hero heading 'Find your expert' is visible Inter 900 36px #F4F4F8",
+        "Search bar is 58px tall and visible",
+        "Filter pills are visible and horizontally scrollable",
+        "Pro cards are visible with images and fallback",
+        "All images have onError handler hiding broken images or showing gradient fallback",
+        "Empty state 'No experts available' shows when no pros match",
+        "Tapping a pro card navigates to fiche_pro",
+        "TabBarClient active = 'explorer'",
+        "All four tab onClick handlers navigate to the correct screens"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/screens/client/ExplorerScreen.tsx",
+          "operation": "modify",
+          "description": "Rewrite the component with the following mandatory structure: (1) Root element with style={{ position: 'relative', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}. (2) Header positioned absolutely at top:0 left:0 right:0 height:56px zIndex:100 containing NEXUS logo, role-switch pill (onClick calls go('pro_dashboard') when role === 'client'), and notification bell. (3) Scroll zone with style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', paddingTop: '72px' }} (no forced height, no overflow:hidden) containing: hero heading 'Find your expert' (fontFamily: 'Inter', fontWeight: 900, fontSize: '36px', color: '#F4F4F8'), search bar (height: '58px') with IconSearch, filter pills (All/Flash/Barber/Coiffure/Esthetique/Massage) in a horizontally scrollable container where active pill has gold gradient background and text color var(--void), 'Available now' section with pro cards in horizontal scroll (each card 168x228px), 'Experts for you' section with pro cards in vertical list. (4) TabBarClient with flexShrink:0 in natural flex flow (never position:fixed), active='explorer', with onClick handlers: explorer → go('explorer'), reservations → go('client_reservations'), alertes → go('client_alertes'), profil → go('client_profil'). (5) Every <img> tag must include onError={(e) => { e.currentTarget.style.display = 'none'; }} or render a gradient fallback div when image fails. (6) Empty state: when no pros match the current filter, display 'No experts available' (fontFamily: 'Inter', fontWeight: 500, fontSize: '14px', color: '#54546C') centered. (7) Clicking a pro card calls update({ selectedPro: pro }) then go('fiche_pro'). Import TabBarClient from frontend/src/components/TabBarClient.tsx (create if missing). Use the PROS_DEMO constant (defined in REQ-52) as the data source."
+        },
+        {
+          "path": "frontend/src/components/TabBarClient.tsx",
+          "operation": "create",
+          "description": "Create a TabBarClient component that accepts props: active (string), onExplorerClick, onReservationsClick, onAlertesClick, onProfilClick (all callbacks). Render a bottom tab bar with four tabs: Explorer (icon: home or search), Réservations (icon: calendar), Alertes (icon: bell), Profil (icon: user). The active tab is highlighted in gold. Use flexShrink:0 and position relative (never position:fixed). Each tab calls the corresponding onClick handler. Style with Inter font, spacing, and color tokens from the design system."
+        }
+      ]
+    },
+    {
+      "id": "REQ-52",
+      "summary": "Define PROS_DEMO constant with exactly 6 demo pro entries in ExplorerScreen.tsx, used as fallback when canister data is unavailable",
+      "acceptanceCriteria": [
+        "PROS_DEMO constant contains exactly 6 entries with the exact data specified",
+        "All 6 Unsplash image URLs use the exact format with w=400&h=500&fit=crop&q=80",
+        "Demo pros are rendered when canister returns empty list or is unavailable",
+        "Demo pros are replaced by real data when canister responds with non-empty list",
+        "All 6 cards are visible on screen with names, categories, ratings, and prices"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/screens/client/ExplorerScreen.tsx",
+          "operation": "modify",
+          "description": "At the top of the file (before the component definition), define a constant PROS_DEMO with exactly 6 demo professional entries. Each entry must be an object with properties: id (string), prenom (string), nom (string), categorie (string), ville (string), note (number), nbAvis (number), prix (number), flash (boolean), reponsMin (number), image (string). The exact data: [{ id:'1', prenom:'Alexandre', nom:'Studio Blade', categorie:'Barber', ville:'Geneve', note:4.9, nbAvis:127, prix:35, flash:true, reponsMin:8, image:'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&h=500&fit=crop&q=80' }, { id:'2', prenom:'Karim', nom:'Karim Cuts', categorie:'Barber', ville:'Lausanne', note:4.8, nbAvis:89, prix:40, flash:true, reponsMin:12, image:'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400&h=500&fit=crop&q=80' }, { id:'3', prenom:'Elise', nom:'Elise Coiffure', categorie:'Coiffure', ville:'Geneve', note:4.9, nbAvis:203, prix:55, flash:false, reponsMin:25, image:'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=400&h=500&fit=crop&q=80' }, { id:'4', prenom:'Nadia', nom:'Nadia Beauty', categorie:'Esthetique', ville:'Lausanne', note:4.7, nbAvis:156, prix:70, flash:true, reponsMin:5, image:'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&h=500&fit=crop&q=80' }, { id:'5', prenom:'Marco', nom:'Zen by Marco', categorie:'Massage', ville:'Berne', note:4.8, nbAvis:94, prix:80, flash:false, reponsMin:30, image:'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&h=500&fit=crop&q=80' }, { id:'6', prenom:'Clara', nom:'Clara Nails', categorie:'Esthetique', ville:'Geneve', note:4.6, nbAvis:78, prix:40, flash:true, reponsMin:15, image:'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=500&fit=crop&q=80' }]. Use PROS_DEMO as the initial data source. If canister integration is present and returns a non-empty list, replace demo data with real data. If canister returns an empty list or throws an error, continue displaying PROS_DEMO."
+        }
+      ]
+    },
+    {
+      "id": "REQ-53",
+      "summary": "Add guard to FicheProScreen.tsx to redirect to explorer when selectedPro is null, and ensure back button calls go('explorer')",
+      "acceptanceCriteria": [
+        "FicheProScreen returns null and calls go('explorer') when state.selectedPro is null",
+        "FicheProScreen renders correctly when state.selectedPro is a valid object",
+        "Header back button calls go('explorer')",
+        "Pro name, category, cover image, services, and stats are rendered from state.selectedPro",
+        "Cover image has onError gradient fallback",
+        "Booking CTA calls go('booking_1')"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/screens/client/FicheProScreen.tsx",
+          "operation": "modify",
+          "description": "At the top of the component function (before any rendering logic), add a guard: if (!state.selectedPro) { useEffect(() => { go('explorer'); }, []); return null; }. Ensure the Header component's back button (or back icon) calls go('explorer'). Verify that all data fields (pro name, category, cover image, services, stats) are read from state.selectedPro. For the cover image <img>, add onError handler that either hides the image or shows a gradient fallback div. Ensure the booking CTA button calls go('booking_1')."
+        }
+      ]
+    }
+  ]
+}

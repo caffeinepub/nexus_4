@@ -1,0 +1,51 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-26T23:01:23.270Z",
+  "summary": "The diff implements all four requirements (REQ-49 through REQ-53) with strong coverage. useAppState.ts has the correct Screen union, initialState, and go() function. App.tsx has the exact 'explorer' case. ExplorerScreen.tsx has the PROS_DEMO array with all 6 entries and the required layout. FicheProScreen.tsx has the null guard. A few minor items in REQ-51 are uncertain due to truncation but appear largely implemented.",
+  "missing_requirements": [
+    {
+      "id": "REQ-51",
+      "requirement": "TabBarClient must be in natural flex flow, never position:fixed, with flexShrink:0",
+      "reason": "The ExplorerScreen.tsx diff is truncated and does not show the TabBarClient rendering section. Cannot confirm it is rendered in natural flex flow with flexShrink:0 and not position:fixed.",
+      "evidence": [
+        "frontend/src/screens/client/ExplorerScreen.tsx"
+      ]
+    },
+    {
+      "id": "REQ-51",
+      "requirement": "Filter pill labeled 'All' as first filter option",
+      "reason": "The FILTERS array in ExplorerScreen.tsx uses 'Tous' (French) rather than 'All' as the first filter label. The spec explicitly lists 'All / Flash / Barber / Coiffure / Esthetique / Massage'.",
+      "evidence": [
+        "frontend/src/screens/client/ExplorerScreen.tsx"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Booking1Screen, Booking2Screen, Booking3Screen, and Booking4Screen are fully implemented as separate screen files with complete multi-step booking flows",
+      "reason": "The build request lists adding new screens as a non-goal and the fix scope only covers ExplorerScreen, FicheProScreen, App.tsx, and useAppState.ts. The diff shows four fully implemented booking screens beyond the stated fix scope.",
+      "evidence": [
+        "frontend/src/screens/client/Booking1Screen.tsx",
+        "frontend/src/screens/client/Booking2Screen.tsx",
+        "frontend/src/screens/client/Booking3Screen.tsx",
+        "frontend/src/screens/client/Booking4Screen.tsx"
+      ]
+    }
+  ],
+  "confidence": 0.78,
+  "changed_files": [
+    "frontend-file-summaries.txt",
+    "frontend/src/App.tsx",
+    "frontend/src/components/NotifsPanel.tsx",
+    "frontend/src/components/Toast.tsx",
+    "frontend/src/screens/client/Booking1Screen.tsx",
+    "frontend/src/screens/client/Booking2Screen.tsx",
+    "frontend/src/screens/client/Booking3Screen.tsx",
+    "frontend/src/screens/client/Booking4Screen.tsx",
+    "frontend/src/screens/client/ExplorerScreen.tsx",
+    "frontend/src/screens/client/FicheProScreen.tsx",
+    "frontend/src/state/useAppState.ts",
+    "project_state.json"
+  ]
+}

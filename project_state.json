@@ -1,0 +1,641 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 13,
+  "summary": "NEXUS v8.0 — Marketplace beauté et bien-être Suisse romande. React 18 TypeScript strict, backend Motoko ICP mainnet, auth Internet Identity, paiement TWINT exclusif via Payrexx. Design system sombre avec palette gold/void, navigation useState uniquement, icônes SVG inline, zéro emoji, zéro Stripe, zéro React Router, zéro Tailwind. Layout mobile-first max-width 430px avec header absolu 56px, tab bar dans le flux flex, CTA ancré bas avec safe-area iOS.",
+  "architectural_notes": [
+    "Navigation par useState uniquement — zéro React Router",
+    "Paiement TWINT exclusif via Payrexx (psp[0]=twint) — zéro Stripe/Revolut",
+    "Auth Internet Identity ICP — createActor avec identity réelle, HOST ic0.app",
+    "Layout mobile : wrapper fixed inset-0, inner max-width 430px flex column, header absolu 56px, tab bar dans flux flex (jamais fixed), CTA flex-shrink-0 avec safe-area-inset-bottom",
+    "Fond gold #F2D06B → texte TOUJOURS #050507 sans exception",
+    "Icônes SVG inline uniquement — zéro emoji, zéro icône externe",
+    "Backend Motoko ICP mainnet : stable memory, preupgrade/postupgrade, heartbeat escrow 48h",
+    "Twilio OTP via Cloudflare Worker (VITE_WORKER_URL) — SMS réel +41",
+    "Zéro données simulées, zéro mode démo, zéro setTimeout fake paiements",
+    "Font unique Inter 300-900 — zéro autre police"
+  ],
+  "known_issues": [
+    "Les builds complets (50+ fichiers) dépassent la capacité du moteur — livraison par parties 1/4 nécessaire",
+    "Bug OTP/Rôle : screen initial démarre sur 'otp', cards RoleScreen noires (#000 au lieu de #0D0D13), onClick manquants sur cards, OTPScreen s'affiche prématurément — correction en cours (useAppState.ts, RoleScreen.tsx, OTPScreen.tsx, App.tsx)",
+    "Bug Explorer : écran inaccessible après OTP client — go('explorer') manquant, layout scroll cassé, tab bar fixed au lieu de flux flex, images sans fallback — correction en cours (useAppState.ts, ExplorerScreen.tsx, FicheProScreen.tsx, App.tsx)"
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-create-frontend-src-styles-globals-css-with-google-fonts-inter-import-weights-300-900-full-css-custom-property-palette-void-050507-d1-09090d-d2-0d0d13-d3-121219-d4-1c1c26-d5-2e2e3e-gold-f2d06b-gold2-d4a050-t1-f4f4f8-t2-9898b4-t3-54546c-flash-00d97a-alert-ff3d5a-blue-5b7fff-e1-rgba-255-255-255-0-04-e2-rgba-255-255-255-0-08-full-mobile-reset-input-textarea-height-52px-font-size-16px-button-active-transform-scale-0-97-transition-120ms-css-keyframe-animations-fadein-breathe-spin-slideup-slidedown-scalein-float-shimmer-fall-progressfill-scrollbar-hidden-globally-scrollbar-width-none-webkit-scrollbar-display-none-webkit-tap-highlight-color-transparent-user-select-none-on-interactive-elements",
+      "title": "Create frontend/src/styles/globals.css with: Google Fonts Inter import (weights 300–900); full CSS custom property palette (--void:#050507, --d1:#09090D, --d2:#0D0D13, --d3:#121219, --d4:#1C1C26, --d5:#2E2E3E, --gold:#F2D06B, --gold2:#D4A050, --t1:#F4F4F8, --t2:#9898B4, --t3:#54546C, --flash:#00D97A, --alert:#FF3D5A, --blue:#5B7FFF, --e1:rgba(255,255,255,0.04), --e2:rgba(255,255,255,0.08)); full mobile reset; input/textarea height 52px font-size 16px; button active transform scale(0.97) transition 120ms; CSS keyframe animations: fadeIn, breathe, spin, slideUp, slideDown, scaleIn, float, shimmer, fall, progressFill; scrollbar hidden globally (scrollbar-width:none, ::-webkit-scrollbar display:none); -webkit-tap-highlight-color transparent; user-select none on interactive elements.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-components-icons-index-tsx-exporting-35-svg-icon-components-iconflash-iconsearch-iconcheck-iconx-iconbell-iconradar-iconwallet-icongrid-iconedit-iconstar-iconlock-iconarrowright-iconarrowleft-iconarrowdown-iconarrowup-iconcalendar-iconuser-iconcamera-iconphone-iconbank-iconhome-iconshield-iconclock-iconmappin-iconrefresh-iconlogout-iconplus-icontrash-iconmessage-iconeye-iconsettings-iconchevronright-iconbuilding-iconhouse-iconloader-icontoggle-icontwint-each-component-accepts-props-size-number-default-24-color-string-default-currentcolor-style-cssproperties-optional-all-svgs-use-stroke-currentcolor-strokewidth-1-5-fill-none-strokelinecap-round-strokelinejoin-round-no-emoji-anywhere-icontwint-renders-the-twint-logo-as-an-svg-shape",
+      "title": "Create frontend/src/components/icons/index.tsx exporting 35 SVG icon components: IconFlash, IconSearch, IconCheck, IconX, IconBell, IconRadar, IconWallet, IconGrid, IconEdit, IconStar, IconLock, IconArrowRight, IconArrowLeft, IconArrowDown, IconArrowUp, IconCalendar, IconUser, IconCamera, IconPhone, IconBank, IconHome, IconShield, IconClock, IconMapPin, IconRefresh, IconLogout, IconPlus, IconTrash, IconMessage, IconEye, IconSettings, IconChevronRight, IconBuilding, IconHouse, IconLoader, IconToggle, IconTwint. Each component accepts props: size (number, default 24), color (string, default 'currentColor'), style (CSSProperties optional). All SVGs use stroke=currentColor, strokeWidth=1.5, fill=none, strokeLinecap=round, strokeLinejoin=round. No emoji anywhere. IconTwint renders the TWINT logo as an SVG shape.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-state-useappstate-ts-defining-1-a-screen-union-type-covering-all-routes-login-role-otp-explorer-fiche-pro-booking-1-booking-2-booking-3-booking-4-booking-5-live-status-client-reservations-client-alertes-client-profil-pro-dashboard-pro-radar-pro-wallet-pro-business-pro-subscription-pro-success-admin-login-admin-dashboard-admin-pros-admin-bookings-admin-revenus-notifs-panel-2-a-globalstate-interface-with-fields-screen-prevscreen-role-client-pro-admin-null-protab-businesstab-clienttab-isauthenticated-boolean-principal-string-null-userphone-useremail-username-proactif-boolean-prodata-full-object-with-id-name-categorie-services-rating-reviewcount-bio-photos-disponibilites-adresse-ville-actif-subscriptionactive-subscriptionexpiry-solde-number-sequestre-number-virementat-string-null-selectedpro-object-null-selectedservice-object-null-bookingdata-object-with-proid-serviceid-date-heure-montant-status-bookingid-notifications-array-notifsopen-boolean-loading-boolean-loadingmsg-string-toasts-array-with-id-msg-type-modalopen-boolean-serviceeditoropen-boolean-editingservice-object-null-adminauthenticated-boolean-3-a-useappstate-hook-returning-state-plus-actions-go-screen-screen-to-navigate-while-saving-prevscreen-update-partial-partial-globalstate-helper-showtoast-msg-string-type-success-error-info-sms-duration-number-that-auto-removes-after-duration-removetoast-id-string",
+      "title": "Create frontend/src/state/useAppState.ts defining: (1) a Screen union type covering all routes: login, role, otp, explorer, fiche_pro, booking_1, booking_2, booking_3, booking_4, booking_5, live_status, client_reservations, client_alertes, client_profil, pro_dashboard, pro_radar, pro_wallet, pro_business, pro_subscription, pro_success, admin_login, admin_dashboard, admin_pros, admin_bookings, admin_revenus, notifs_panel; (2) a GlobalState interface with fields: screen, prevScreen, role (client|pro|admin|null), proTab, businessTab, clientTab, isAuthenticated (boolean), principal (string|null), userPhone, userEmail, userName, proActif (boolean), proData (full object with id, name, categorie, services[], rating, reviewCount, bio, photos[], disponibilites, adresse, ville, actif, subscriptionActive, subscriptionExpiry), solde (number), sequestre (number), virementAt (string|null), selectedPro (object|null), selectedService (object|null), bookingData (object with proId, serviceId, date, heure, montant, status, bookingId), notifications (array), notifsOpen (boolean), loading (boolean), loadingMsg (string), toasts (array with id/msg/type), modalOpen (boolean), serviceEditorOpen (boolean), editingService (object|null), adminAuthenticated (boolean); (3) a useAppState() hook returning state plus actions: go(screen: Screen) to navigate while saving prevScreen, update(partial: Partial<GlobalState>) helper, showToast(msg: string, type: 'success'|'error'|'info'|'sms', duration?: number) that auto-removes after duration, removeToast(id: string).",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-lib-actor-ts-providing-internet-identity-authentication-utilities-using-dfinity-auth-client-and-dfinity-agent-export-login-that-opens-ii-popup-and-resolves-on-authentication-logout-that-clears-the-auth-session-isauthenticated-returning-boolean-createactor-canisterid-string-idlfactory-any-returning-an-authenticated-actor-instance-getidentity-returning-the-current-identity-getprincipal-returning-the-principal-as-a-string-the-ic-host-must-be-set-to-https-ic0-app-for-production-no-mock-or-demo-fallbacks",
+      "title": "Create frontend/src/lib/actor.ts providing Internet Identity authentication utilities using @dfinity/auth-client and @dfinity/agent. Export: login() that opens II popup and resolves on authentication; logout() that clears the auth session; isAuthenticated() returning boolean; createActor(canisterId: string, idlFactory: any) returning an authenticated actor instance; getIdentity() returning the current Identity; getPrincipal() returning the Principal as a string. The IC host must be set to https://ic0.app for production. No mock or demo fallbacks.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-lib-payrexx-ts-exporting-two-url-builder-functions-for-payrexx-twint-payments-createsubscriptionurl-proid-string-email-string-phone-string-string-builds-a-payrexx-subscription-payment-link-with-psp-0-twint-the-pro-s-email-and-phone-pre-filled-referencing-the-instance-from-vite-payrexx-instance-and-using-vite-payrexx-secret-for-hmac-signing-if-required-createbookingurl-bookingid-string-montant-number-servicename-string-email-string-string-builds-a-payrexx-one-time-payment-link-for-a-booking-with-psp-0-twint-the-amount-service-name-and-email-pre-filled-both-functions-use-only-twint-as-psp-no-stripe-no-revolut-no-other-payment-provider-environment-variables-are-read-from-import-meta-env-vite-payrexx-instance-and-import-meta-env-vite-payrexx-secret",
+      "title": "Create frontend/src/lib/payrexx.ts exporting two URL builder functions for Payrexx TWINT payments. createSubscriptionUrl(proId: string, email: string, phone: string): string builds a Payrexx subscription payment link with psp[0]=twint, the pro's email and phone pre-filled, referencing the instance from VITE_PAYREXX_INSTANCE and using VITE_PAYREXX_SECRET for HMAC signing if required. createBookingUrl(bookingId: string, montant: number, serviceName: string, email: string): string builds a Payrexx one-time payment link for a booking with psp[0]=twint, the amount, service name, and email pre-filled. Both functions use only TWINT as PSP — no Stripe, no Revolut, no other payment provider. Environment variables are read from import.meta.env.VITE_PAYREXX_INSTANCE and import.meta.env.VITE_PAYREXX_SECRET.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-auth-loginscreen-tsx-layout-fixed-inset-0-no-header-background-var-void-four-animated-blur-orbs-positioned-absolutely-with-float-keyframe-animation-vertically-centered-content-nexus-inter-900-64px-var-t1-with-in-var-blue-tracking-4px-tagline-l-excellence-a-votre-porte-inter-300-16px-var-t3-italic-gold-gradient-divider-48px-wide-btnprimary-se-connecter-with-iconlock-calls-authclient-login-from-frontend-src-lib-actor-ts-on-click-then-calls-go-role-security-subtext-var-t3-below-button-legal-links-absolutely-positioned-at-bottom-of-page-zero-emoji",
+      "title": "Create frontend/src/screens/auth/LoginScreen.tsx. Layout: fixed inset-0, no header, background var(--void). Four animated blur orbs positioned absolutely with float keyframe animation. Vertically centered content: 'NEXUS' Inter 900 64px var(--t1) with '.' in var(--blue) tracking -4px; tagline 'L'excellence a votre porte' Inter 300 16px var(--t3) italic; gold gradient divider 48px wide. BtnPrimary 'SE CONNECTER' with IconLock, calls authClient.login() from frontend/src/lib/actor.ts on click then calls go('role'). Security subtext var(--t3) below button. Legal links absolutely positioned at bottom of page. Zero emoji.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-auth-rolescreen-tsx-layout-fixed-inset-0-flex-flex-col-header-showing-logo-only-no-back-button-two-role-cards-minimum-height-100px-with-tap-active-border-effect-client-card-icon-in-var-blue-label-i-am-a-client-subtitle-book-an-expert-at-home-tap-activates-border-var-blue-calls-update-role-client-and-go-otp-pro-card-icon-in-var-gold-label-i-am-a-professional-subtitle-deploy-your-beauty-activity-tap-activates-border-var-gold-calls-update-role-pro-and-go-otp-below-cards-link-administration-access-inter-var-t3-that-calls-go-admin-login-zero-emoji",
+      "title": "Create frontend/src/screens/auth/RoleScreen.tsx. Layout: fixed inset-0 flex flex-col, header showing logo only (no back button). Two role cards minimum height 100px with tap/active border effect: CLIENT card — icon in var(--blue), label 'I am a client', subtitle 'Book an expert at home', tap activates border var(--blue), calls update({role:'client'}) and go('otp'); PRO card — icon in var(--gold), label 'I am a professional', subtitle 'Deploy your beauty activity', tap activates border var(--gold), calls update({role:'pro'}) and go('otp'). Below cards: link 'Administration access' Inter var(--t3) that calls go('admin_login'). Zero emoji.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-auth-otpscreen-tsx-layout-fixed-inset-0-flex-flex-col-header-with-back-arrow-navigating-to-role-scroll-zone-with-padding-top-72px-phone-input-with-41-prefix-and-validation-send-code-button-calls-a-sendotp-function-via-cloudflare-worker-twilio-stub-in-frontend-src-lib-twilio-ts-if-it-exists-otherwise-a-canister-call-four-separate-digit-inputs-each-64px-wide-72px-tall-spaced-apart-auto-advance-on-input-and-backspace-navigation-on-completion-calls-verifyotp-success-navigates-to-explorer-if-role-client-or-pro-dashboard-if-role-pro-error-displays-message-in-var-alert-resend-button-with-60-second-cooldown-countdown-zero-emoji",
+      "title": "Create frontend/src/screens/auth/OTPScreen.tsx. Layout: fixed inset-0 flex flex-col, header with back arrow navigating to 'role', scroll zone with padding-top 72px. Phone input with +41 prefix and validation. 'Send code' button calls a sendOTP() function (via Cloudflare Worker / Twilio stub in frontend/src/lib/twilio.ts if it exists, otherwise a canister call). Four separate digit inputs each 64px wide 72px tall, spaced apart, auto-advance on input and backspace navigation. On completion calls verifyOTP(); success navigates to 'explorer' if role==='client' or 'pro_dashboard' if role==='pro'; error displays message in var(--alert). Resend button with 60-second cooldown countdown. Zero emoji.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-client-explorerscreen-tsx-layout-fixed-inset-0-flex-flex-col-header-uses-header-component-with-role-client-notifscount-from-state-scroll-zone-flex-1-overflow-y-auto-padding-top-72px-hero-section-with-background-gradient-rgba-91-127-255-0-04-find-your-expert-inter-900-36px-rotating-subtitle-cycling-4-phrases-every-3s-search-bar-58px-height-iconsearch-var-gold-text-input-city-pill-filter-pills-horizontal-scroll-tous-flash-barber-coiffure-esthetique-massage-active-pill-has-gradient-gold-background-and-text-var-void-section-available-now-horizontal-scroll-cards-168x228px-unsplash-image-format-https-images-unsplash-com-id-w-400-h-500-fit-crop-q-80-with-onerror-gradient-fallback-always-disponible-badge-var-flash-with-breathe-animation-rating-blur-bg-top-right-name-category-responds-in-xmin-section-experts-for-you-vertical-rows-80px-avatar-name-category-rating-from-x-chf-in-var-gold-clicking-any-pro-sets-selectedpro-and-navigates-to-fiche-pro-tabbarclient-anchored-at-bottom-with-active-explorer-unsplash-ids-photo-1503951914875-452162b0f3f1-photo-1599351431202-1e0f0137899a-photo-1621605815971-fbc98d665033-photo-1562322140-8baeececf3df-photo-1605497788044-5a32c7078486-photo-1570172619644-dfd03ed5d881-photo-1604654894610-df63bc536371-photo-1544161515-4ab6ce6db874-zero-emoji",
+      "title": "Create frontend/src/screens/client/ExplorerScreen.tsx. Layout: fixed inset-0 flex flex-col. Header uses Header component with role='client', notifsCount from state. Scroll zone flex-1 overflow-y-auto padding-top 72px. Hero section with background gradient rgba(91,127,255,0.04): 'Find your expert' Inter 900 36px, rotating subtitle cycling 4 phrases every 3s. Search bar 58px height: IconSearch var(--gold), text input, city pill. Filter pills horizontal scroll: Tous/Flash/Barber/Coiffure/Esthetique/Massage — active pill has gradient gold background and text var(--void). Section 'Available now': horizontal scroll cards 168x228px — Unsplash image (format https://images.unsplash.com/[ID]?w=400&h=500&fit=crop&q=80) with onError gradient fallback always, 'Disponible' badge var(--flash) with breathe animation, rating blur-bg top-right, name + category + 'Responds in Xmin'. Section 'EXPERTS FOR YOU': vertical rows 80px — avatar + name/category/rating + 'from X CHF' in var(--gold). Clicking any pro sets selectedPro and navigates to 'fiche_pro'. TabBarClient anchored at bottom with active='explorer'. Unsplash IDs: photo-1503951914875-452162b0f3f1, photo-1599351431202-1e0f0137899a, photo-1621605815971-fbc98d665033, photo-1562322140-8baeececf3df, photo-1605497788044-5a32c7078486, photo-1570172619644-dfd03ed5d881, photo-1604654894610-df63bc536371, photo-1544161515-4ab6ce6db874. Zero emoji.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-client-ficheproscreen-tsx-layout-fixed-inset-0-flex-flex-col-header-with-back-arrow-to-explorer-scroll-zone-flex-1-overflow-y-auto-with-padding-top-56px-no-extra-padding-cover-starts-at-top-under-header-cover-image-270px-height-with-gradient-overlay-unsplash-with-onerror-gradient-fallback-avatar-92px-diameter-gold-border-offset-46px-from-cover-bottom-edge-pro-name-inter-800-26px-slogan-italic-var-t3-stats-bar-3-columns-with-count-up-animation-bookings-rating-reviews-services-horizontal-scroll-each-service-card-tap-gives-gold-border-sets-selectedservice-2x2-photo-gallery-client-reviews-section-sticky-cta-at-bottom-btnprimary-book-x-chf-gradient-gold-calls-go-booking-1-zero-emoji",
+      "title": "Create frontend/src/screens/client/FicheProScreen.tsx. Layout: fixed inset-0 flex flex-col. Header with back arrow to 'explorer'. Scroll zone flex-1 overflow-y-auto with padding-top 56px (no extra padding, cover starts at top under header). Cover image 270px height with gradient overlay (Unsplash with onError gradient fallback). Avatar 92px diameter, gold border, offset -46px from cover bottom edge. Pro name Inter 800 26px, slogan italic var(--t3). Stats bar 3 columns with count-up animation (bookings, rating, reviews). Services horizontal scroll: each service card, tap gives gold border, sets selectedService. 2x2 photo gallery. Client reviews section. Sticky CTA at bottom: BtnPrimary 'Book — X CHF' gradient gold, calls go('booking_1'). Zero emoji.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-client-booking1screen-tsx-through-booking5screen-tsx-5-files-all-share-layout-fixed-inset-0-flex-flex-col-header-with-back-arrow-and-title-step-x-of-5-progress-indicator-with-4-nodes-scroll-zone-flex-1-overflow-y-auto-padding-top-72px-btnprimary-continue-gold-flex-shrink-0-anchored-at-bottom-booking1-service-selection-cards-tapped-card-gets-gold-border-stores-selection-in-bookingdata-booking2-time-slot-grid-tapped-slot-gets-gold-border-flash-slots-labeled-now-flash-in-var-flash-booking3-phone-input-address-input-city-input-optional-note-textarea-all-validated-before-continue-enabled-booking4-full-booking-recap-service-slot-address-price-cta-changes-to-confirm-and-pay-via-twint-clicking-calls-createbookingurl-from-frontend-src-lib-payrexx-ts-and-redirects-via-window-location-href-booking5-animated-svg-hourglass-text-the-expert-has-30-minutes-to-confirm-polls-canister-every-10-seconds-for-booking-status-on-confirmation-navigates-to-live-status-zero-emoji-zero-stripe",
+      "title": "Create frontend/src/screens/client/Booking1Screen.tsx through Booking5Screen.tsx (5 files). All share: layout fixed inset-0 flex flex-col, Header with back arrow and title 'Step X of 5', progress indicator with 4 nodes, scroll zone flex-1 overflow-y-auto padding-top 72px, BtnPrimary 'Continue' gold flex-shrink-0 anchored at bottom. Booking1: service selection cards, tapped card gets gold border, stores selection in bookingData. Booking2: time slot grid, tapped slot gets gold border; flash slots labeled 'Now · Flash' in var(--flash). Booking3: phone input, address input, city input, optional note textarea; all validated before Continue enabled. Booking4: full booking recap (service, slot, address, price); CTA changes to 'Confirm and pay via TWINT', clicking calls createBookingUrl() from frontend/src/lib/payrexx.ts and redirects via window.location.href. Booking5: animated SVG hourglass, text 'The expert has 30 minutes to confirm', polls canister every 10 seconds for booking status; on confirmation navigates to 'live_status'. Zero emoji, zero Stripe.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-pro-prodashboardscreen-tsx-layout-fixed-inset-0-flex-flex-col-header-component-with-role-pro-onswitchrole-navigating-to-role-notifscount-from-state-onnotifs-opening-notifs-panel-scroll-zone-flex-1-overflow-y-auto-padding-top-72px-greeting-hello-firstname-inter-800-30px-var-t1-trial-badge-small-dot-var-flash-with-label-trial-active-inter-600-12px-three-metric-cards-in-a-row-with-count-up-animation-bookings-this-month-average-rating-total-earned-chf-flash-toggle-card-animated-toggle-switch-when-active-shows-flash-mode-on-with-var-flash-glow-border-and-breathe-animation-on-the-dot-indicator-calls-canister-updateprostatus-next-appointment-card-shows-next-upcoming-booking-service-name-client-date-time-or-empty-state-if-none-tabbarpro-at-bottom-flex-shrink-0-with-active-dashboard-zero-emoji-all-gold-backgrounds-use-text-color-050507",
+      "title": "Create frontend/src/screens/pro/ProDashboardScreen.tsx. Layout: fixed inset-0 flex flex-col. Header component with role='pro', onSwitchRole navigating to 'role', notifsCount from state, onNotifs opening notifs panel. Scroll zone flex-1 overflow-y-auto padding-top 72px. Greeting 'Hello [FirstName]' Inter 800 30px var(--t1). Trial badge: small dot var(--flash) with label 'Trial active' Inter 600 12px. Three metric cards in a row with count-up animation: Bookings this month, Average rating, Total earned (CHF). Flash toggle card: animated toggle switch; when active shows 'Flash mode ON' with var(--flash) glow border and breathe animation on the dot indicator; calls canister updateProStatus(). Next appointment card: shows next upcoming booking (service name, client, date/time), or empty state if none. TabBarPro at bottom (flex-shrink-0) with active='dashboard'. Zero emoji. All gold backgrounds use text color #050507.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-pro-proradarscreen-tsx-layout-fixed-inset-0-flex-flex-col-title-radar-inter-900-40px-var-t1-in-the-scroll-header-area-padding-top-72px-three-tabs-pending-confirmed-history-each-tab-fetches-bookings-from-canister-via-getprobookings-pending-tab-shows-booking-request-cards-service-name-amount-in-var-gold-countdown-timer-using-setinterval-every-1-second-showing-time-remaining-when-remaining-time-2-minutes-countdown-color-switches-to-var-alert-with-breathe-animation-each-card-has-two-buttons-decline-dark-background-calls-cancelbooking-canister-and-accept-gold-gradient-background-text-050507-calls-confirmbooking-canister-confirmed-and-history-tabs-show-booking-cards-with-colored-status-badges-tabbarpro-at-bottom-with-active-radar-zero-emoji",
+      "title": "Create frontend/src/screens/pro/ProRadarScreen.tsx. Layout: fixed inset-0 flex flex-col. Title 'Radar' Inter 900 40px var(--t1) in the scroll header area, padding-top 72px. Three tabs: 'Pending' / 'Confirmed' / 'History'. Each tab fetches bookings from canister via getProBookings(). Pending tab shows booking request cards: service name + amount in var(--gold), countdown timer using setInterval every 1 second showing time remaining; when remaining time < 2 minutes, countdown color switches to var(--alert) with breathe animation. Each card has two buttons: 'Decline' (dark background, calls cancelBooking() canister) and 'Accept' (gold gradient background, text #050507, calls confirmBooking() canister). Confirmed and History tabs show booking cards with colored status badges. TabBarPro at bottom with active='radar'. Zero emoji.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-pro-prowalletscreen-tsx-layout-fixed-inset-0-flex-flex-col-scroll-zone-flex-1-overflow-y-auto-padding-top-72px-balance-card-with-shimmer-gradient-animation-using-shimmer-keyframe-from-globals-css-balance-amount-inter-900-52px-var-t1-below-it-in-escrow-x-chf-and-release-in-48h-in-var-t3-transfer-button-gold-gradient-text-050507-if-virement-is-available-greyed-out-background-var-d4-text-var-t3-during-cooldown-cooldown-countdown-uses-setinterval-every-1-second-displaying-remaining-time-until-next-transfer-is-available-derived-from-state-virementat-revenue-bars-section-7-animated-vertical-bars-representing-the-last-7-days-of-revenue-bars-animate-height-from-0-to-their-value-on-mount-using-css-transition-transaction-list-each-transaction-row-shows-date-description-amount-color-coded-by-type-booking-var-blue-subscription-var-gold-refund-var-alert-virement-var-flash-tabbarpro-at-bottom-with-active-wallet-zero-emoji",
+      "title": "Create frontend/src/screens/pro/ProWalletScreen.tsx. Layout: fixed inset-0 flex flex-col. Scroll zone flex-1 overflow-y-auto padding-top 72px. Balance card with shimmer gradient animation (using shimmer keyframe from globals.css): balance amount Inter 900 52px var(--t1); below it, 'In escrow: X CHF' and 'Release in 48h' in var(--t3). Transfer button: gold gradient (text #050507) if virement is available; greyed out (background var(--d4), text var(--t3)) during cooldown. Cooldown countdown uses setInterval every 1 second, displaying remaining time until next transfer is available (derived from state.virementAt). Revenue bars section: 7 animated vertical bars representing the last 7 days of revenue; bars animate height from 0 to their value on mount using CSS transition. Transaction list: each transaction row shows date, description, amount; color-coded by type (booking=var(--blue), subscription=var(--gold), refund=var(--alert), virement=var(--flash)). TabBarPro at bottom with active='wallet'. Zero emoji.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-pro-tabs-tabprofil-tsx-as-a-react-component-not-a-screen-used-inside-probusinessscreen-fields-first-name-required-last-name-required-slogan-bio-textarea-max-200-chars-with-character-counter-category-selection-2x2-grid-of-cards-barber-coiffure-esthetique-massage-tapping-a-card-gives-it-a-gold-border-and-stores-the-selection-work-location-3-cards-labeled-home-visit-salon-both-selecting-home-visit-reveals-a-range-slider-for-km-radius-selecting-salon-reveals-an-address-text-input-selecting-both-reveals-both-city-dropdown-with-exactly-12-swiss-romand-cities-geneva-lausanne-fribourg-neuchatel-sion-sierre-monthey-yverdon-morges-nyon-vevey-montreux-all-inputs-styled-per-globals-css-height-52px-font-size-16px-zero-emoji-gold-backgrounds-use-text-050507",
+      "title": "Create frontend/src/screens/pro/tabs/TabProfil.tsx as a React component (not a screen) used inside ProBusinessScreen. Fields: First Name (required), Last Name (required), Slogan, Bio (textarea max 200 chars with character counter). Category selection: 2x2 grid of cards (Barber, Coiffure, Esthetique, Massage); tapping a card gives it a gold border and stores the selection. Work location: 3 cards labeled 'Home visit', 'Salon', 'Both'; selecting 'Home visit' reveals a range slider for km radius; selecting 'Salon' reveals an address text input; selecting 'Both' reveals both. City dropdown with exactly 12 Swiss Romand cities: Geneva, Lausanne, Fribourg, Neuchatel, Sion, Sierre, Monthey, Yverdon, Morges, Nyon, Vevey, Montreux. All inputs styled per globals.css (height 52px, font-size 16px). Zero emoji. Gold backgrounds use text #050507.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-pro-tabs-tabservices-tsx-as-a-react-component-used-inside-probusinessscreen-top-action-add-service-button-with-dashed-gold-border-tapping-opens-serviceeditor-sets-state-serviceeditoropen-true-state-editingservice-null-service-list-below-each-service-row-shows-name-price-chf-duration-min-active-inactive-toggle-edit-button-opens-serviceeditor-with-that-service-delete-button-with-confirmation-services-are-draggable-to-reorder-css-only-drag-approach-or-simple-up-down-arrows-on-first-render-if-the-pro-s-category-is-set-and-no-services-exist-pre-populate-with-5-default-services-per-category-barber-haircut-25chf-30min-beard-trim-15chf-20min-hair-beard-35chf-45min-shave-20chf-25min-kids-cut-20chf-25min-coiffure-blow-dry-40chf-45min-color-80chf-90min-cut-dry-55chf-60min-highlights-100chf-120min-treatment-35chf-30min-esthetique-facial-60chf-60min-eyebrow-shaping-25chf-20min-waxing-40chf-45min-eyelash-tint-30chf-30min-peeling-70chf-60min-massage-swedish-70chf-60min-deep-tissue-80chf-60min-sports-75chf-60min-relaxation-65chf-45min-hot-stone-90chf-75min-zero-emoji",
+      "title": "Create frontend/src/screens/pro/tabs/TabServices.tsx as a React component used inside ProBusinessScreen. Top action: '+ Add service' button with dashed gold border; tapping opens ServiceEditor (sets state.serviceEditorOpen=true, state.editingService=null). Service list below: each service row shows name, price (CHF), duration (min), active/inactive toggle, edit button (opens ServiceEditor with that service), delete button (with confirmation). Services are draggable to reorder (CSS-only drag approach or simple up/down arrows). On first render, if the pro's category is set and no services exist, pre-populate with 5 default services per category: Barber (Haircut 25CHF 30min, Beard trim 15CHF 20min, Hair+Beard 35CHF 45min, Shave 20CHF 25min, Kids cut 20CHF 25min), Coiffure (Blow-dry 40CHF 45min, Color 80CHF 90min, Cut+dry 55CHF 60min, Highlights 100CHF 120min, Treatment 35CHF 30min), Esthetique (Facial 60CHF 60min, Eyebrow shaping 25CHF 20min, Waxing 40CHF 45min, Eyelash tint 30CHF 30min, Peeling 70CHF 60min), Massage (Swedish 70CHF 60min, Deep tissue 80CHF 60min, Sports 75CHF 60min, Relaxation 65CHF 45min, Hot stone 90CHF 75min). Zero emoji.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-pro-tabs-serviceeditor-tsx-as-a-bottomsheet-component-using-the-existing-bottomsheet-ui-component-fields-name-text-required-price-stepper-chf-increment-decrement-buttons-min-0-step-5-duration-stepper-minutes-increment-decrement-min-15-step-15-description-textarea-badge-pills-single-select-from-flash-popular-new-premium-promo-mode-three-pill-buttons-home-visit-salon-both-footer-cancel-button-dark-calls-onclose-and-save-button-gold-gradient-text-050507-save-calls-createservice-canister-if-new-service-or-updateservice-canister-if-editing-existing-receive-props-open-boolean-onclose-void-service-object-null-for-new-vs-edit-onsaved-service-object-void-zero-emoji",
+      "title": "Create frontend/src/screens/pro/tabs/ServiceEditor.tsx as a BottomSheet component (using the existing BottomSheet UI component). Fields: Name (text, required); Price stepper (CHF, increment/decrement buttons, min 0, step 5); Duration stepper (minutes, increment/decrement, min 15, step 15); Description (textarea); Badge pills (single-select from: Flash, Popular, New, Premium, Promo); Mode (three pill buttons: 'Home visit', 'Salon', 'Both'). Footer: 'Cancel' button (dark, calls onClose) and 'Save' button (gold gradient, text #050507); Save calls createService() canister if new service or updateService() canister if editing existing. Receive props: open (boolean), onClose (() => void), service (object|null for new vs edit), onSaved ((service: object) => void). Zero emoji.",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-pro-tabs-tabtarifs-tsx-as-a-react-component-used-inside-probusinessscreen-day-availability-7-day-pills-mon-sun-that-are-multi-selectable-each-selected-day-reveals-start-time-and-end-time-inputs-text-or-time-input-flash-mode-toggle-when-enabled-reveals-a-chf-supplement-stepper-how-much-extra-is-charged-for-flash-bookings-minimum-notice-5-single-select-pills-immediate-30min-1h-2h-4h-cancellation-policy-3-single-select-pills-flexible-free-cancellation-moderate-50-if-24h-strict-no-refund-if-48h-all-selections-stored-in-component-state-and-passed-up-via-an-onchange-prop-zero-emoji",
+      "title": "Create frontend/src/screens/pro/tabs/TabTarifs.tsx as a React component used inside ProBusinessScreen. Day availability: 7 day pills (Mon–Sun) that are multi-selectable; each selected day reveals start time and end time inputs (text or time input). Flash mode toggle: when enabled, reveals a CHF supplement stepper (how much extra is charged for flash bookings). Minimum notice: 5 single-select pills (Immediate, 30min, 1h, 2h, 4h). Cancellation policy: 3 single-select pills (Flexible — free cancellation, Moderate — 50% if <24h, Strict — no refund if <48h). All selections stored in component state and passed up via an onChange prop. Zero emoji.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-pro-tabs-tabpaiement-tsx-as-a-react-component-used-inside-probusinessscreen-twint-card-background-with-var-flash-tint-rgba-0-217-122-0-06-phone-number-input-with-41-prefix-validates-swiss-mobile-format-when-valid-card-border-changes-to-var-flash-iban-card-background-with-var-gold-tint-rgba-242-208-107-0-06-text-input-that-auto-formats-to-ch-xx-xxxx-xxxx-xxxx-xxxx-x-format-as-the-user-types-when-valid-starts-with-ch-correct-length-card-border-changes-to-var-flash-financial-summary-section-4-line-recap-showing-commission-nexus-15-net-earnings-per-booking-example-monthly-subscription-cost-19-90-chf-and-estimated-monthly-net-zero-emoji-gold-backgrounds-use-text-050507",
+      "title": "Create frontend/src/screens/pro/tabs/TabPaiement.tsx as a React component used inside ProBusinessScreen. TWINT card: background with var(--flash) tint (rgba(0,217,122,0.06)); phone number input with +41 prefix; validates Swiss mobile format; when valid, card border changes to var(--flash). IBAN card: background with var(--gold) tint (rgba(242,208,107,0.06)); text input that auto-formats to CH XX XXXX XXXX XXXX XXXX X format as the user types; when valid (starts with CH, correct length), card border changes to var(--flash). Financial summary section: 4-line recap showing Commission NEXUS (15%), Net earnings per booking example, Monthly subscription cost (19.90 CHF), and Estimated monthly net. Zero emoji. Gold backgrounds use text #050507.",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-pro-tabs-tabgalerie-tsx-as-a-react-component-used-inside-probusinessscreen-photo-counter-x-4-with-a-gold-progress-bar-width-proportional-to-count-4-warning-message-3-photos-minimum-in-var-alert-shown-when-photo-count-3-tips-section-4-short-photography-advice-tips-good-lighting-neutral-background-professional-appearance-sharp-focus-2x2-photo-grid-empty-slots-show-dashed-border-with-a-icon-filled-slots-show-the-image-preview-with-a-delete-button-overlay-slot-1-has-a-cover-badge-overlay-tapping-an-empty-slot-triggers-a-file-input-selected-file-is-read-via-filereader-and-uploaded-to-the-canister-uploadprophoto-call-on-success-the-photo-url-is-added-to-prodata-photos-mini-explorer-preview-card-at-the-bottom-showing-how-the-pro-profile-card-would-look-in-the-explorer-screen-name-category-first-photo-as-background-rating-zero-emoji",
+      "title": "Create frontend/src/screens/pro/tabs/TabGalerie.tsx as a React component used inside ProBusinessScreen. Photo counter X/4 with a gold progress bar (width proportional to count/4). Warning message '3 photos minimum' in var(--alert) shown when photo count < 3. Tips section: 4 short photography advice tips (good lighting, neutral background, professional appearance, sharp focus). 2x2 photo grid: empty slots show dashed border with a '+' icon; filled slots show the image preview with a delete button overlay. Slot 1 has a 'Cover' badge overlay. Tapping an empty slot triggers a file input; selected file is read via FileReader and uploaded to the canister (uploadProPhoto() call); on success the photo URL is added to proData.photos. Mini Explorer preview card at the bottom showing how the pro profile card would look in the Explorer screen (name, category, first photo as background, rating). Zero emoji.",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-pro-probusinessscreen-tsx-layout-position-fixed-inset-0-flex-flex-col-header-component-positioned-absolute-top-0-height-56px-z-index-100-title-and-tab-zone-flex-shrink-0-padding-top-72px-padding-bottom-0-progresscircle-component-showing-overall-profile-completion-percentage-5-segment-progress-bar-one-segment-per-tab-five-tab-pills-profile-services-schedule-payment-gallery-scroll-zone-flex-1-overflow-y-auto-padding-20px-20px-0-renders-the-active-tab-component-tabprofil-tabservices-tabtarifs-tabpaiement-tabgalerie-cta-zone-flex-shrink-0-padding-12px-16px-for-tabs-1-4-btnprimary-save-and-continue-that-advances-to-next-tab-and-saves-data-for-tab-5-gallery-when-completion-80-btnprimary-activate-my-profile-gold-gradient-text-050507-calls-go-pro-subscription-for-tab-5-when-completion-80-btnprimary-disabled-greyed-out-activate-my-profile-tabbarpro-flex-shrink-0-at-bottom-with-active-business-serviceeditor-rendered-as-overlay-when-state-serviceeditoropen-is-true-zero-emoji",
+      "title": "Create frontend/src/screens/pro/ProBusinessScreen.tsx. Layout: position fixed inset-0 flex flex-col. Header component positioned absolute top-0, height 56px, z-index 100. Title and tab zone (flex-shrink-0, padding-top 72px, padding-bottom 0): ProgressCircle component showing overall profile completion percentage; 5-segment progress bar (one segment per tab); five tab pills: 'Profile' / 'Services' / 'Schedule' / 'Payment' / 'Gallery'. Scroll zone: flex-1 overflow-y-auto, padding 20px 20px 0; renders the active tab component (TabProfil, TabServices, TabTarifs, TabPaiement, TabGalerie). CTA zone (flex-shrink-0, padding 12px 16px): for tabs 1-4, BtnPrimary 'Save and continue' that advances to next tab and saves data; for tab 5 (Gallery) when completion >= 80%, BtnPrimary 'Activate my profile' gold gradient text #050507 calls go('pro_subscription'); for tab 5 when completion < 80%, BtnPrimary disabled greyed out 'Activate my profile'. TabBarPro flex-shrink-0 at bottom with active='business'. ServiceEditor rendered as overlay when state.serviceEditorOpen is true. Zero emoji.",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-pro-subscriptionmodal-tsx-as-a-screen-not-a-floating-modal-that-renders-in-the-main-screen-slot-when-state-screen-pro-subscription-use-bottomsheet-component-internally-or-implement-a-full-screen-bottom-anchored-layout-content-5-benefit-rows-each-with-a-gold-svg-checkmark-and-a-benefit-label-unlimited-bookings-twint-payments-flash-mode-pro-dashboard-analytics-priority-support-title-7-days-free-inter-900-var-t1-subtitle-then-19-90-chf-month-inter-400-var-t3-btnprimary-start-for-free-gold-gradient-text-050507-clicking-calls-createsubscriptionurl-from-frontend-src-lib-payrexx-ts-and-redirects-via-window-location-href-below-button-twint-only-mention-in-var-t3-inter-500-12px-zero-emoji-zero-stripe-zero-revolut",
+      "title": "Create frontend/src/screens/pro/SubscriptionModal.tsx as a screen (not a floating modal) that renders in the main screen slot when state.screen === 'pro_subscription'. Use BottomSheet component internally or implement a full-screen bottom-anchored layout. Content: 5 benefit rows, each with a gold SVG checkmark and a benefit label (Unlimited bookings, TWINT payments, Flash mode, Pro dashboard & analytics, Priority support). Title '7 DAYS FREE' Inter 900 var(--t1). Subtitle 'Then 19.90 CHF / month' Inter 400 var(--t3). BtnPrimary 'Start for free' gold gradient text #050507; clicking calls createSubscriptionUrl() from frontend/src/lib/payrexx.ts and redirects via window.location.href. Below button: 'TWINT only' mention in var(--t3) Inter 500 12px. Zero emoji, zero Stripe, zero Revolut.",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-pro-successscreen-tsx-layout-fixed-inset-0-flex-flex-col-background-var-void-centered-content-progress-bar-at-top-gold-gradient-animates-from-0-to-100-over-2-seconds-using-progressfill-keyframe-animated-check-icon-circle-with-var-flash-border-svg-checkmark-inside-scalein-animation-on-mount-title-welcome-to-nexus-pro-inter-800-28px-var-t1-30-confetti-particles-small-rectangles-4x8px-in-gold-f2d06b-and-gold2-d4a050-colors-randomly-positioned-across-the-screen-width-animated-with-fall-keyframe-at-varying-delays-and-durations-btnprimary-access-my-pro-space-gold-gradient-text-050507-anchored-at-bottom-clicking-calls-update-proactif-true-then-go-pro-dashboard-zero-emoji",
+      "title": "Create frontend/src/screens/pro/SuccessScreen.tsx. Layout: fixed inset-0 flex flex-col, background var(--void), centered content. Progress bar at top: gold gradient, animates from 0% to 100% over 2 seconds using progressFill keyframe. Animated check icon: circle with var(--flash) border, SVG checkmark inside, scaleIn animation on mount. Title 'Welcome to NEXUS Pro' Inter 800 28px var(--t1). 30 confetti particles: small rectangles (4x8px) in gold (#F2D06B) and gold2 (#D4A050) colors, randomly positioned across the screen width, animated with fall keyframe at varying delays and durations. BtnPrimary 'Access my pro space' gold gradient text #050507 anchored at bottom; clicking calls update({ proActif: true }) then go('pro_dashboard'). Zero emoji.",
+      "reqIds": [
+        "REQ-38"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-admin-adminloginscreen-tsx-layout-fixed-inset-0-flex-flex-col-background-var-void-vertically-centered-content-title-nexus-admin-inter-900-32px-var-alert-centered-email-input-and-password-input-type-password-both-styled-per-globals-css-btnprimary-sign-in-with-background-var-alert-override-the-default-gold-gradient-clicking-calls-adminlogin-email-password-on-the-canister-on-success-calls-update-adminauthenticated-true-and-go-admin-dashboard-on-error-shows-toast-with-the-error-message-zero-emoji",
+      "title": "Create frontend/src/screens/admin/AdminLoginScreen.tsx. Layout: fixed inset-0 flex flex-col, background var(--void), vertically centered content. Title 'NEXUS ADMIN' Inter 900 32px var(--alert) centered. Email input and Password input (type='password'), both styled per globals.css. BtnPrimary 'Sign in' with background var(--alert) (override the default gold gradient); clicking calls adminLogin(email, password) on the canister; on success calls update({ adminAuthenticated: true }) and go('admin_dashboard'); on error shows toast with the error message. Zero emoji.",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-admin-admindashboardscreen-tsx-layout-fixed-inset-0-flex-flex-col-header-showing-nexus-admin-inter-800-var-alert-on-the-left-and-a-logout-button-calls-update-adminauthenticated-false-then-go-login-on-the-right-scroll-zone-flex-1-overflow-y-auto-padding-top-72px-four-kpi-cards-in-a-2x2-grid-with-count-up-animation-total-pros-total-bookings-total-revenue-chf-active-pros-section-pros-awaiting-validation-table-listing-pending-pros-with-columns-name-category-city-each-row-has-approve-button-var-flash-background-text-050507-calling-validatepro-id-canister-and-refuse-button-var-alert-background-calling-refusepro-id-canister-section-recent-bookings-table-with-columns-client-pro-service-date-amount-each-row-has-a-colored-status-badge-pending-var-gold-confirmed-var-blue-completed-var-flash-cancelled-var-t3-nexus-total-commissions-line-total-commissions-x-chf-inter-700-var-gold-tabbaradmin-at-bottom-with-active-dashboard-zero-emoji",
+      "title": "Create frontend/src/screens/admin/AdminDashboardScreen.tsx. Layout: fixed inset-0 flex flex-col. Header showing 'NEXUS ADMIN' Inter 800 var(--alert) on the left and a logout button (calls update({ adminAuthenticated: false }) then go('login')) on the right. Scroll zone flex-1 overflow-y-auto padding-top 72px. Four KPI cards in a 2x2 grid with count-up animation: Total pros, Total bookings, Total revenue (CHF), Active pros. Section 'Pros awaiting validation': table listing pending pros with columns Name, Category, City; each row has 'Approve' button (var(--flash) background, text #050507) calling validatePro(id) canister and 'Refuse' button (var(--alert) background) calling refusePro(id) canister. Section 'Recent bookings': table with columns Client, Pro, Service, Date, Amount; each row has a colored status badge (pending=var(--gold), confirmed=var(--blue), completed=var(--flash), cancelled=var(--t3)). NEXUS total commissions line: 'Total commissions: X CHF' Inter 700 var(--gold). TabBarAdmin at bottom with active='dashboard'. Zero emoji.",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-admin-adminprosscreen-tsx-layout-fixed-inset-0-flex-flex-col-header-with-title-professionals-and-logout-button-scroll-zone-flex-1-overflow-y-auto-padding-top-72px-filter-pills-row-all-active-pending-and-city-pills-horizontal-scroll-selecting-a-filter-filters-the-list-below-full-pros-list-fetched-from-canister-via-listpros-each-row-shows-avatar-initials-circle-name-category-city-status-badge-active-var-flash-pending-var-gold-refused-var-alert-each-pending-row-has-inline-approve-var-flash-and-refuse-var-alert-action-buttons-calling-validatepro-refusepro-on-the-canister-tabbaradmin-at-bottom-with-active-pros-zero-emoji",
+      "title": "Create frontend/src/screens/admin/AdminProsScreen.tsx. Layout: fixed inset-0 flex flex-col. Header with title 'Professionals' and logout button. Scroll zone flex-1 overflow-y-auto padding-top 72px. Filter pills row: 'All', 'Active', 'Pending', and city pills (horizontal scroll); selecting a filter filters the list below. Full pros list fetched from canister via listPros(): each row shows avatar initials circle, name, category, city, status badge (active=var(--flash), pending=var(--gold), refused=var(--alert)). Each pending row has inline 'Approve' (var(--flash)) and 'Refuse' (var(--alert)) action buttons calling validatePro()/refusePro() on the canister. TabBarAdmin at bottom with active='pros'. Zero emoji.",
+      "reqIds": [
+        "REQ-41"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-admin-adminbookingsscreen-tsx-layout-fixed-inset-0-flex-flex-col-header-with-title-bookings-scroll-zone-flex-1-overflow-y-auto-padding-top-72px-filter-pills-row-all-pending-confirmed-completed-cancelled-bookings-list-fetched-from-canister-all-bookings-for-admin-view-each-row-shows-booking-id-truncated-client-name-pro-name-service-date-amount-in-chf-and-a-colored-status-badge-pending-var-gold-confirmed-var-blue-completed-var-flash-cancelled-var-t3-disputed-var-alert-tabbaradmin-at-bottom-with-active-bookings-zero-emoji",
+      "title": "Create frontend/src/screens/admin/AdminBookingsScreen.tsx. Layout: fixed inset-0 flex flex-col. Header with title 'Bookings'. Scroll zone flex-1 overflow-y-auto padding-top 72px. Filter pills row: 'All', 'Pending', 'Confirmed', 'Completed', 'Cancelled'. Bookings list fetched from canister (all bookings for admin view): each row shows booking ID (truncated), client name, pro name, service, date, amount in CHF, and a colored status badge (pending=var(--gold), confirmed=var(--blue), completed=var(--flash), cancelled=var(--t3), disputed=var(--alert)). TabBarAdmin at bottom with active='bookings'. Zero emoji.",
+      "reqIds": [
+        "REQ-42"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-admin-adminrevenusscreen-tsx-layout-fixed-inset-0-flex-flex-col-header-with-title-revenue-scroll-zone-flex-1-overflow-y-auto-padding-top-72px-total-commissions-summary-card-total-nexus-commissions-x-chf-inter-800-var-gold-revenue-bar-chart-7-animated-vertical-bars-representing-the-last-7-months-bars-animate-height-from-0-on-mount-with-css-transition-each-bar-labeled-with-month-abbreviation-below-nexus-transaction-list-each-row-shows-date-type-subscription-booking-commission-pro-name-amount-in-var-gold-tabbaradmin-at-bottom-with-active-revenus-zero-emoji",
+      "title": "Create frontend/src/screens/admin/AdminRevenusScreen.tsx. Layout: fixed inset-0 flex flex-col. Header with title 'Revenue'. Scroll zone flex-1 overflow-y-auto padding-top 72px. Total commissions summary card: 'Total NEXUS commissions: X CHF' Inter 800 var(--gold). Revenue bar chart: 7 animated vertical bars representing the last 7 months; bars animate height from 0 on mount with CSS transition; each bar labeled with month abbreviation below. NEXUS transaction list: each row shows date, type (subscription/booking commission), pro name, amount in var(--gold). TabBarAdmin at bottom with active='revenus'. Zero emoji.",
+      "reqIds": [
+        "REQ-43"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-frontend-src-app-tsx-with-the-complete-final-version-that-imports-and-routes-all-26-screens-the-app-component-must-import-useappstate-import-toast-and-notifspanel-ui-components-implement-a-renderscreen-switch-covering-all-screen-values-login-role-otp-explorer-fiche-pro-booking-1-booking-2-booking-3-booking-4-booking-5-live-status-client-reservations-client-alertes-client-profil-pro-dashboard-pro-radar-pro-wallet-pro-business-pro-subscription-pro-success-admin-login-admin-dashboard-admin-pros-admin-bookings-admin-revenus-with-default-falling-back-to-loginscreen-pass-props-to-each-screen-exactly-as-specified-in-the-user-s-message-go-state-update-showtoast-removetoast-where-applicable-wrap-the-rendered-screen-in-an-outer-div-with-style-position-fixed-inset-0-background-050507-fontfamily-inter-sans-serif-inner-div-with-style-maxwidth-430px-width-100-height-100-margin-0-auto-display-flex-flexdirection-column-overflow-hidden-position-relative-render-toast-with-toasts-and-removetoast-props-render-notifspanel-with-open-state-notifsopen-onclose-updating-notifsopen-to-false-notifications-state-notifications-markread-updating-all-notifications-to-lu-true-zero-emoji",
+      "title": "Replace frontend/src/App.tsx with the complete final version that imports and routes all 26 screens. The App component must: import useAppState; import Toast and NotifsPanel UI components; implement a renderScreen() switch covering all Screen values: login, role, otp, explorer, fiche_pro, booking_1, booking_2, booking_3, booking_4, booking_5, live_status, client_reservations, client_alertes, client_profil, pro_dashboard, pro_radar, pro_wallet, pro_business, pro_subscription, pro_success, admin_login, admin_dashboard, admin_pros, admin_bookings, admin_revenus — with default falling back to LoginScreen; pass props to each screen exactly as specified in the user's message (go, state, update, showToast, removeToast where applicable); wrap the rendered screen in an outer div with style: position fixed, inset 0, background #050507, fontFamily Inter sans-serif; inner div with style: maxWidth 430px, width 100%, height 100%, margin 0 auto, display flex, flexDirection column, overflow hidden, position relative; render Toast with toasts and removeToast props; render NotifsPanel with open=state.notifsOpen, onClose updating notifsOpen to false, notifications=state.notifications, markRead updating all notifications to lu:true. Zero emoji.",
+      "reqIds": [
+        "REQ-44"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-app-tsx-verify-the-renderscreen-switch-statement-so-that-case-role-renders-only-rolescreen-and-case-otp-renders-only-otpscreen-these-two-cases-must-be-fully-independent-and-must-never-overlap-or-render-simultaneously-no-fallthrough-between-cases-default-case-must-fall-back-to-loginscreen",
+      "title": "In frontend/src/App.tsx, verify the renderScreen() switch statement so that case 'role' renders only RoleScreen and case 'otp' renders only OTPScreen. These two cases must be fully independent and must never overlap or render simultaneously. No fallthrough between cases. Default case must fall back to LoginScreen.",
+      "reqIds": [
+        "REQ-46"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-auth-rolescreen-tsx-to-fix-card-interactivity-and-visibility-the-client-card-must-have-onclick-update-role-client-go-otp-the-pro-card-must-have-onclick-update-role-pro-go-otp-card-styles-background-0d0d13-border-1px-solid-rgba-255-255-255-0-06-color-f4f4f8-never-background-000000-never-black-text-on-black-background-screen-background-must-be-050507-each-card-must-have-minimum-height-100px-and-minimum-tap-area-44px-card-label-text-must-be-inter-800-20px-f4f4f8-and-clearly-visible-padding-24px-on-both-sides-the-administration-access-link-below-the-cards-must-call-go-admin-login",
+      "title": "Rewrite frontend/src/screens/auth/RoleScreen.tsx to fix card interactivity and visibility. The CLIENT card must have onClick={() => { update({ role: 'client' }); go('otp'); }}. The PRO card must have onClick={() => { update({ role: 'pro' }); go('otp'); }}. Card styles: background #0D0D13, border 1px solid rgba(255,255,255,0.06), color #F4F4F8 — never background #000000, never black text on black background. Screen background must be #050507. Each card must have minimum height 100px and minimum tap area 44px. Card label text must be Inter 800 20px #F4F4F8 and clearly visible. Padding 24px on both sides. The 'Administration access' link below the cards must call go('admin_login').",
+      "reqIds": [
+        "REQ-47"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-screens-auth-otpscreen-tsx-add-a-guard-at-the-top-of-the-component-if-state-screen-otp-and-state-role-is-null-immediately-call-go-role-and-return-null-otpscreen-must-never-render-when-role-is-null",
+      "title": "In frontend/src/screens/auth/OTPScreen.tsx, add a guard at the top of the component: if state.screen === 'otp' AND state.role is null, immediately call go('role') and return null. OTPScreen must never render when role is null.",
+      "reqIds": [
+        "REQ-48"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-state-useappstate-ts-ensure-1-the-screen-union-type-includes-explorer-as-a-valid-value-2-the-initial-globalstate-has-clienttab-defaulting-to-explorer-3-the-go-action-correctly-navigates-to-explorer-no-logic-should-prevent-this-transition-verify-no-field-in-initialstate-accidentally-defaults-to-otp-or-any-screen-other-than-login",
+      "title": "In frontend/src/state/useAppState.ts, ensure: (1) the Screen union type includes 'explorer' as a valid value; (2) the initial GlobalState has clientTab defaulting to 'explorer'; (3) the go() action correctly navigates to 'explorer' — no logic should prevent this transition. Verify no field in initialState accidentally defaults to 'otp' or any screen other than 'login'.",
+      "reqIds": [
+        "REQ-49"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-app-tsx-verify-and-fix-the-renderscreen-switch-statement-so-that-case-explorer-exists-exactly-as-case-explorer-return-explorerscreen-go-go-state-state-update-update-the-string-explorer-must-be-lowercase-with-no-typos-no-fallthrough-this-case-must-be-independent-and-always-render-explorerscreen-when-state-screen-explorer",
+      "title": "In frontend/src/App.tsx, verify and fix the renderScreen() switch statement so that case 'explorer' exists exactly as: case 'explorer': return <ExplorerScreen go={go} state={state} update={update} />. The string 'explorer' must be lowercase with no typos. No fallthrough. This case must be independent and always render ExplorerScreen when state.screen === 'explorer'.",
+      "reqIds": [
+        "REQ-50"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-client-explorerscreen-tsx-with-the-following-mandatory-layout-and-behavior-1-root-element-position-relative-or-fixed-inset-0-display-flex-flexdirection-column-height-100-overflow-hidden-2-header-position-absolute-top-0-left-0-right-0-height-56px-z-index-100-shows-nexus-logo-role-switch-pill-pro-with-gold-border-onclick-go-pro-dashboard-when-role-client-and-notification-bell-3-scroll-zone-flex-1-overflowy-auto-webkitoverflowscrolling-touch-paddingtop-72px-no-forced-height-no-overflow-hidden-4-tabbarclient-flex-shrink-0-in-natural-flex-flow-never-position-fixed-5-visible-content-inside-scroll-zone-hero-heading-find-your-expert-inter-900-36px-f4f4f8-search-bar-58px-height-with-iconsearch-filter-pills-horizontal-scroll-all-flash-barber-coiffure-esthetique-massage-with-active-pill-gold-gradient-background-and-text-var-void-pro-cards-in-available-now-horizontal-scroll-168x228px-and-experts-for-you-vertical-list-6-every-img-tag-must-have-onerror-e-e-currenttarget-style-display-none-or-a-visible-gradient-fallback-7-empty-state-if-no-pros-match-filters-display-no-experts-available-inter-500-14px-54546c-centered-8-clicking-a-pro-card-calls-update-selectedpro-pro-then-go-fiche-pro-9-tabbarclient-active-tab-explorer-tab-onclick-handlers-explorer-go-explorer-reservations-go-client-reservations-alertes-go-client-alertes-profil-go-client-profil",
+      "title": "Rewrite frontend/src/screens/client/ExplorerScreen.tsx with the following mandatory layout and behavior: (1) Root element: position relative (or fixed inset-0), display flex, flexDirection column, height 100%, overflow hidden. (2) Header: position absolute, top 0, left 0, right 0, height 56px, z-index 100 — shows NEXUS logo, role-switch pill ('Pro' with gold border, onClick → go('pro_dashboard') when role === 'client'), and notification bell. (3) Scroll zone: flex 1, overflowY auto, WebkitOverflowScrolling touch, paddingTop 72px — NO forced height, NO overflow hidden. (4) TabBarClient: flex-shrink 0, in natural flex flow, NEVER position fixed. (5) Visible content inside scroll zone: hero heading 'Find your expert' Inter 900 36px #F4F4F8; search bar 58px height with IconSearch; filter pills horizontal scroll (All / Flash / Barber / Coiffure / Esthetique / Massage) with active pill gold gradient background and text var(--void); pro cards in 'Available now' horizontal scroll (168x228px) and 'Experts for you' vertical list. (6) Every <img> tag must have onError={(e) => { e.currentTarget.style.display = 'none'; }} or a visible gradient fallback. (7) Empty state: if no pros match filters, display 'No experts available' Inter 500 14px #54546C centered. (8) Clicking a pro card calls update({ selectedPro: pro }) then go('fiche_pro'). (9) TabBarClient active tab = 'explorer'; tab onClick handlers: explorer → go('explorer'), reservations → go('client_reservations'), alertes → go('client_alertes'), profil → go('client_profil').",
+      "reqIds": [
+        "REQ-51"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-screens-client-explorerscreen-tsx-define-a-pros-demo-constant-array-with-exactly-6-demo-professional-entries-always-rendered-as-fallback-when-no-canister-data-is-available-replaced-by-real-data-when-canister-responds-the-array-must-contain-id-1-prenom-alexandre-nom-studio-blade-categorie-barber-ville-geneve-note-4-9-nbavis-127-prix-35-flash-true-reponsmin-8-image-https-images-unsplash-com-photo-1503951914875-452162b0f3f1-w-400-h-500-fit-crop-q-80-id-2-prenom-karim-nom-karim-cuts-categorie-barber-ville-lausanne-note-4-8-nbavis-89-prix-40-flash-true-reponsmin-12-image-https-images-unsplash-com-photo-1599351431202-1e0f0137899a-w-400-h-500-fit-crop-q-80-id-3-prenom-elise-nom-elise-coiffure-categorie-coiffure-ville-geneve-note-4-9-nbavis-203-prix-55-flash-false-reponsmin-25-image-https-images-unsplash-com-photo-1562322140-8baeececf3df-w-400-h-500-fit-crop-q-80-id-4-prenom-nadia-nom-nadia-beauty-categorie-esthetique-ville-lausanne-note-4-7-nbavis-156-prix-70-flash-true-reponsmin-5-image-https-images-unsplash-com-photo-1570172619644-dfd03ed5d881-w-400-h-500-fit-crop-q-80-id-5-prenom-marco-nom-zen-by-marco-categorie-massage-ville-berne-note-4-8-nbavis-94-prix-80-flash-false-reponsmin-30-image-https-images-unsplash-com-photo-1544161515-4ab6ce6db874-w-400-h-500-fit-crop-q-80-id-6-prenom-clara-nom-clara-nails-categorie-esthetique-ville-geneve-note-4-6-nbavis-78-prix-40-flash-true-reponsmin-15-image-https-images-unsplash-com-photo-1604654894610-df63bc536371-w-400-h-500-fit-crop-q-80-these-demo-entries-are-used-as-the-initial-value-and-whenever-the-canister-returns-an-empty-list-or-throws-an-error",
+      "title": "In frontend/src/screens/client/ExplorerScreen.tsx, define a PROS_DEMO constant array with exactly 6 demo professional entries (always rendered as fallback when no canister data is available, replaced by real data when canister responds). The array must contain: { id:'1', prenom:'Alexandre', nom:'Studio Blade', categorie:'Barber', ville:'Geneve', note:4.9, nbAvis:127, prix:35, flash:true, reponsMin:8, image:'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&h=500&fit=crop&q=80' }, { id:'2', prenom:'Karim', nom:'Karim Cuts', categorie:'Barber', ville:'Lausanne', note:4.8, nbAvis:89, prix:40, flash:true, reponsMin:12, image:'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400&h=500&fit=crop&q=80' }, { id:'3', prenom:'Elise', nom:'Elise Coiffure', categorie:'Coiffure', ville:'Geneve', note:4.9, nbAvis:203, prix:55, flash:false, reponsMin:25, image:'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=400&h=500&fit=crop&q=80' }, { id:'4', prenom:'Nadia', nom:'Nadia Beauty', categorie:'Esthetique', ville:'Lausanne', note:4.7, nbAvis:156, prix:70, flash:true, reponsMin:5, image:'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&h=500&fit=crop&q=80' }, { id:'5', prenom:'Marco', nom:'Zen by Marco', categorie:'Massage', ville:'Berne', note:4.8, nbAvis:94, prix:80, flash:false, reponsMin:30, image:'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&h=500&fit=crop&q=80' }, { id:'6', prenom:'Clara', nom:'Clara Nails', categorie:'Esthetique', ville:'Geneve', note:4.6, nbAvis:78, prix:40, flash:true, reponsMin:15, image:'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=500&fit=crop&q=80' }. These demo entries are used as the initial value and whenever the canister returns an empty list or throws an error.",
+      "reqIds": [
+        "REQ-52"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-screens-client-ficheproscreen-tsx-add-a-guard-at-the-top-of-the-component-if-state-selectedpro-is-null-or-undefined-immediately-call-go-explorer-and-return-null-ficheproscreen-must-never-render-when-selectedpro-is-null-the-component-must-read-pro-data-from-state-selectedpro-and-display-it-correctly-the-back-button-in-the-header-must-call-go-explorer",
+      "title": "In frontend/src/screens/client/FicheProScreen.tsx, add a guard at the top of the component: if state.selectedPro is null or undefined, immediately call go('explorer') and return null. FicheProScreen must never render when selectedPro is null. The component must read pro data from state.selectedPro and display it correctly. The back button in the header must call go('explorer').",
+      "reqIds": [
+        "REQ-53"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Fondations techniques : globals.css, icons/index.tsx, useAppState.ts, actor.ts, payrexx.ts",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Composants UI : BtnPrimary, BtnSecondary, Input, Card, Header, TabBarClient, TabBarPro, TabBarAdmin, BottomSheet, ProgressCircle, Toast, NotifsPanel",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Écrans auth : LoginScreen, RoleScreen, OTPScreen (Internet Identity + Twilio SMS réel)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Écrans client : Explorer, FichePro, Booking 1-5, LiveStatus, Reservations, Alertes, ClientProfil",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Écrans pro : ProDashboard, ProRadar, ProWallet, ProBusiness (5 tabs), SubscriptionModal, SuccessScreen",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Écrans admin : AdminLogin, AdminDashboard, AdminPros, AdminBookings, AdminRevenus",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Backend Motoko ICP : Types.mo, main.mo avec toutes les fonctions publiques, heartbeat escrow 48h, stubs Payrexx et Twilio commentés",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Lib : api.ts (canister calls), twilio.ts (OTP via Cloudflare Worker), App.tsx racine, dfx.json, .env.production",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Implement the backend Motoko actor in backend/main.mo with stable memory and the following data types: Role (variant: client, pro, admin), ModeTravail (variant: domicile, salon, both), Categorie (variant: coiffure, esthetique, onglerie, massage, maquillage, other), StatutBooking (variant: pending, confirmed, completed, cancelled, disputed), TypeTransaction (variant: booking, subscription, refund, virement), User record (id: Principal, phone: Text, email: Text, name: Text, role: Role, createdAt: Int), Pro record (id: Principal, name: Text, categorie: Categorie, bio: Text, adresse: Text, ville: Text, phone: Text, email: Text, modeTravail: ModeTravail, services: [Service], photos: [Text], rating: Float, reviewCount: Nat, actif: Bool, subscriptionActive: Bool, subscriptionExpiry: Int, createdAt: Int), Service record (id: Text, name: Text, duree: Nat, prix: Float, description: Text, actif: Bool), Booking record (id: Text, clientId: Principal, proId: Principal, serviceId: Text, date: Text, heure: Text, montant: Float, statut: StatutBooking, payrexxRef: Text, createdAt: Int), Notification record (id: Text, userId: Principal, message: Text, type_: Text, read_: Bool, createdAt: Int), Transaction record (id: Text, proId: Principal, montant: Float, type_: TypeTransaction, ref_: Text, createdAt: Int). Implement stable HashMaps for users, pros, bookings, notifications, transactions. Implement preupgrade/postupgrade hooks. Implement public functions: registerUser, registerPro, getUser, getPro, listPros, listProsByCategory, addService, updateService, createBooking, confirmBooking, completeBooking, cancelBooking, getProBookings, getClientBookings, addNotification, getNotifications, markNotificationRead, addTransaction, getProTransactions, getProSolde, getProSequestre. Include heartbeat function that checks bookings older than 48 hours in pending state and cancels them (escrow release). Include commented stubs for Payrexx webhook handler and Twilio SMS sender with French SMS templates as comments.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Create frontend/src/components/ui/Header.tsx: position absolute top 0 left 0 right 0, height 56px, z-index 100, background rgba(5,5,7,0.97), backdrop-filter blur(32px), border-bottom 1px solid rgba(255,255,255,0.04), flex layout space-between, padding 0 16px. Props: role ('client'|'pro'|'admin'|null), showBack (boolean), onBack (() => void), title (string optional), onLogoClick (() => void), notifsCount (number), onNotifs (() => void), onSwitchRole (() => void). LEFT: if showBack — circle button 40px background #0D0D13 border 1px #1C1C26, IconArrowLeft size 18 color #F4F4F8, onClick onBack; else — div onClick onLogoClick cursor pointer, 'NEXUS' Inter 900 22px #F4F4F8 + '.' Inter 900 24px #5B7FFF, letter-spacing -0.04em. CENTER (if title): position absolute left 50% transform translateX(-50%), Inter 700 16px #F4F4F8, white-space nowrap. RIGHT (if role !== 'admin'): flex gap 8px align-items center; switch pill border-radius 999px px-10px py-5px flex align-items center gap 4px — if role==='client': border 1px solid rgba(242,208,107,0.3), IconRefresh size 11 color #F2D06B, label 'Pro' Inter 600 10px #F2D06B uppercase letter-spacing 0.06em; if role==='pro': border 1px solid rgba(91,127,255,0.3), IconRefresh size 11 color #5B7FFF, label 'Client' Inter 600 10px #5B7FFF; onClick onSwitchRole. Bell button circle 40px #0D0D13 border 1px solid rgba(255,255,255,0.04), IconBell size 18 color #9898B4, onClick onNotifs; if notifsCount > 0 — badge absolute top 8px right 8px, min-width 16px height 16px background #FF3D5A border-radius 999px, Inter 700 9px #fff text-center. No emoji anywhere.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Create frontend/src/components/ui/BtnPrimary.tsx: Props: label (string), onClick (() => void), loading (boolean optional), disabled (boolean optional), icon (ReactNode optional), small (boolean optional), danger (boolean optional). Style: width 100%, height 46px if small else 56px, background #1C1C26 if disabled / #FF3D5A if danger / linear-gradient(135deg, #F2D06B, #D4A050) otherwise. Color: #54546C if disabled / #fff if danger / #050507 otherwise. Inter 700, font-size 13px if small else 15px, letter-spacing 0.06em, text-transform uppercase, border-radius 14px, border none, flex center gap 8px, cursor not-allowed if disabled else pointer, box-shadow none if disabled else '0 6px 24px rgba(242,208,107,0.25)', transition transform 120ms, active state scale(0.97), flex-shrink 0. Loading state: replace label with 18x18px div border 2px solid currentColor border-top-color transparent border-radius 50% animation spin 0.8s linear infinite. No emoji.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Create frontend/src/components/ui/TabBarClient.tsx: Props: active (string), onChange ((tab: string) => void). Wrapper: flex-shrink 0, display flex, background rgba(5,5,7,0.97), border-top 1px solid rgba(255,255,255,0.04), padding-bottom env(safe-area-inset-bottom, 0px). Four tabs: {id:'explorer', label:'Explorer', Icon:IconSearch}, {id:'reservations', label:'Reservations', Icon:IconCalendar}, {id:'alertes', label:'Alertes', Icon:IconBell}, {id:'profil', label:'Profil', Icon:IconUser}. Each tab: flex 1, flex-direction column, align-items center, justify-content center, padding 10px 0 8px, background none, border none, cursor pointer, gap 3px, position relative. Active tab: gold indicator div absolute top 0 left 50% translateX(-50%) width 24px height 2px background #F2D06B border-radius 2px; Icon color #F2D06B; label Inter 600 10px #F2D06B. Inactive tab: Icon color #2E2E3E; label Inter 400 10px #2E2E3E. No emoji.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Create frontend/src/components/ui/TabBarPro.tsx: Same pattern as TabBarClient. Props: active (string), onChange ((tab: string) => void). Four tabs: {id:'radar', label:'Radar', Icon:IconRadar}, {id:'wallet', label:'Wallet', Icon:IconWallet}, {id:'dashboard', label:'Home', Icon:IconHome}, {id:'business', label:'Business', Icon:IconEdit}. Active color #F2D06B (gold indicator, icon, label). Inactive color #2E2E3E. Same wrapper styles with safe-area-inset-bottom. No emoji.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Create frontend/src/components/ui/TabBarAdmin.tsx: Same pattern as TabBarClient. Props: active (string), onChange ((tab: string) => void). Four tabs: {id:'dashboard', label:'Dashboard', Icon:IconGrid}, {id:'pros', label:'Pros', Icon:IconUser}, {id:'bookings', label:'Appointments', Icon:IconCalendar}, {id:'revenus', label:'Revenue', Icon:IconWallet}. Active color #FF3D5A (indicator, icon, label). Inactive color #2E2E3E. Same wrapper styles with safe-area-inset-bottom. No emoji.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Create frontend/src/components/ui/BottomSheet.tsx: Props: open (boolean), onClose (() => void), title (string), children (ReactNode), footer (ReactNode optional). If !open return null. Overlay: position fixed inset 0, background rgba(5,5,7,0.85), z-index 400, onClick onClose. Sheet (inside overlay): position absolute bottom 0 left 0 right 0, max-height calc(100vh - 64px - env(safe-area-inset-bottom, 0px)), display flex flex-direction column, background #0D0D13, border-radius 24px 24px 0 0, border 1px solid rgba(255,255,255,0.06) border-bottom none, animation slideUp 250ms ease-out, onClick stopPropagation. Handle: width 36px height 4px background #2E2E3E border-radius 2px margin 12px auto flex-shrink 0. Title: padding 0 24px 16px, flex-shrink 0, border-bottom 1px solid rgba(255,255,255,0.04), Inter 800 20px #F4F4F8. Content: flex 1 overflow-y auto -webkit-overflow-scrolling touch padding 20px 24px. Footer (if provided): flex-shrink 0 padding 12px 24px 16px border-top 1px solid rgba(255,255,255,0.04) background #0D0D13. No emoji.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Create frontend/src/components/ui/Toast.tsx: Define local interface Toast { id: string; message: string; type: 'success'|'error'|'info'|'sms'; duration?: number }. Props: toasts (Toast[]), removeToast ((id: string) => void). Container: position fixed top 72px left 16px right 16px z-index 9999, display flex flex-direction column gap 8px, max-width 430px margin 0 auto, pointer-events none. Each toast item: background rgba(9,9,13,0.97), backdrop-filter blur(24px), border 1px solid rgba(255,255,255,0.06), border-left 3px solid (#00D97A for success / #FF3D5A for error / #5B7FFF for info / #F2D06B for sms), border-radius 14px, padding 13px 16px, Inter 500 13px #F4F4F8, animation slideDown 300ms, pointer-events auto. Each toast uses useEffect to auto-dismiss after duration ?? 3000ms by calling removeToast(id). No emoji.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Create frontend/src/components/ui/NotifsPanel.tsx: Define local interface Notification { id: string; title: string; message: string; type: string; read: boolean; createdAt: number }. Props: open (boolean), onClose (() => void), notifications (Notification[]), markRead (() => void). If !open return null. Overlay: position fixed inset 0 background rgba(5,5,7,0.8) z-index 500 onClick onClose. Panel: position absolute right 0 top 0 bottom 0 width 100% max-width 430px, background #050507, border-left 1px solid rgba(255,255,255,0.04), display flex flex-direction column, animation slideUp 250ms. Panel header (padding 56px 20px 16px): 'Notifications' Inter 800 22px #F4F4F8, 'Mark all read' Inter 500 12px #F2D06B onClick markRead, X close button circle 32px onClick onClose. Notification list (flex 1 overflow-y auto): each notification item padding 16px 20px, border-bottom 1px solid rgba(255,255,255,0.04), background rgba(242,208,107,0.02) if unread. Left: circle 36px with icon color based on type: nouvelle_demande=#FF3D5A, paiement_confirme=#00D97A, fonds_liberes=#F2D06B, booking_confirme=#5B7FFF, avis_recu=#F2D06B (use appropriate SVG icons from the icon library). Title Inter 600 14px #F4F4F8, message Inter 400 13px #9898B4, timestamp Inter 400 11px #54546C, unread dot 6px #F2D06B if !read. Empty state: 'No notifications' centered, IconBell size 32 color #2E2E3E. No emoji.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "Create frontend/src/components/ui/ProgressCircle.tsx: Props: pct (number), size (number, default 48), strokeWidth (number, default 3). Render SVG size x size. Compute: radius = (size - strokeWidth) / 2, circumference = 2 * Math.PI * radius, dashOffset = circumference * (1 - pct / 100). Background circle: stroke #1C1C26, fill none, strokeWidth, cx/cy size/2, r radius. Progress circle: stroke color — pct < 40 → #FF3D5A / pct < 80 → #F2D06B / pct >= 80 → #00D97A; strokeDasharray circumference; strokeDashoffset dashOffset; transition stroke-dashoffset 600ms ease; transform rotate(-90deg) transform-origin center; fill none; strokeLinecap round. Centered text: Inter 700, font-size size/4 px, fill same color logic as stroke, text-anchor middle, dominant-baseline middle. Render '{pct}%'. No emoji.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-24",
+      "summary": "Écrans Auth : LoginScreen (orbs, II login réel), RoleScreen (cards client/pro/admin), OTPScreen (Twilio réel, 4 inputs, cooldown 60s)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-25",
+      "summary": "Écrans Client : ExplorerScreen (hero rotatif, search, filtres, cards Unsplash+fallback), FicheProScreen (cover, avatar, stats count-up, services, galerie, avis, CTA sticky)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-26",
+      "summary": "Booking1–5 : sélection service, créneaux flash, coordonnées, récap TWINT (createBookingUrl→window.location), Booking5 hourglass animé + polling canister 10s → live_status",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-27",
+      "summary": "LiveStatusScreen (countdown setInterval, timeline 5 étapes SVG, polling 30s), ReservationsScreen (tabs À venir/Terminées, canister), AlertesScreen, ClientProfilScreen (éditable, historique, logout→login)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-34",
+      "summary": "Create frontend/src/screens/client/LiveStatusScreen.tsx. Layout: fixed inset-0 flex flex-col. Header with back arrow. Scroll zone flex-1 overflow-y-auto padding-top 72px. Live countdown timer using setInterval every 1 second, displayed Inter 900 52px var(--gold). SVG timeline with 5 steps: completed steps in var(--flash), active step in var(--gold) with breathe animation, pending steps in var(--d4). Polls canister for booking status every 30 seconds. TabBarClient at bottom with no active tab highlighted. Zero emoji.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-35",
+      "summary": "Create frontend/src/screens/client/ReservationsScreen.tsx. Layout: fixed inset-0 flex flex-col. Header with title 'My reservations' Inter 800. Scroll zone flex-1 overflow-y-auto padding-top 72px. Two tabs 'Upcoming' / 'Completed'. Each tab shows booking cards fetched from canister via getClientBookings(); each card shows service name, pro name, date, time, and a colored status badge (pending=var(--gold), confirmed=var(--blue), completed=var(--flash), cancelled=var(--t3)). TabBarClient at bottom with active='reservations'. Zero emoji.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-36",
+      "summary": "Create frontend/src/screens/client/AlertesScreen.tsx. Layout: fixed inset-0 flex flex-col. Renders the full notification list inline (same content as NotifsPanel but as a dedicated screen, not a slide-over). Notifications fetched from canister getNotifications(). Unread notifications highlighted. Mark-all-read button. TabBarClient at bottom with active='alertes'. Zero emoji.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-37",
+      "summary": "Create frontend/src/screens/client/ClientProfilScreen.tsx. Layout: fixed inset-0 flex flex-col. Header with title 'My Profile'. Scroll zone flex-1 overflow-y-auto padding-top 72px. Avatar circle with user initials or photo, user name Inter 700, email below. Editable fields section: name, email, phone — inline edit with save confirmation. Payment history section listing past transactions from canister. Logout button styled danger (var(--alert) background) at bottom of scroll content; clicking calls logout() from frontend/src/lib/actor.ts then go('login'). TabBarClient at bottom with active='profil'. Zero emoji.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-38",
+      "summary": "Update frontend/src/App.tsx to include routing for all 14 new screens: login, role, otp, explorer, fiche_pro, booking_1, booking_2, booking_3, booking_4, booking_5, live_status, client_reservations, client_alertes, client_profil. Import and render each corresponding screen component based on the current screen value from useAppState(). Preserve existing toast overlay and any existing routed screens already in App.tsx.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-39",
+      "summary": "ProDashboardScreen: Header+switch+notifs, 'Bonjour [Prenom]' Inter 800 30px, badge essai dot #flash, 3 métriques count-up, Flash toggle card animé, prochain RDV card, TabBarPro",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-40",
+      "summary": "ProRadarScreen: 'Radar' Inter 900 40px, tabs En attente/Confirmées/Historique, cards demandes avec countdown 1s, <2min #alert breathe, Décliner/Accepter → confirmBooking() canister, TabBarPro",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-41",
+      "summary": "ProWalletScreen: card solde shimmer gradient Inter 900 52px, séquestre libération 48h, bouton virement gold/grisé cooldown 1s, 7 barres revenus animées, liste transactions colorées, TabBarPro",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-42",
+      "summary": "TabProfil.tsx: PRENOM/NOM/SLOGAN/BIO 200chars, catégorie grid 2x2 tap gold, lieu 3 cards domicile/salon/les deux avec slider km et input adresse, ville dropdown 12 villes romandes",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-43",
+      "summary": "TabServices.tsx: '+Ajouter' border dashed gold, liste drag+edit+delete+toggle, pré-rempli par catégorie (Barber/Coiffure/Esthetique/Massage 5 services chacun avec prix/durée définis)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-44",
+      "summary": "ServiceEditor.tsx: BottomSheet, NOM*/PRIX stepper/DUREE stepper, DESCRIPTION, BADGE pills, MODE domicile/salon/les deux, footer Annuler+Sauvegarder → createService()/updateService() canister",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-45",
+      "summary": "TabTarifs.tsx: 7 jours pills multiple, chaque actif → inputs début/fin, Flash toggle + supplément CHF stepper, délai minimum 5 pills, annulation 3 pills",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-46",
+      "summary": "TabPaiement.tsx: TWINT card #flash tint +41 validation border #flash, IBAN card #gold tint CH format auto border #flash, récap 4 lignes financier",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-47",
+      "summary": "TabGalerie.tsx: compteur X/4 barre gold, <3 photos #alert, tips 4 conseils, grid 2x2 dashed/preview, slot 1 badge COUVERTURE, FileReader → upload canister, preview Explorer mini card",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-48",
+      "summary": "ProBusinessScreen.tsx: layout fixed inset-0 flex flex-col, header absolu 56px, zone titre+tabs flex-shrink-0 pt-72px ProgressCircle+5 segments+tabs Profil/Services/Tarifs/Paiement/Galerie, scroll flex-1, CTA contextuel (tabs 1-4 sauvegarder, tab 5 activer/disabled), TabBarPro",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-49",
+      "summary": "SubscriptionModal.tsx: BottomSheet, 5 avantages SVG check gold, '7 JOURS GRATUITS' Inter 900, '19.90 CHF/mois', BtnPrimary → createSubscriptionUrl() → window.location.href, mention TWINT uniquement",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-50",
+      "summary": "SuccessScreen.tsx: progress bar gold 2s, check #flash scaleIn, 'Bienvenue sur NEXUS Pro', 30 confetti gold fall, BtnPrimary → proActif true + go('pro_dashboard')",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-51",
+      "summary": "AdminLoginScreen.tsx: 'NEXUS ADMIN' #alert centré, EMAIL+PASSWORD inputs, BtnPrimary background #alert → adminLogin() canister → go('admin_dashboard')",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-52",
+      "summary": "AdminDashboardScreen.tsx: header 'NEXUS ADMIN'+logout, 4 KPIs grid 2x2 count-up, pros en attente validation tableau Valider #flash/Refuser #alert, derniers bookings tableau badges colorés, commissions NEXUS total, TabBarAdmin",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-53",
+      "summary": "AdminProsScreen.tsx: liste complète pros canister, filtres actifs/attente/ville, actions valider/refuser, TabBarAdmin",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-54",
+      "summary": "AdminBookingsScreen.tsx: liste bookings avec filtres, badges statut colorés, TabBarAdmin",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-55",
+      "summary": "AdminRevenusScreen.tsx: total commissions par mois, 7 barres graphique animées, liste transactions NEXUS, TabBarAdmin",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-56",
+      "summary": "App.tsx final: import tous les 26 screens + useAppState + Toast + NotifsPanel, switch complet tous les cases de Screen, wrapper fixed #050507 max-width 430px flex column, ToastContainer + NotifsPanel overlay",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-57",
+      "summary": "In frontend/src/state/useAppState.ts, ensure the initial GlobalState has screen set to 'login' (never 'otp' or any other value) and role set to null. Verify the entire initialState object is correct and no field accidentally defaults to 'otp'.",
+      "reqIds": [
+        "REQ-45"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-58",
+      "summary": "Fix Explorer client bug: useAppState go('explorer') après OTP client, clientTab:'explorer' par défaut, App.tsx case 'explorer' exact minuscule, ExplorerScreen layout flex column/scroll correct, tab bar dans flux jamais fixed, PROS_DEMO 6 entrées Unsplash toujours visibles, onError images, FicheProScreen accessible depuis tap card avec guard selectedPro null → go('explorer')",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "NEXUS",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

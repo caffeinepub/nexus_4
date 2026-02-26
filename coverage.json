@@ -1,0 +1,91 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-26T23:01:23.278Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 5,
+    "implemented": 5,
+    "items": [
+      {
+        "id": "REQ-49",
+        "summary": "In frontend/src/state/useAppState.ts, ensure: (1) the Screen union type includes 'explorer' as a valid value; (2) the initial GlobalState has clientTab defaulting to 'explorer'; (3) the go() action correctly navigates to 'explorer' — no logic should prevent this transition. Verify no field in initialState accidentally defaults to 'otp' or any screen other than 'login'.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/state/useAppState.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/state/useAppState.ts"
+        ]
+      },
+      {
+        "id": "REQ-50",
+        "summary": "In frontend/src/App.tsx, verify and fix the renderScreen() switch statement so that case 'explorer' exists exactly as: case 'explorer': return <ExplorerScreen go={go} state={state} update={update} />. The string 'explorer' must be lowercase with no typos. No fallthrough. This case must be independent and always render ExplorerScreen when state.screen === 'explorer'.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "id": "REQ-51",
+        "summary": "Rewrite frontend/src/screens/client/ExplorerScreen.tsx with the following mandatory layout and behavior: (1) Root element: position relative (or fixed inset-0), display flex, flexDirection column, height 100%, overflow hidden. (2) Header: position absolute, top 0, left 0, right 0, height 56px, z-index 100 — shows NEXUS logo, role-switch pill ('Pro' with gold border, onClick → go('pro_dashboard') when role === 'client'), and notification bell. (3) Scroll zone: flex 1, overflowY auto, WebkitOverflowScrolling touch, paddingTop 72px — NO forced height, NO overflow hidden. (4) TabBarClient: flex-shrink 0, in natural flex flow, NEVER position fixed. (5) Visible content inside scroll zone: hero heading 'Find your expert' Inter 900 36px #F4F4F8; search bar 58px height with IconSearch; filter pills horizontal scroll (All / Flash / Barber / Coiffure / Esthetique / Massage) with active pill gold gradient background and text var(--void); pro cards in 'Available now' horizontal scroll (168x228px) and 'Experts for you' vertical list. (6) Every <img> tag must have onError={(e) => { e.currentTarget.style.display = 'none'; }} or a visible gradient fallback. (7) Empty state: if no pros match filters, display 'No experts available' Inter 500 14px #54546C centered. (8) Clicking a pro card calls update({ selectedPro: pro }) then go('fiche_pro'). (9) TabBarClient active tab = 'explorer'; tab onClick handlers: explorer → go('explorer'), reservations → go('client_reservations'), alertes → go('client_alertes'), profil → go('client_profil').",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/screens/client/ExplorerScreen.tsx",
+          "frontend/src/components/TabBarClient.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/screens/client/ExplorerScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-52",
+        "summary": "In frontend/src/screens/client/ExplorerScreen.tsx, define a PROS_DEMO constant array with exactly 6 demo professional entries (always rendered as fallback when no canister data is available, replaced by real data when canister responds). The array must contain: { id:'1', prenom:'Alexandre', nom:'Studio Blade', categorie:'Barber', ville:'Geneve', note:4.9, nbAvis:127, prix:35, flash:true, reponsMin:8, image:'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&h=500&fit=crop&q=80' }, { id:'2', prenom:'Karim', nom:'Karim Cuts', categorie:'Barber', ville:'Lausanne', note:4.8, nbAvis:89, prix:40, flash:true, reponsMin:12, image:'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400&h=500&fit=crop&q=80' }, { id:'3', prenom:'Elise', nom:'Elise Coiffure', categorie:'Coiffure', ville:'Geneve', note:4.9, nbAvis:203, prix:55, flash:false, reponsMin:25, image:'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=400&h=500&fit=crop&q=80' }, { id:'4', prenom:'Nadia', nom:'Nadia Beauty', categorie:'Esthetique', ville:'Lausanne', note:4.7, nbAvis:156, prix:70, flash:true, reponsMin:5, image:'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&h=500&fit=crop&q=80' }, { id:'5', prenom:'Marco', nom:'Zen by Marco', categorie:'Massage', ville:'Berne', note:4.8, nbAvis:94, prix:80, flash:false, reponsMin:30, image:'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&h=500&fit=crop&q=80' }, { id:'6', prenom:'Clara', nom:'Clara Nails', categorie:'Esthetique', ville:'Geneve', note:4.6, nbAvis:78, prix:40, flash:true, reponsMin:15, image:'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=500&fit=crop&q=80' }. These demo entries are used as the initial value and whenever the canister returns an empty list or throws an error.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/screens/client/ExplorerScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/screens/client/ExplorerScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-53",
+        "summary": "In frontend/src/screens/client/FicheProScreen.tsx, add a guard at the top of the component: if state.selectedPro is null or undefined, immediately call go('explorer') and return null. FicheProScreen must never render when selectedPro is null. The component must read pro data from state.selectedPro and display it correctly. The back button in the header must call go('explorer').",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/screens/client/FicheProScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/screens/client/FicheProScreen.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/App.tsx",
+    "frontend/src/components/NotifsPanel.tsx",
+    "frontend/src/components/Toast.tsx",
+    "frontend/src/screens/client/Booking1Screen.tsx",
+    "frontend/src/screens/client/Booking2Screen.tsx",
+    "frontend/src/screens/client/Booking3Screen.tsx",
+    "frontend/src/screens/client/Booking4Screen.tsx",
+    "frontend/src/screens/client/ExplorerScreen.tsx",
+    "frontend/src/screens/client/FicheProScreen.tsx",
+    "frontend/src/state/useAppState.ts",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

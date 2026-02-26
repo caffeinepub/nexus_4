@@ -1,0 +1,105 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-in-frontend-src-state-useappstate-ts-ensure-1-the-screen-union-type-includes-explorer-as-a-valid-value-2-the-initial-globalstate-has-clienttab-defaulting-to-explorer-3-the-go-action-correctly-navigates-to-explorer-no-logic-should-prevent-this-transition-verify-no-field-in-initialstate-accidentally-defaults-to-otp-or-any-screen-other-than-login",
+      "featureTitle": "In frontend/src/state/useAppState.ts, ensure: (1) the Screen union type includes 'explorer' as a valid value; (2) the initial GlobalState has clientTab defaulting to 'explorer'; (3) the go() action correctly navigates to 'explorer' — no logic should prevent this transition. Verify no field in initialState accidentally defaults to 'otp' or any screen other than 'login'.",
+      "files": [
+        "frontend/src/state/useAppState.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-49"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-in-frontend-src-app-tsx-verify-and-fix-the-renderscreen-switch-statement-so-that-case-explorer-exists-exactly-as-case-explorer-return-explorerscreen-go-go-state-state-update-update-the-string-explorer-must-be-lowercase-with-no-typos-no-fallthrough-this-case-must-be-independent-and-always-render-explorerscreen-when-state-screen-explorer",
+      "featureTitle": "In frontend/src/App.tsx, verify and fix the renderScreen() switch statement so that case 'explorer' exists exactly as: case 'explorer': return <ExplorerScreen go={go} state={state} update={update} />. The string 'explorer' must be lowercase with no typos. No fallthrough. This case must be independent and always render ExplorerScreen when state.screen === 'explorer'.",
+      "files": [
+        "frontend/src/App.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-50"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-rewrite-frontend-src-screens-client-explorerscreen-tsx-with-the-following-mandatory-layout-and-behavior-1-root-element-position-relative-or-fixed-inset-0-display-flex-flexdirection-column-height-100-overflow-hidden-2-header-position-absolute-top-0-left-0-right-0-height-56px-z-index-100-shows-nexus-logo-role-switch-pill-pro-with-gold-border-onclick-go-pro-dashboard-when-role-client-and-notification-bell-3-scroll-zone-flex-1-overflowy-auto-webkitoverflowscrolling-touch-paddingtop-72px-no-forced-height-no-overflow-hidden-4-tabbarclient-flex-shrink-0-in-natural-flex-flow-never-position-fixed-5-visible-content-inside-scroll-zone-hero-heading-find-your-expert-inter-900-36px-f4f4f8-search-bar-58px-height-with-iconsearch-filter-pills-horizontal-scroll-all-flash-barber-coiffure-esthetique-massage-with-active-pill-gold-gradient-background-and-text-var-void-pro-cards-in-available-now-horizontal-scroll-168x228px-and-experts-for-you-vertical-list-6-every-img-tag-must-have-onerror-e-e-currenttarget-style-display-none-or-a-visible-gradient-fallback-7-empty-state-if-no-pros-match-filters-display-no-experts-available-inter-500-14px-54546c-centered-8-clicking-a-pro-card-calls-update-selectedpro-pro-then-go-fiche-pro-9-tabbarclient-active-tab-explorer-tab-onclick-handlers-explorer-go-explorer-reservations-go-client-reservations-alertes-go-client-alertes-profil-go-client-profil",
+      "featureTitle": "Rewrite frontend/src/screens/client/ExplorerScreen.tsx with the following mandatory layout and behavior: (1) Root element: position relative (or fixed inset-0), display flex, flexDirection column, height 100%, overflow hidden. (2) Header: position absolute, top 0, left 0, right 0, height 56px, z-index 100 — shows NEXUS logo, role-switch pill ('Pro' with gold border, onClick → go('pro_dashboard') when role === 'client'), and notification bell. (3) Scroll zone: flex 1, overflowY auto, WebkitOverflowScrolling touch, paddingTop 72px — NO forced height, NO overflow hidden. (4) TabBarClient: flex-shrink 0, in natural flex flow, NEVER position fixed. (5) Visible content inside scroll zone: hero heading 'Find your expert' Inter 900 36px #F4F4F8; search bar 58px height with IconSearch; filter pills horizontal scroll (All / Flash / Barber / Coiffure / Esthetique / Massage) with active pill gold gradient background and text var(--void); pro cards in 'Available now' horizontal scroll (168x228px) and 'Experts for you' vertical list. (6) Every <img> tag must have onError={(e) => { e.currentTarget.style.display = 'none'; }} or a visible gradient fallback. (7) Empty state: if no pros match filters, display 'No experts available' Inter 500 14px #54546C centered. (8) Clicking a pro card calls update({ selectedPro: pro }) then go('fiche_pro'). (9) TabBarClient active tab = 'explorer'; tab onClick handlers: explorer → go('explorer'), reservations → go('client_reservations'), alertes → go('client_alertes'), profil → go('client_profil').",
+      "files": [
+        "frontend/src/screens/client/ExplorerScreen.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-51"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-in-frontend-src-screens-client-explorerscreen-tsx-define-a-pros-demo-constant-array-with-exactly-6-demo-professional-entries-always-rendered-as-fallback-when-no-canister-data-is-available-replaced-by-real-data-when-canister-responds-the-array-must-contain-id-1-prenom-alexandre-nom-studio-blade-categorie-barber-ville-geneve-note-4-9-nbavis-127-prix-35-flash-true-reponsmin-8-image-https-images-unsplash-com-photo-1503951914875-452162b0f3f1-w-400-h-500-fit-crop-q-80-id-2-prenom-karim-nom-karim-cuts-categorie-barber-ville-lausanne-note-4-8-nbavis-89-prix-40-flash-true-reponsmin-12-image-https-images-unsplash-com-photo-1599351431202-1e0f0137899a-w-400-h-500-fit-crop-q-80-id-3-prenom-elise-nom-elise-coiffure-categorie-coiffure-ville-geneve-note-4-9-nbavis-203-prix-55-flash-false-reponsmin-25-image-https-images-unsplash-com-photo-1562322140-8baeececf3df-w-400-h-500-fit-crop-q-80-id-4-prenom-nadia-nom-nadia-beauty-categorie-esthetique-ville-lausanne-note-4-7-nbavis-156-prix-70-flash-true-reponsmin-5-image-https-images-unsplash-com-photo-1570172619644-dfd03ed5d881-w-400-h-500-fit-crop-q-80-id-5-prenom-marco-nom-zen-by-marco-categorie-massage-ville-berne-note-4-8-nbavis-94-prix-80-flash-false-reponsmin-30-image-https-images-unsplash-com-photo-1544161515-4ab6ce6db874-w-400-h-500-fit-crop-q-80-id-6-prenom-clara-nom-clara-nails-categorie-esthetique-ville-geneve-note-4-6-nbavis-78-prix-40-flash-true-reponsmin-15-image-https-images-unsplash-com-photo-1604654894610-df63bc536371-w-400-h-500-fit-crop-q-80-these-demo-entries-are-used-as-the-initial-value-and-whenever-the-canister-returns-an-empty-list-or-throws-an-error",
+      "featureTitle": "In frontend/src/screens/client/ExplorerScreen.tsx, define a PROS_DEMO constant array with exactly 6 demo professional entries (always rendered as fallback when no canister data is available, replaced by real data when canister responds). The array must contain: { id:'1', prenom:'Alexandre', nom:'Studio Blade', categorie:'Barber', ville:'Geneve', note:4.9, nbAvis:127, prix:35, flash:true, reponsMin:8, image:'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&h=500&fit=crop&q=80' }, { id:'2', prenom:'Karim', nom:'Karim Cuts', categorie:'Barber', ville:'Lausanne', note:4.8, nbAvis:89, prix:40, flash:true, reponsMin:12, image:'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400&h=500&fit=crop&q=80' }, { id:'3', prenom:'Elise', nom:'Elise Coiffure', categorie:'Coiffure', ville:'Geneve', note:4.9, nbAvis:203, prix:55, flash:false, reponsMin:25, image:'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=400&h=500&fit=crop&q=80' }, { id:'4', prenom:'Nadia', nom:'Nadia Beauty', categorie:'Esthetique', ville:'Lausanne', note:4.7, nbAvis:156, prix:70, flash:true, reponsMin:5, image:'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&h=500&fit=crop&q=80' }, { id:'5', prenom:'Marco', nom:'Zen by Marco', categorie:'Massage', ville:'Berne', note:4.8, nbAvis:94, prix:80, flash:false, reponsMin:30, image:'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&h=500&fit=crop&q=80' }, { id:'6', prenom:'Clara', nom:'Clara Nails', categorie:'Esthetique', ville:'Geneve', note:4.6, nbAvis:78, prix:40, flash:true, reponsMin:15, image:'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=500&fit=crop&q=80' }. These demo entries are used as the initial value and whenever the canister returns an empty list or throws an error.",
+      "files": [
+        "frontend/src/screens/client/ExplorerScreen.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-52"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-in-frontend-src-screens-client-ficheproscreen-tsx-add-a-guard-at-the-top-of-the-component-if-state-selectedpro-is-null-or-undefined-immediately-call-go-explorer-and-return-null-ficheproscreen-must-never-render-when-selectedpro-is-null-the-component-must-read-pro-data-from-state-selectedpro-and-display-it-correctly-the-back-button-in-the-header-must-call-go-explorer",
+      "featureTitle": "In frontend/src/screens/client/FicheProScreen.tsx, add a guard at the top of the component: if state.selectedPro is null or undefined, immediately call go('explorer') and return null. FicheProScreen must never render when selectedPro is null. The component must read pro data from state.selectedPro and display it correctly. The back button in the header must call go('explorer').",
+      "files": [
+        "frontend/src/screens/client/FicheProScreen.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-53"
+      ],
+      "confidence": "high"
+    }
+  ]
+}
