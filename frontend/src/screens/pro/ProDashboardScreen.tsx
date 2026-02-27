@@ -8,6 +8,7 @@ interface Props {
   state: GlobalState;
   update: (partial: Partial<GlobalState>) => void;
   showToast: (msg: string, type?: ToastType, duration?: number) => void;
+  removeToast?: (id: string) => void;
 }
 
 function useCountUp(target: number, duration = 1500) {
@@ -48,6 +49,12 @@ export default function ProDashboardScreen({ go, state, update, showToast }: Pro
 
   return (
     <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', background: '#050507' }}>
+      <style>{`
+        @keyframes breathe {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+        }
+      `}</style>
       <Header
         role="pro"
         onSwitchRole={() => { update({ role: 'client' }); go('explorer'); }}
@@ -58,13 +65,33 @@ export default function ProDashboardScreen({ go, state, update, showToast }: Pro
 
       <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' as any, overscrollBehavior: 'contain', paddingTop: 72, paddingBottom: 16 }}>
         {/* Greeting */}
-        <div style={{ padding: '20px 20px 0', marginBottom: 20 }}>
+        <div style={{ padding: '20px 20px 0', marginBottom: 12 }}>
           <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 800, fontSize: 26, color: '#F4F4F8', lineHeight: 1.2 }}>
             Bonjour, {prenom}
           </div>
           <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#54546C', fontWeight: 400, marginTop: 4, textTransform: 'capitalize' }}>
             {today}
           </div>
+          {/* Share my profile pill */}
+          <button
+            onClick={() => go('pro_share')}
+            style={{
+              marginTop: 12,
+              background: 'rgba(242,208,107,0.08)',
+              border: '1px solid rgba(242,208,107,0.2)',
+              borderRadius: 999,
+              padding: '8px 16px',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13, color: '#F2D06B' }}>Partager mon profil</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M5 12h14M12 5l7 7-7 7" stroke="#F2D06B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
         </div>
 
         {/* Flash toggle */}
@@ -129,7 +156,7 @@ export default function ProDashboardScreen({ go, state, update, showToast }: Pro
         </div>
 
         {/* Metric cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, padding: '0 20px', marginBottom: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, padding: '0 20px', marginBottom: 12 }}>
           {METRICS.map((m, i) => (
             <div key={i} style={{
               background: '#0D0D13', border: '1px solid rgba(255,255,255,0.06)',
@@ -143,6 +170,70 @@ export default function ProDashboardScreen({ go, state, update, showToast }: Pro
           ))}
         </div>
 
+        {/* Why NEXUS Pro link */}
+        <div style={{ padding: '0 20px', marginBottom: 16 }}>
+          <button
+            onClick={() => go('pro_pitch')}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, padding: '4px 0' }}
+          >
+            <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 13, color: '#F2D06B' }}>
+              Pourquoi NEXUS Pro — decouvrir toutes les fonctionnalites
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M5 12h14M12 5l7 7-7 7" stroke="#F2D06B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* Boost my visibility */}
+        <div style={{ margin: '0 20px 16px', background: '#0D0D13', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, overflow: 'hidden' }}>
+          <div style={{ borderLeft: '3px solid #F2D06B', padding: '14px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#F4F4F8' }}>Booster ma visibilite</div>
+            <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 12, color: '#9898B4', marginTop: 2 }}>Apparaissez en tete des resultats</div>
+          </div>
+          {/* Standard */}
+          <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13, color: '#F4F4F8' }}>Standard</div>
+              <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 11, color: '#9898B4' }}>Inclus dans votre abonnement</div>
+            </div>
+            <div style={{ background: 'rgba(0,217,122,0.1)', border: '1px solid rgba(0,217,122,0.3)', borderRadius: 999, padding: '4px 10px', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 11, color: '#00D97A' }}>
+              Actif
+            </div>
+          </div>
+          {/* Premium */}
+          <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13, color: '#F4F4F8' }}>Premium</div>
+              <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 11, color: '#9898B4' }}>En tete de liste 1 semaine · +5 CHF/sem</div>
+            </div>
+            <button
+              onClick={() => showToast('Boost Premium active via TWINT — bientot disponible', 'info')}
+              style={{ background: 'rgba(242,208,107,0.1)', border: '1px solid rgba(242,208,107,0.3)', borderRadius: 999, padding: '4px 12px', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 11, color: '#F2D06B' }}
+            >
+              Activer
+            </button>
+          </div>
+          {/* Flash 24h */}
+          <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13, color: '#F4F4F8' }}>Flash 24h</span>
+                <div style={{ background: 'linear-gradient(135deg, #F2D06B, #D4A050)', borderRadius: 999, padding: '2px 7px', animation: 'breathe 2s ease-in-out infinite' }}>
+                  <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 800, fontSize: 9, color: '#050507' }}>BOOST</span>
+                </div>
+              </div>
+              <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 11, color: '#9898B4' }}>Badge BOOST dans l'Explorer · +2 CHF/jour</div>
+            </div>
+            <button
+              onClick={() => showToast('Boost Flash 24h active via TWINT — bientot disponible', 'info')}
+              style={{ background: 'rgba(242,208,107,0.1)', border: '1px solid rgba(242,208,107,0.3)', borderRadius: 999, padding: '4px 12px', cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 11, color: '#F2D06B' }}
+            >
+              Activer
+            </button>
+          </div>
+        </div>
+
         {/* Next appointment */}
         <div style={{ margin: '0 20px 16px' }}>
           <div style={{ background: '#0D0D13', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 16, padding: '16px' }}>
@@ -154,14 +245,14 @@ export default function ProDashboardScreen({ go, state, update, showToast }: Pro
                 <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#F4F4F8' }}>Prochain RDV</span>
               </div>
               <button
-                onClick={() => go('pro_radar')}
+                onClick={() => go('pro_stats')}
                 style={{
                   background: 'none', border: 'none', cursor: 'pointer',
                   fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 500, color: '#F2D06B',
                   display: 'flex', alignItems: 'center', gap: 4,
                 }}
               >
-                Voir details
+                Voir mes stats
                 <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="#F2D06B" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 18l6-6-6-6" />
                 </svg>
@@ -186,6 +277,30 @@ export default function ProDashboardScreen({ go, state, update, showToast }: Pro
               </div>
             </div>
           </div>
+        </div>
+
+        {/* My Network row */}
+        <div style={{ margin: '0 20px 16px' }}>
+          <button
+            onClick={() => go('pro_network')}
+            style={{
+              width: '100%', background: '#0D0D13', border: '1px solid rgba(255,255,255,0.06)',
+              borderRadius: 16, padding: '0 16px', height: 64,
+              display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', textAlign: 'left',
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="2" stroke="#5B7FFF" strokeWidth="2"/>
+              <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="#5B7FFF" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 13, color: '#F4F4F8' }}>Mon Reseau — invitez des collegues et gagnez des recompenses</div>
+              <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 11, color: '#9898B4' }}>3 pros dans votre reseau</div>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M9 18l6-6-6-6" stroke="#54546C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
         </div>
 
         {/* Rating card */}

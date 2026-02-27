@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 25,
-  "summary": "NEXUS v8.0 — Marketplace beauté et bien-être Suisse romande. React 18 TypeScript strict, backend Motoko ICP mainnet, auth Internet Identity, paiement TWINT exclusif via Payrexx. Design system sombre avec palette gold/void, navigation useState uniquement, icônes SVG inline, zéro emoji, zéro Stripe, zéro React Router, zéro Tailwind. Layout responsive : mobile-first max-width 430px avec header absolu 56px, tab bar dans le flux flex, CTA ancré bas avec safe-area iOS — plus adaptation desktop/tablette avec mise en page intelligente.",
+  "projectStateVersion": 29,
+  "summary": "NEXUS v8.0 — Marketplace beauté et bien-être Suisse romande. React 18 TypeScript strict, backend Motoko ICP mainnet, auth Internet Identity, paiement TWINT exclusif via Payrexx. Design system sombre avec palette gold/void, navigation useState uniquement, icônes SVG inline, zéro emoji, zéro Stripe, zéro React Router, zéro Tailwind. Layout responsive : mobile-first max-width 430px avec header absolu 56px, tab bar dans le flux flex, CTA ancré bas avec safe-area iOS — plus adaptation desktop/tablette avec mise en page intelligente. Abonnement pro : 29.90 CHF/mois après 7 jours gratuits. Stratégie de monétisation conversionnelle : valeur perçue maximale pour les micro-indépendants, partage social, réseau de micro-services, fonctionnalités inégalées pour l'indépendance professionnelle.",
   "architectural_notes": [
     "Navigation par useState uniquement — zéro React Router",
     "Paiement TWINT exclusif via Payrexx (psp[0]=twint) — zéro Stripe/Revolut",
@@ -19,9 +19,10 @@
     "Bug OTP/Rôle : screen initial démarre sur 'otp', cards RoleScreen noires (#000 au lieu de #0D0D13), onClick manquants sur cards, OTPScreen s'affiche prématurément — correction en cours (useAppState.ts, RoleScreen.tsx, OTPScreen.tsx, App.tsx)",
     "Correction finale lancement en cours : 4 problèmes critiques (Booking flow, Espace Pro, Espace Admin, Géolocalisation Explorer) — 24 fichiers à livrer (AR-59)",
     "Mise en page : certains écrans ne montrent pas tout le contenu visible à l'écran (overflow, hauteurs fixes problématiques) — correction intelligente requise mobile + desktop",
-    "Boucle infinie auth : la connexion tourne en boucle et les étapes suivantes (Role, OTP, Explorer) ne sont pas accessibles — correction en cours (LoginScreen, RoleScreen, OTPScreen, useAppState, App.tsx)"
+    "Boucle infinie auth : la connexion tourne en boucle et les étapes suivantes (Role, OTP, Explorer) ne sont pas accessibles — correction en cours (LoginScreen, RoleScreen, OTPScreen, useAppState, App.tsx)",
+    "Sidebar desktop masque le contenu principal — bouton toggle collapse/expand requis (AR-183)"
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
       "id": "feature-create-frontend-src-styles-globals-css-with-google-fonts-inter-import-weights-300-900-full-css-custom-property-palette-void-050507-d1-09090d-d2-0d0d13-d3-121219-d4-1c1c26-d5-2e2e3e-gold-f2d06b-gold2-d4a050-t1-f4f4f8-t2-9898b4-t3-54546c-flash-00d97a-alert-ff3d5a-blue-5b7fff-e1-rgba-255-255-255-0-04-e2-rgba-255-255-255-0-08-full-mobile-reset-input-textarea-height-52px-font-size-16px-button-active-transform-scale-0-97-transition-120ms-css-keyframe-animations-fadein-breathe-spin-slideup-slidedown-scalein-float-shimmer-fall-progressfill-scrollbar-hidden-globally-scrollbar-width-none-webkit-scrollbar-display-none-webkit-tap-highlight-color-transparent-user-select-none-on-interactive-elements",
@@ -1078,6 +1079,110 @@
         "REQ-205"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-app-tsx-add-a-collapsible-sidebar-state-a-boolean-sidebarcollapsed-default-false-stored-in-react-usestate-with-a-toggle-button-at-the-top-of-the-sidebar-when-collapsed-the-sidebar-width-shrinks-from-220px-to-64px-using-a-css-transition-of-220ms-ease-in-collapsed-state-nav-items-show-only-the-icon-no-label-text-in-expanded-state-nav-items-show-icon-label-the-main-content-area-must-expand-to-fill-the-freed-space-using-css-grid-or-flex-the-toggle-button-is-a-40px-circle-at-the-top-of-the-sidebar-icon-is-iconchevronright-rotated-180deg-when-expanded-0deg-when-collapsed-with-transition-220ms-the-collapsed-expanded-state-is-persisted-to-localstorage-under-the-key-nexus-sidebar-collapsed-and-restored-on-mount",
+      "title": "In frontend/src/App.tsx, add a collapsible sidebar state: a boolean `sidebarCollapsed` (default false) stored in React useState, with a toggle button at the top of the sidebar. When collapsed, the sidebar width shrinks from 220px to 64px using a CSS transition of 220ms ease; in collapsed state, nav items show only the icon (no label text); in expanded state, nav items show icon + label. The main content area must expand to fill the freed space using CSS grid or flex. The toggle button is a 40px circle at the top of the sidebar — icon is IconChevronRight (rotated 180deg when expanded, 0deg when collapsed) with transition 220ms. The collapsed/expanded state is persisted to localStorage under the key 'nexus_sidebar_collapsed' and restored on mount.",
+      "reqIds": [
+        "REQ-206"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-every-occurrence-of-the-subscription-price-across-the-entire-codebase-from-19-90-chf-to-29-90-chf-month-specifically-update-subscriptionmodal-tsx-subtitle-text-then-29-90-chf-month-tabpaiement-tsx-financial-summary-line-monthly-subscription-cost-29-90-chf-probusinessscreen-tsx-any-cta-or-label-referencing-the-subscription-cost-and-any-other-string-in-the-frontend-that-displays-the-old-price-the-7-day-free-trial-period-remains-unchanged",
+      "title": "Update every occurrence of the subscription price across the entire codebase from 19.90 CHF to 29.90 CHF/month. Specifically update: SubscriptionModal.tsx subtitle text ('Then 29.90 CHF / month'), TabPaiement.tsx financial summary line ('Monthly subscription cost: 29.90 CHF'), ProBusinessScreen.tsx any CTA or label referencing the subscription cost, and any other string in the frontend that displays the old price. The 7-day free trial period remains unchanged.",
+      "reqIds": [
+        "REQ-208"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-pro-propitchscreen-tsx-as-a-full-conversion-landing-screen-screen-key-pro-pitch-that-convinces-independent-professionals-to-subscribe-to-nexus-pro-layout-position-fixed-inset-0-display-flex-flex-direction-column-background-var-void-scroll-zone-flex-1-overflow-y-auto-content-sections-in-order-1-hero-four-animated-blur-orbs-same-float-keyframe-as-loginscreen-headline-the-platform-that-sets-you-free-inter-900-48px-f4f4f8-centered-subheadline-no-boss-no-commission-just-your-clients-inter-400-18px-9898b4-gold-gradient-divider-2-three-value-pillars-in-glass-card-rows-with-a-colored-icon-circle-40px-left-freedom-iconhome-f2d06b-work-where-you-want-when-you-want-at-your-price-revenue-iconwallet-00d97a-keep-85-of-every-booking-no-hidden-fees-network-iconradar-5b7fff-join-500-independent-pros-already-on-nexus-3-animated-counter-showing-500-active-pros-count-up-from-0-over-2s-on-mount-inter-900-64px-f2d06b-centered-with-label-professionals-trust-nexus-inter-400-14px-9898b4-4-three-testimonial-cards-horizontal-scroll-fictitious-pros-with-unsplash-avatar-images-name-category-city-star-rating-filled-f2d06b-quote-text-inter-400-14px-9898b4-unsplash-ids-photo-1570172619644-dfd03ed5d881-sophie-r-esthetique-lausanne-4-9-stars-my-revenue-doubled-in-3-months-photo-1503951914875-452162b0f3f1-karim-b-barber-geneva-5-0-stars-i-work-100-on-my-own-terms-now-photo-1544161515-4ab6ce6db874-marc-t-massage-zurich-4-8-stars-best-investment-i-made-for-my-practice-5-satisfaction-guarantee-row-iconshield-00d97a-30-day-money-back-guarantee-inter-600-14px-f4f4f8-6-cta-zone-flex-shrink-0-padding-16px-20px-btnprimary-start-free-for-7-days-gold-gradient-text-050507-onclick-calls-go-pro-subscription-below-button-twint-only-29-90-chf-month-after-trial-inter-400-12px-54546c-centered-add-pro-pitch-to-the-screen-union-type-in-useappstate-ts-and-add-a-case-in-app-tsx-renderscreen-switch-back-arrow-in-header-calls-go-pro-dashboard-zero-emoji",
+      "title": "Create frontend/src/screens/pro/ProPitchScreen.tsx as a full conversion landing screen (screen key: 'pro_pitch') that convinces independent professionals to subscribe to NEXUS Pro. Layout: position fixed inset-0, display flex, flex-direction column, background var(--void), scroll zone flex-1 overflow-y auto. Content sections in order: (1) Hero — four animated blur orbs (same float keyframe as LoginScreen), headline 'The platform that sets you free' Inter 900 48px #F4F4F8 centered, subheadline 'No boss. No commission. Just your clients.' Inter 400 18px #9898B4, gold gradient divider; (2) Three value pillars in glass-card rows with a colored icon circle (40px) left — 'Freedom' (IconHome #F2D06B): 'Work where you want, when you want, at your price'; 'Revenue' (IconWallet #00D97A): 'Keep 85% of every booking — no hidden fees'; 'Network' (IconRadar #5B7FFF): 'Join 500+ independent pros already on NEXUS'; (3) Animated counter showing '500+' active pros (count-up from 0 over 2s on mount) Inter 900 64px #F2D06B centered with label 'professionals trust NEXUS' Inter 400 14px #9898B4; (4) Three testimonial cards horizontal scroll — fictitious pros with Unsplash avatar images, name, category, city, star rating (filled #F2D06B), quote text Inter 400 14px #9898B4 — Unsplash IDs: photo-1570172619644-dfd03ed5d881 (Sophie R., Esthetique, Lausanne, 4.9 stars, 'My revenue doubled in 3 months'), photo-1503951914875-452162b0f3f1 (Karim B., Barber, Geneva, 5.0 stars, 'I work 100% on my own terms now'), photo-1544161515-4ab6ce6db874 (Marc T., Massage, Zurich, 4.8 stars, 'Best investment I made for my practice'); (5) Satisfaction guarantee row: IconShield #00D97A + '30-day money-back guarantee' Inter 600 14px #F4F4F8; (6) CTA zone flex-shrink-0 padding 16px 20px: BtnPrimary 'Start free for 7 days' gold gradient text #050507 onClick calls go('pro_subscription'), below button 'TWINT only · 29.90 CHF/month after trial' Inter 400 12px #54546C centered. Add 'pro_pitch' to the Screen union type in useAppState.ts and add a case in App.tsx renderScreen() switch. Back arrow in header calls go('pro_dashboard'). Zero emoji.",
+      "reqIds": [
+        "REQ-209"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-view-pitch-entry-point-from-prodashboardscreen-add-a-secondary-link-or-card-below-the-metric-cards-labeled-why-nexus-pro-discover-all-features-inter-500-13px-f2d06b-with-iconarrowright-size-14-f2d06b-that-calls-go-pro-pitch-on-click-this-must-be-visible-in-the-scroll-zone-without-requiring-scroll-on-most-screens",
+      "title": "Add a 'View pitch' entry point from ProDashboardScreen: add a secondary link or card below the metric cards labeled 'Why NEXUS Pro — discover all features' Inter 500 13px #F2D06B with IconArrowRight size 14 #F2D06B that calls go('pro_pitch') on click. This must be visible in the scroll zone without requiring scroll on most screens.",
+      "reqIds": [
+        "REQ-210"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-pro-prostatsscreen-tsx-as-a-dedicated-analytics-screen-screen-key-pro-stats-layout-position-fixed-inset-0-display-flex-flex-direction-column-header-absolute-56px-with-back-arrow-calling-go-pro-dashboard-scroll-zone-flex-1-overflow-y-auto-paddingtop-72px-tabbarpro-flex-shrink-0-at-bottom-with-no-active-tab-content-sections-1-conversion-rate-card-glass-card-label-profile-views-bookings-inter-600-12px-54546c-uppercase-value-24-inter-900-48px-f2d06b-subtitle-based-on-last-30-days-inter-400-12px-9898b4-2-revenue-per-service-bar-chart-6-animated-vertical-bars-heights-animate-from-0-on-mount-each-bar-labeled-with-service-name-below-in-inter-500-10px-54546c-and-chf-amount-above-in-inter-700-12px-f2d06b-demo-values-haircut-420-chf-beard-trim-180-chf-hair-beard-315-chf-shave-100-chf-kids-cut-80-chf-other-60-chf-bars-use-gradient-fill-linear-gradient-to-top-d4a050-f2d06b-border-radius-6px-6px-0-0-3-peak-hours-heatmap-7-rows-mon-sun-x-12-columns-8h-20h-svg-grid-each-cell-is-a-28x20px-rectangle-fill-color-opacity-scales-from-rgba-242-208-107-0-05-to-rgba-242-208-107-0-6-based-on-a-demo-booking-density-value-row-column-labels-inter-500-10px-54546c-4-rating-trend-card-line-chart-svg-showing-rating-over-last-30-days-demo-values-4-6-4-7-4-7-4-8-4-8-4-9-line-stroke-f2d06b-2px-area-fill-rgba-242-208-107-0-06-5-top-3-loyal-clients-section-3-glass-card-rows-showing-initials-avatar-circle-40px-1c1c26-f2d06b-border-name-inter-600-14px-f4f4f8-bookings-inter-400-12px-9898b4-demo-thomas-m-8-bookings-julien-r-5-bookings-sophie-l-4-bookings-6-monthly-revenue-projection-card-projected-this-month-inter-600-12px-54546c-value-340-chf-inter-900-36px-00d97a-subtitle-based-on-your-current-average-inter-400-12px-9898b4-add-pro-stats-to-screen-union-type-in-useappstate-ts-and-case-in-app-tsx-zero-emoji",
+      "title": "Create frontend/src/screens/pro/ProStatsScreen.tsx as a dedicated analytics screen (screen key: 'pro_stats'). Layout: position fixed inset-0, display flex, flex-direction column, header absolute 56px with back arrow calling go('pro_dashboard'), scroll zone flex-1 overflow-y auto paddingTop 72px, TabBarPro flex-shrink-0 at bottom with no active tab. Content sections: (1) Conversion rate card glass-card: label 'Profile views → Bookings' Inter 600 12px #54546C uppercase, value '24%' Inter 900 48px #F2D06B, subtitle 'Based on last 30 days' Inter 400 12px #9898B4; (2) Revenue per service bar chart: 6 animated vertical bars (heights animate from 0 on mount), each bar labeled with service name below in Inter 500 10px #54546C and CHF amount above in Inter 700 12px #F2D06B — demo values: Haircut 420 CHF, Beard trim 180 CHF, Hair+Beard 315 CHF, Shave 100 CHF, Kids cut 80 CHF, Other 60 CHF; bars use gradient fill linear-gradient(to top, #D4A050, #F2D06B) border-radius 6px 6px 0 0; (3) Peak hours heatmap: 7 rows (Mon–Sun) x 12 columns (8h–20h) SVG grid — each cell is a 28x20px rectangle, fill color opacity scales from rgba(242,208,107,0.05) to rgba(242,208,107,0.6) based on a demo booking density value, row/column labels Inter 500 10px #54546C; (4) Rating trend card: line chart SVG showing rating over last 30 days (demo values: 4.6, 4.7, 4.7, 4.8, 4.8, 4.9), line stroke #F2D06B 2px, area fill rgba(242,208,107,0.06); (5) Top 3 loyal clients section: 3 glass-card rows showing initials avatar circle 40px #1C1C26 #F2D06B border, name Inter 600 14px #F4F4F8, '# bookings' Inter 400 12px #9898B4 — demo: 'Thomas M. · 8 bookings', 'Julien R. · 5 bookings', 'Sophie L. · 4 bookings'; (6) Monthly revenue projection card: 'Projected this month' Inter 600 12px #54546C, value '340 CHF' Inter 900 36px #00D97A, subtitle 'Based on your current average' Inter 400 12px #9898B4. Add 'pro_stats' to Screen union type in useAppState.ts and case in App.tsx. Zero emoji.",
+      "reqIds": [
+        "REQ-211"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-view-my-stats-entry-point-from-prodashboardscreen-add-a-link-button-labeled-view-my-stats-inter-500-12px-f2d06b-with-iconarrowright-size-14-in-the-next-appointment-card-footer-area-that-calls-go-pro-stats-on-click",
+      "title": "Add a 'View my stats' entry point from ProDashboardScreen: add a link/button labeled 'View my stats' Inter 500 12px #F2D06B with IconArrowRight size 14 in the Next appointment card footer area that calls go('pro_stats') on click.",
+      "reqIds": [
+        "REQ-212"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-pro-prosharescreen-tsx-as-a-social-sharing-screen-screen-key-pro-share-layout-position-fixed-inset-0-display-flex-flex-direction-column-header-absolute-56px-with-back-arrow-calling-go-pro-dashboard-scroll-zone-flex-1-overflow-y-auto-paddingtop-72px-content-1-share-profile-preview-card-glass-card-280px-centered-pro-cover-unsplash-image-120px-height-with-gradient-overlay-avatar-60px-gold-border-pro-name-inter-700-18px-f4f4f8-category-city-inter-400-13px-9898b4-star-rating-row-filled-f2d06b-from-x-chf-inter-600-14px-f2d06b-link-text-nexus-app-pro-state-prodata-id-demo-001-inter-500-11px-54546c-2-qr-code-section-generate-a-dynamic-svg-qr-code-representing-the-url-https-nexus-app-pro-id-implement-a-minimal-qr-code-svg-generator-in-pure-typescript-using-a-simple-matrix-approach-no-external-library-render-as-an-svg-180x180px-with-dark-modules-on-white-transparent-background-center-the-svg-in-a-white-200x200px-rounded-card-3-share-options-grid-2x2-each-option-is-a-glass-card-button-80px-height-with-colored-icon-circle-44px-and-label-below-inter-500-12px-f4f4f8-copy-link-iconcheck-f2d06b-onclick-navigator-clipboard-writetext-url-then-showtoast-link-copied-success-whatsapp-iconmessage-00d97a-onclick-window-open-https-wa-me-text-encodeuricomponent-discover-my-profile-on-nexus-https-nexus-app-pro-id-sms-iconphone-5b7fff-onclick-window-open-sms-body-encodeuricomponent-book-me-on-nexus-https-nexus-app-pro-id-instagram-iconcamera-ff3d5a-onclick-navigator-clipboard-writetext-url-then-showtoast-link-copied-paste-in-your-bio-info-add-pro-share-to-screen-union-type-and-app-tsx-renderscreen-switch-zero-emoji",
+      "title": "Create frontend/src/screens/pro/ProShareScreen.tsx as a social sharing screen (screen key: 'pro_share'). Layout: position fixed inset-0, display flex, flex-direction column, header absolute 56px with back arrow calling go('pro_dashboard'), scroll zone flex-1 overflow-y auto paddingTop 72px. Content: (1) Share profile preview card glass-card 280px centered: pro cover Unsplash image 120px height with gradient overlay, avatar 60px gold border, pro name Inter 700 18px #F4F4F8, category + city Inter 400 13px #9898B4, star rating row (filled #F2D06B), 'from X CHF' Inter 600 14px #F2D06B, link text 'nexus.app/pro/[state.proData.id ?? demo-001]' Inter 500 11px #54546C; (2) QR code section: generate a dynamic SVG QR code representing the URL 'https://nexus.app/pro/[id]' — implement a minimal QR code SVG generator in pure TypeScript using a simple matrix approach (no external library), render as an SVG 180x180px with dark modules on white/transparent background, center the SVG in a white 200x200px rounded card; (3) Share options grid 2x2: each option is a glass-card button 80px height with colored icon circle 44px and label below Inter 500 12px #F4F4F8 — 'Copy link' (IconCheck #F2D06B, onClick: navigator.clipboard.writeText(url).then(() => showToast('Link copied!', 'success'))), 'WhatsApp' (IconMessage #00D97A, onClick: window.open('https://wa.me/?text=' + encodeURIComponent('Discover my profile on NEXUS: https://nexus.app/pro/[id]'))), 'SMS' (IconPhone #5B7FFF, onClick: window.open('sms:?body=' + encodeURIComponent('Book me on NEXUS: https://nexus.app/pro/[id]'))), 'Instagram' (IconCamera #FF3D5A, onClick: navigator.clipboard.writeText(url).then(() => showToast('Link copied — paste in your bio!', 'info'))). Add 'pro_share' to Screen union type and App.tsx renderScreen() switch. Zero emoji.",
+      "reqIds": [
+        "REQ-213"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-share-my-profile-buttons-on-prodashboardscreen-and-probusinessscreen-on-prodashboardscreen-add-a-secondary-action-button-in-the-greeting-section-area-labeled-share-my-profile-with-iconarrowright-size-14-background-rgba-242-208-107-0-08-border-1px-solid-rgba-242-208-107-0-2-border-radius-999px-padding-8px-16px-inter-600-13px-f2d06b-onclick-calls-go-pro-share-on-probusinessscreen-add-the-same-style-button-in-the-cta-zone-area-above-the-main-cta-button-on-tabs-1-and-2-only-calling-go-pro-share-zero-emoji",
+      "title": "Add 'Share my profile' buttons on ProDashboardScreen and ProBusinessScreen. On ProDashboardScreen: add a secondary action button in the greeting section area labeled 'Share my profile' with IconArrowRight size 14, background rgba(242,208,107,0.08) border 1px solid rgba(242,208,107,0.2) border-radius 999px padding 8px 16px, Inter 600 13px #F2D06B, onClick calls go('pro_share'). On ProBusinessScreen: add the same style button in the CTA zone area (above the main CTA button) on tabs 1 and 2 only, calling go('pro_share'). Zero emoji.",
+      "reqIds": [
+        "REQ-214"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-pro-pronetworkscreen-tsx-as-a-micro-network-referral-screen-screen-key-pro-network-layout-position-fixed-inset-0-display-flex-flex-direction-column-header-absolute-56px-with-back-arrow-calling-go-pro-dashboard-scroll-zone-flex-1-overflow-y-auto-paddingtop-72px-content-sections-1-referral-code-card-glass-card-centered-title-my-referral-code-inter-700-18px-f4f4f8-code-value-nexus-state-id-or-demo42-inter-900-32px-f2d06b-letter-spacing-0-08em-in-a-bordered-box-background-1c1c26-border-1px-dashed-rgba-242-208-107-0-3-border-radius-14px-padding-16px-copy-button-iconcheck-f2d06b-label-copy-code-inter-600-13px-f2d06b-background-rgba-242-208-107-0-08-border-1px-solid-rgba-242-208-107-0-2-border-radius-999px-padding-8px-16px-that-calls-navigator-clipboard-writetext-code-then-showtoast-code-copied-success-2-reward-explanation-card-glass-card-iconstar-f2d06b-24px-earn-1-free-month-for-every-pro-you-bring-who-activates-a-subscription-inter-500-14px-f4f4f8-3-stats-row-two-metrics-side-by-side-pros-invited-inter-400-12px-54546c-with-value-3-inter-800-28px-f4f4f8-months-earned-inter-400-12px-54546c-with-value-1-inter-800-28px-00d97a-4-network-list-section-title-my-network-inter-700-16px-f4f4f8-with-gold-left-accent-bar-3px-list-of-3-demo-pros-each-glass-card-row-72px-height-showing-initials-avatar-circle-40px-name-inter-600-14px-f4f4f8-category-city-inter-400-12px-9898b4-status-badge-pill-active-active-background-rgba-0-217-122-0-1-text-00d97a-pending-pending-background-rgba-242-208-107-0-1-text-f2d06b-demo-marie-l-coiffure-lausanne-active-sofiane-r-barber-geneva-active-emma-d-esthetique-berne-pending-5-invite-cta-btnprimary-invite-a-colleague-gold-gradient-text-050507-onclick-calls-go-pro-share-add-pro-network-to-screen-union-type-and-app-tsx-renderscreen-zero-emoji",
+      "title": "Create frontend/src/screens/pro/ProNetworkScreen.tsx as a micro-network / referral screen (screen key: 'pro_network'). Layout: position fixed inset-0, display flex, flex-direction column, header absolute 56px with back arrow calling go('pro_dashboard'), scroll zone flex-1 overflow-y auto paddingTop 72px. Content sections: (1) Referral code card glass-card centered: title 'My referral code' Inter 700 18px #F4F4F8, code value 'NEXUS-[STATE_ID or DEMO42]' Inter 900 32px #F2D06B letter-spacing 0.08em in a bordered box background #1C1C26 border 1px dashed rgba(242,208,107,0.3) border-radius 14px padding 16px, copy button (IconCheck #F2D06B label 'Copy code' Inter 600 13px #F2D06B background rgba(242,208,107,0.08) border 1px solid rgba(242,208,107,0.2) border-radius 999px padding 8px 16px) that calls navigator.clipboard.writeText(code).then(() => showToast('Code copied!', 'success')); (2) Reward explanation card glass-card: IconStar #F2D06B 24px + 'Earn 1 free month for every pro you bring who activates a subscription' Inter 500 14px #F4F4F8; (3) Stats row: two metrics side-by-side — 'Pros invited' Inter 400 12px #54546C with value '3' Inter 800 28px #F4F4F8, 'Months earned' Inter 400 12px #54546C with value '1' Inter 800 28px #00D97A; (4) Network list section title 'My network' Inter 700 16px #F4F4F8 with gold left accent bar 3px; list of 3 demo pros: each glass-card row 72px height showing initials avatar circle 40px, name Inter 600 14px #F4F4F8, category + city Inter 400 12px #9898B4, status badge pill (active: 'Active' background rgba(0,217,122,0.1) text #00D97A; pending: 'Pending' background rgba(242,208,107,0.1) text #F2D06B) — demo: 'Marie L. · Coiffure · Lausanne · Active', 'Sofiane R. · Barber · Geneva · Active', 'Emma D. · Esthetique · Berne · Pending'; (5) Invite CTA: BtnPrimary 'Invite a colleague' gold gradient text #050507 onClick calls go('pro_share'). Add 'pro_network' to Screen union type and App.tsx renderScreen(). Zero emoji.",
+      "reqIds": [
+        "REQ-215"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-my-network-entry-point-from-probusinessscreen-in-the-probusinessscreen-content-zone-visible-on-all-tabs-below-the-active-tab-content-add-a-secondary-glass-card-row-64px-height-at-the-bottom-of-the-scroll-zone-showing-iconradar-5b7fff-20px-label-my-network-invite-colleagues-earn-rewards-inter-500-13px-f4f4f8-subtitle-3-pros-in-your-network-inter-400-11px-9898b4-iconchevronright-54546c-16px-on-the-right-edge-onclick-calls-go-pro-network-also-add-an-entry-point-on-prodashboardscreen-as-a-row-card-in-the-scroll-zone-below-the-next-appointment-card-with-the-same-styling-zero-emoji",
+      "title": "Add a 'My Network' entry point from ProBusinessScreen: in the ProBusinessScreen content zone (visible on all tabs below the active tab content), add a secondary glass-card row 64px height at the bottom of the scroll zone showing IconRadar #5B7FFF 20px, label 'My Network — invite colleagues & earn rewards' Inter 500 13px #F4F4F8, subtitle '3 pros in your network' Inter 400 11px #9898B4, IconChevronRight #54546C 16px on the right edge — onClick calls go('pro_network'). Also add an entry point on ProDashboardScreen as a row card in the scroll zone below the next appointment card with the same styling. Zero emoji.",
+      "reqIds": [
+        "REQ-216"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-pro-visibility-boost-feature-to-prodashboardscreen-add-a-glass-card-section-labeled-boost-my-visibility-inter-700-16px-f4f4f8-with-gold-left-accent-bar-3px-in-the-scroll-zone-below-the-flash-toggle-card-inside-the-card-display-3-boost-tier-rows-1-standard-row-label-inter-600-13px-9898b4-included-in-your-subscription-status-pill-active-background-rgba-0-217-122-0-1-text-00d97a-2-premium-row-label-top-of-list-for-1-week-inter-600-13px-f4f4f8-price-5-chf-week-inter-500-12px-9898b4-button-activate-background-rgba-242-208-107-0-1-border-1px-solid-rgba-242-208-107-0-3-border-radius-999px-padding-6px-14px-inter-600-12px-f2d06b-onclick-calls-showtoast-premium-boost-activated-via-twint-coming-soon-info-3-flash-24h-row-label-appear-with-boost-badge-in-explorer-inter-600-13px-f4f4f8-price-2-chf-day-inter-500-12px-9898b4-animated-boost-badge-pill-background-linear-gradient-135deg-f2d06b-d4a050-text-050507-inter-800-9px-letter-spacing-0-06em-with-a-subtle-breathe-animation-scale-1-1-05-1-over-2s-button-activate-same-pill-style-as-premium-row-onclick-calls-showtoast-flash-24h-boost-activated-via-twint-coming-soon-info-in-explorerscreen-for-pros-demo-entries-that-have-flash-true-and-note-4-8-alexandre-karim-render-an-animated-boost-pill-badge-same-gradient-style-breathe-animation-on-the-card-overlaid-at-the-top-right-corner-zero-emoji",
+      "title": "Add a pro visibility boost feature to ProDashboardScreen. Add a glass-card section labeled 'Boost my visibility' Inter 700 16px #F4F4F8 with gold left accent bar 3px in the scroll zone below the Flash toggle card. Inside the card, display 3 boost tier rows: (1) 'Standard' row — label Inter 600 13px #9898B4 'Included in your subscription', status pill 'Active' background rgba(0,217,122,0.1) text #00D97A; (2) 'Premium' row — label 'Top of list for 1 week' Inter 600 13px #F4F4F8, price '+5 CHF/week' Inter 500 12px #9898B4, button 'Activate' background rgba(242,208,107,0.1) border 1px solid rgba(242,208,107,0.3) border-radius 999px padding 6px 14px Inter 600 12px #F2D06B — onClick calls showToast('Premium boost activated via TWINT — coming soon', 'info'); (3) 'Flash 24h' row — label 'Appear with BOOST badge in Explorer' Inter 600 13px #F4F4F8, price '+2 CHF/day' Inter 500 12px #9898B4, animated 'BOOST' badge pill background linear-gradient(135deg, #F2D06B, #D4A050) text #050507 Inter 800 9px letter-spacing 0.06em with a subtle breathe animation (scale 1→1.05→1 over 2s), button 'Activate' same pill style as Premium row — onClick calls showToast('Flash 24h boost activated via TWINT — coming soon', 'info'). In ExplorerScreen, for PROS_DEMO entries that have flash === true AND note >= 4.8 (Alexandre, Karim), render an animated 'BOOST' pill badge (same gradient style, breathe animation) on the card overlaid at the top-right corner. Zero emoji.",
+      "reqIds": [
+        "REQ-218"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-frontend-src-state-useappstate-ts-to-add-the-new-screen-values-to-the-screen-union-type-pro-pitch-pro-stats-pro-share-pro-network-all-other-fields-defaults-and-behaviors-remain-unchanged-the-go-function-must-handle-all-new-screen-values-without-any-guards",
+      "title": "Update frontend/src/state/useAppState.ts to add the new screen values to the Screen union type: 'pro_pitch', 'pro_stats', 'pro_share', 'pro_network'. All other fields, defaults, and behaviors remain unchanged. The go() function must handle all new screen values without any guards.",
+      "reqIds": [
+        "REQ-220"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-frontend-src-app-tsx-renderscreen-switch-to-add-cases-for-all-new-screens-case-pro-pitch-renders-propitchscreen-case-pro-stats-renders-prostatsscreen-case-pro-share-renders-prosharescreen-case-pro-network-renders-pronetworkscreen-all-cases-pass-go-state-update-showtoast-removetoast-props-no-fallthrough-between-cases-the-default-case-continues-to-fall-back-to-loginscreen-all-existing-28-cases-remain-intact",
+      "title": "Update frontend/src/App.tsx renderScreen() switch to add cases for all new screens: case 'pro_pitch' renders ProPitchScreen, case 'pro_stats' renders ProStatsScreen, case 'pro_share' renders ProShareScreen, case 'pro_network' renders ProNetworkScreen. All cases pass go, state, update, showToast, removeToast props. No fallthrough between cases. The default case continues to fall back to LoginScreen. All existing 28 cases remain intact.",
+      "reqIds": [
+        "REQ-221"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -1872,6 +1977,84 @@
       "summary": "Refine frontend/src/styles/globals.css with all missing fixes: (1) add height: 100dvh on the html and body root; (2) add --safe-bottom: env(safe-area-inset-bottom, 8px); (3) .screen-root { position: fixed; inset: 0; display: flex; flex-direction: column; background: var(--void); }; (4) .scroll-zone { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; }; (5) .cta-zone { flex-shrink: 0; padding: 12px 20px calc(12px + var(--safe-bottom)); background: rgba(5,5,7,0.97); border-top: 1px solid rgba(255,255,255,0.04); }; (6) .tab-bar { flex-shrink: 0; }; (7) ensure all keyframe animations (fadeIn, breathe, shimmer, fall, progressFill, scaleIn, slideUp, slideDown, float, spin) are fully defined with correct will-change GPU hints; (8) .glass-card, .gold-text, .glow-gold utility classes correct at all breakpoints; (9) media query breakpoints at 430px, 768px, 900px; (10) body font-size 15px at >= 768px; (11) smooth scroll on html element; (12) overscroll-behavior: contain on all scroll zones.",
       "reqIds": [
         "REQ-188"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-183",
+      "summary": "Sidebar desktop : ajouter un bouton toggle pour réduire/fermer la barre latérale (mode collapsed avec icônes seulement, sans labels), état persisté localement, animation smooth 220ms, contenu principal s'étend pour remplir l'espace libéré",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-185",
+      "summary": "In frontend/src/styles/globals.css, add CSS custom properties and utility rules to support the collapsible sidebar: add `--sidebar-collapsed-width: 64px`; update the existing `--sidebar-width: 220px`; add a `.sidebar-collapsed` modifier class that sets sidebar width to var(--sidebar-collapsed-width); add transition rules `width 220ms ease, min-width 220ms ease` on the sidebar element; ensure the CSS grid / flex layout for the desktop two-column container adapts when the sidebar width changes so the main content column always fills the remaining viewport width.",
+      "reqIds": [
+        "REQ-207"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-186",
+      "summary": "Mise à jour du prix d'abonnement pro à 29.90 CHF/mois (au lieu de 19.90) après 7 jours gratuits — mettre à jour SubscriptionModal, TabPaiement résumé financier, ProBusinessScreen CTA, et toutes les occurrences du prix dans le code",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-187",
+      "summary": "Créer une page/écran 'Pourquoi NEXUS Pro' (pro_pitch) : landing de conversion ultra-persuasive pour convaincre les pros de s'abonner — headline révolutionnaire, 3 piliers valeur (Liberté, Revenus, Réseau), témoignages fictifs avec photos Unsplash, compteur de pros actifs animé, bouton CTA 'Démarrer gratuitement 7 jours' gold gradient, badge TWINT only, garantie satisfait ou remboursé",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-188",
+      "summary": "Ajouter un système de partage social pour les pros : bouton 'Partager mon profil' sur ProDashboard et ProBusinessScreen — génère un lien unique nexus.app/pro/[id], options de partage (copier lien, WhatsApp, Instagram, SMS), QR code SVG généré dynamiquement, preview card de partage avec photo+nom+spécialité+note+lien",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-189",
+      "summary": "Ajouter un système de micro-réseau pour les pros : section 'Mon Réseau' dans ProBusinessScreen (nouvel onglet ou section dédiée) — inviter des collègues pros avec code de parrainage unique, tracker les parrainages (X pros invités), récompense : 1 mois offert par pro parrainé actif, liste des pros du réseau avec statut",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-190",
+      "summary": "Créer un écran ProStatsScreen (pro_stats) avec analytics avancés pour les pros : taux de conversion (vues fiche → réservations), revenus par service (graphe barres), heures de pointe (heatmap 7x24h SVG), note évolution sur 30 jours, top 3 clients fidèles, projections revenus mensuels basées sur moyenne actuelle — accessible depuis ProDashboard via lien 'Voir mes stats'",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-191",
+      "summary": "Ajouter des badges et certifications pros sur la fiche pro et l'Explorer : badge 'Top Pro' (étoile gold) si note >= 4.8, badge 'Flash Expert' (éclair #flash) si mode flash actif, badge 'Certifié NEXUS' (shield #blue) après 50 réservations complètes, badge 'Nouveau' (#alert) pour les pros < 30 jours — affichés sur les cards Explorer et la FichePro",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-192",
+      "summary": "Ajouter un système de boost de visibilité payant pour les pros (fonctionnalité premium dans l'abonnement) : bouton 'Booster ma visibilité' dans ProDashboard — 3 niveaux de boost (Standard gratuit, Premium +5 CHF/sem visible en tête de liste, Flash 24h +2 CHF apparaît avec badge BOOST animé dans Explorer), intégration Payrexx TWINT pour les boosts payants",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-193",
+      "summary": "Créer un système de micro-services express dans l'Explorer : nouvelle section 'Services Express' avec filtre 'Disponible maintenant' — affiche uniquement les pros en mode Flash actif, tri par distance si géolocalisation active, badge '< 30 min' sur les cards, animation pulsing gold sur les cards disponibles immédiatement",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-203",
+      "summary": "Add a pro badge system to ExplorerScreen and FicheProScreen. Define a getBadges(pro) utility function in ExplorerScreen.tsx that returns an array of badge objects based on the pro's data: (1) 'Top Pro' badge — shown when pro.note >= 4.8 — IconStar size 10 color #050507 background #F2D06B border-radius 999px padding 2px 6px Inter 700 9px #050507; (2) 'Flash Expert' badge — shown when pro.flash === true — IconFlash size 10 color #050507 background #00D97A border-radius 999px padding 2px 6px Inter 700 9px #050507; (3) 'NEXUS Certified' badge — shown when pro.nbAvis >= 50 — IconShield size 10 color #fff background #5B7FFF border-radius 999px padding 2px 6px Inter 700 9px #fff; (4) 'New' badge — shown when a demo flag pro.isNew === true OR pro.nbAvis < 10 — background rgba(255,61,90,0.15) border 1px solid rgba(255,61,90,0.3) text #FF3D5A Inter 700 9px. Render applicable badge pills overlaid at the bottom-left corner of each 'Available now' card and inline below the name in each 'Experts for you' row. In FicheProScreen, render the badge pills inline below the pro name, above the slogan. In PROS_DEMO data, ensure Alexandre (note 4.9 → Top Pro + Flash Expert + NEXUS Certified), Elise (note 4.9, nbAvis 203 → Top Pro + NEXUS Certified), Nadia (note 4.7, flash true → Flash Expert), Karim (note 4.8, flash true → Top Pro + Flash Expert), Marco (note 4.8 → Top Pro), Clara (flash true → Flash Expert) all display correct badges. Zero emoji.",
+      "reqIds": [
+        "REQ-217"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-205",
+      "summary": "Add an 'Express Services' section to ExplorerScreen as a new content section above 'Available now'. This section appears only when filter is 'All' or 'Flash'. Title 'Express Services' Inter 700 18px #F4F4F8 with a 3px #00D97A left accent bar (instead of gold, to differentiate). Subtitle '< 30 min · Available right now' Inter 400 13px #9898B4. Filter logic: show only PROS_DEMO entries where flash === true (Alexandre, Karim, Nadia, Clara). Display as a horizontal scroll row of compact cards 140x180px: card background linear-gradient(135deg, #0D0D13, #121219) border 1px solid rgba(0,217,122,0.15) border-radius 16px overflow hidden. Top section: pro image 100% width 100px height (Unsplash with onError fallback gradient), overlay gradient bottom linear-gradient(transparent, rgba(5,5,7,0.9)). Bottom section padding 10px: pro name Inter 700 13px #F4F4F8, category Inter 400 11px #9898B4. Bottom row: '< 30 min' pill background rgba(0,217,122,0.1) border 1px solid rgba(0,217,122,0.3) Inter 600 10px #00D97A border-radius 999px padding 2px 8px, and price 'from X CHF' Inter 600 12px #F2D06B. A pulsing gold border animation (box-shadow 0 0 0 1px rgba(242,208,107,0.2) to 0 0 0 3px rgba(242,208,107,0) over 2s keyframe loop) on each card when locationActive is true. Clicking a card calls update({ selectedPro: pro }) then go('fiche_pro'). When locationActive is true, sort express cards by distance (Haversine). Zero emoji.",
+      "reqIds": [
+        "REQ-219"
       ],
       "status": "pending"
     }

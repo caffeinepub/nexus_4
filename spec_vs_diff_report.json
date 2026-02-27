@@ -1,113 +1,176 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-27T19:59:23.145Z",
-  "summary": "The diff implements most of the 22 requirements comprehensively. Core components (LoginScreen, useAppState, App.tsx, Header, BtnPrimary, Toast, BottomSheet, TabBars, NotifsPanel) are rewritten. Booking flow, admin screens, auth screens, and demo data are addressed. However, several specific details from requirements are missing or only partially implemented based on visible diff evidence.",
+  "generatedAt": "2026-02-27T21:18:26.934Z",
+  "summary": "The diff implements most of the requested requirements. New screens (ProPitchScreen, ProStatsScreen, ProShareScreen, ProNetworkScreen) are created, Screen union type is updated, App.tsx cases are added, price is updated to 29.90 CHF, and most entry points/features are added. However, several specific details are missing or deviate from the spec, particularly around badge system (REQ-217), PROS_DEMO data updates, Express Services (REQ-219), exact copy text matching specs, and some fine-grained AC items.",
   "missing_requirements": [
     {
-      "id": "REQ-185",
-      "requirement": "useAppState.ts rewrite with all required state fields and showToast auto-remove with max 4 toasts",
-      "reason": "The file frontend/src/state/useAppState.ts is listed as modified but its content is not shown in the diff summary (omitted due to limits). Cannot confirm all 14 required fields are present with correct defaults, or that go() has no conditional guards.",
+      "requirement": "REQ-209: Testimonial quotes must match spec exactly in English: Sophie R. 'My revenue doubled in 3 months', Karim B. 'I work 100% on my own terms now', Marc T. 'Best investment I made for my practice'. The diff shows different French quotes. Marc T.'s city should be Zurich not Berne, and star ratings (4.9, 5.0, 4.8) are all shown as 5.",
+      "reason": "Unspecified reason",
+      "evidence": [
+        "frontend/src/screens/pro/ProPitchScreen.tsx"
+      ]
+    },
+    {
+      "requirement": "REQ-209: Value pillar titles and descriptions must match spec exactly: 'Freedom' / 'Work where you want, when you want, at your price'; 'Revenue' / 'Keep 85% of every booking — no hidden fees'; 'Network' / 'Join 500+ independent pros already on NEXUS'. The diff uses French text and different descriptions.",
+      "reason": "Unspecified reason",
+      "evidence": [
+        "frontend/src/screens/pro/ProPitchScreen.tsx"
+      ]
+    },
+    {
+      "requirement": "REQ-209: Hero headline must be 'The platform that sets you free' and subheadline 'No boss. No commission. Just your clients.' The diff does not show these English strings.",
+      "reason": "Unspecified reason",
+      "evidence": [
+        "frontend/src/screens/pro/ProPitchScreen.tsx"
+      ]
+    },
+    {
+      "requirement": "REQ-209: CTA subtext must read 'TWINT only · 29.90 CHF/month after trial'. The screen appears to be in French throughout, not matching the specified English string.",
+      "reason": "Unspecified reason",
+      "evidence": [
+        "frontend/src/screens/pro/ProPitchScreen.tsx"
+      ]
+    },
+    {
+      "requirement": "REQ-209: Satisfaction guarantee row must show IconShield #00D97A + '30-day money-back guarantee' — not confirmed in truncated diff.",
+      "reason": "Unspecified reason",
+      "evidence": [
+        "frontend/src/screens/pro/ProPitchScreen.tsx"
+      ]
+    },
+    {
+      "requirement": "REQ-208: SubscriptionModal subtitle must show 'Then 29.90 CHF / month'. The diff shows 'Puis 29.90 CHF / mois' in French — not the exact specified English string.",
+      "reason": "Unspecified reason",
+      "evidence": [
+        "frontend/src/screens/pro/SubscriptionModal.tsx"
+      ]
+    },
+    {
+      "requirement": "REQ-208: TabPaiement financial summary line must read 'Monthly subscription cost: 29.90 CHF'. The diff shows 'Abonnement mensuel: 29.90 CHF / mois' in French — not the exact specified string.",
+      "reason": "Unspecified reason",
+      "evidence": [
+        "frontend/src/screens/pro/tabs/TabPaiement.tsx"
+      ]
+    },
+    {
+      "requirement": "REQ-211: Revenue bar chart demo values must use English service names: 'Haircut 420 CHF, Beard trim 180 CHF, Hair+Beard 315 CHF, Shave 100 CHF, Kids cut 80 CHF, Other 60 CHF'. The diff uses French labels.",
+      "reason": "Unspecified reason",
+      "evidence": [
+        "frontend/src/screens/pro/ProStatsScreen.tsx"
+      ]
+    },
+    {
+      "requirement": "REQ-211: Conversion rate card label must be 'Profile views → Bookings' uppercase. The diff shows 'Taux de conversion' in French.",
+      "reason": "Unspecified reason",
+      "evidence": [
+        "frontend/src/screens/pro/ProStatsScreen.tsx"
+      ]
+    },
+    {
+      "requirement": "REQ-211: Rating trend demo values must be exactly [4.6, 4.7, 4.7, 4.8, 4.8, 4.9] (6 points). The diff uses 10 values.",
+      "reason": "Unspecified reason",
+      "evidence": [
+        "frontend/src/screens/pro/ProStatsScreen.tsx"
+      ]
+    },
+    {
+      "requirement": "REQ-215: Network list demo pros must match spec: 'Marie L. · Coiffure · Lausanne', 'Sofiane R. · Barber · Geneva', 'Emma D. · Esthetique · Berne'. The diff shows 'Barbier' instead of 'Barber' and 'Geneve' instead of 'Geneva'.",
+      "reason": "Unspecified reason",
+      "evidence": [
+        "frontend/src/screens/pro/ProNetworkScreen.tsx"
+      ]
+    },
+    {
+      "requirement": "REQ-215: Referral code card title must be 'My referral code'. The diff uses French 'Mon code de parrainage'.",
+      "reason": "Unspecified reason",
+      "evidence": [
+        "frontend/src/screens/pro/ProNetworkScreen.tsx"
+      ]
+    },
+    {
+      "id": "REQ-217",
+      "requirement": "getBadges() utility function must be defined in ExplorerScreen.tsx and badge pills must render on 'Available now' cards (bottom-left overlay) and inline in 'Experts for you' rows. No evidence of ExplorerScreen.tsx modification in the diff.",
+      "reason": "Unspecified reason",
       "evidence": []
     },
     {
-      "id": "REQ-186",
-      "requirement": "renderScreen() switch must cover all 28 cases as distinct entries; screen container uses key={state.screen} with fadeIn 200ms; sidebar renders role-appropriate nav items",
-      "reason": "In the visible App.tsx diff, 'pro_subscription' maps to ProBusinessScreen (same component as pro_business) rather than a distinct case. The key={state.screen} and fadeIn animation on the screen container are not visible in the truncated diff. The sidebar implementation section is not visible.",
-      "evidence": [
-        "frontend/src/App.tsx"
-      ]
-    },
-    {
-      "requirement": "Refine frontend/src/styles/globals.css with all missing fixes including 100dvh, --safe-bottom, .screen-root, .scroll-zone, .cta-zone, .tab-bar classes, all keyframe animations, utility classes, media query breakpoints",
-      "reason": "frontend/src/styles/globals.css is not present in the diff summary (neither added nor modified), so it cannot be confirmed whether these CSS changes were applied.",
+      "id": "REQ-217",
+      "requirement": "Badges must render in FicheProScreen below pro name above slogan. No evidence of FicheProScreen.tsx modification in the diff.",
+      "reason": "Unspecified reason",
       "evidence": []
     },
     {
-      "id": "REQ-193",
-      "requirement": "AdminDashboardScreen always shows demo KPIs of 8 pros, 47 clients, 156 CHF revenue, 24 transactions",
-      "reason": "AdminDashboardScreen uses fallback values of 24 for totalPros and 18 for activePros, not the specified 8 pros and 47 clients demo values.",
-      "evidence": [
-        "frontend/src/screens/admin/AdminDashboardScreen.tsx"
-      ]
-    },
-    {
-      "id": "REQ-195",
-      "requirement": "Booking2Screen must have exactly 4 fixed time slots: 'In 1 hour', 'In 2 hours', 'This evening', 'Tomorrow morning'",
-      "reason": "Booking2Screen implements 6 slots instead of the required 4, adding 'Demain apres-midi' and 'Apres-demain' which were not specified.",
-      "evidence": [
-        "frontend/src/screens/client/Booking2Screen.tsx"
-      ]
-    },
-    {
-      "id": "REQ-196",
-      "requirement": "ProBusinessScreen and all 5 tabs including SubscriptionModal rewrite",
-      "reason": "ProBusinessScreen.tsx is listed as modified but its content is omitted from the diff due to limits. Cannot verify the 5-tab layout, ProgressCircle, save-and-continue, gallery tab FileReader, SubscriptionModal, and zero black empty space requirements.",
+      "id": "REQ-217",
+      "requirement": "PROS_DEMO data must have isNew flag and nbAvis fields to support badge logic for Alexandre, Elise, Nadia, Karim, Marco, Clara. No evidence of PROS_DEMO updates in the diff.",
+      "reason": "Unspecified reason",
       "evidence": []
     },
     {
-      "id": "REQ-199",
-      "requirement": "Desktop sidebar in App.tsx renders correct vertical navigation items for all 3 roles with correct icons, 56px height, gold active color, hidden on mobile",
-      "reason": "App.tsx content is truncated and the sidebar implementation section is not visible in the diff. Cannot confirm sidebar role-based navigation items are correctly implemented.",
+      "id": "REQ-218",
+      "requirement": "ProDashboardScreen must have a 'Boost my visibility' glass-card with 3 tier rows (Standard/Premium/Flash 24h) below the Flash toggle card. Not confirmed in the truncated ProDashboardScreen diff.",
+      "reason": "Unspecified reason",
       "evidence": [
-        "frontend/src/App.tsx"
+        "frontend/src/screens/pro/ProDashboardScreen.tsx"
       ]
     },
     {
-      "id": "REQ-204",
-      "requirement": "Tab bars hidden at >= 900px via display:none; gold indicator line width transition 0 to 24px 200ms on mount",
-      "reason": "Tab bars use className='tab-bar-mobile' but the CSS rule hiding them at >= 900px depends on globals.css which is not shown in the diff. The indicator uses scaleIn animation rather than the specified width transition from 0 to 24px.",
-      "evidence": [
-        "frontend/src/components/TabBarClient.tsx",
-        "frontend/src/components/TabBarPro.tsx",
-        "frontend/src/components/TabBarAdmin.tsx"
-      ]
-    },
-    {
-      "id": "REQ-205",
-      "requirement": "NotifsPanel: on mobile full-width slide-in from right; stagger fadeIn 30ms per index; thin #2E2E3E bar on left edge as swipe hint",
-      "reason": "NotifsPanel uses slideUp animation instead of a slide-in from right as specified for mobile. The thin #2E2E3E swipe hint bar on the left edge is not present. Stagger fadeIn animation per notification item is not implemented in the visible code.",
-      "evidence": [
-        "frontend/src/components/NotifsPanel.tsx"
-      ]
-    },
-    {
-      "id": "REQ-192",
-      "requirement": "Fix all images: onError handler, sibling gradient fallback div, loading=lazy, object-fit=cover on ExplorerScreen cards, FicheProScreen cover and gallery, TabGalerie previews",
-      "reason": "ExplorerScreen.tsx, FicheProScreen.tsx, and TabGalerie are listed as omitted from the diff due to limits. Cannot confirm image error handling and fallback divs were applied.",
+      "id": "REQ-218",
+      "requirement": "ExplorerScreen must show animated 'BOOST' badge overlay at top-right corner of cards for pros with flash===true AND note>=4.8 (Alexandre, Karim). No evidence of ExplorerScreen.tsx modification.",
+      "reason": "Unspecified reason",
       "evidence": []
     },
     {
-      "id": "REQ-188",
-      "requirement": "globals.css .tab-bar { flex-shrink: 0; } and tab bars hidden on desktop >= 900px",
-      "reason": "Tab bar hiding at >= 900px relies on globals.css which is not present in the diff. The tab bar components only add className='tab-bar-mobile' but no inline display:none logic for desktop breakpoint.",
+      "id": "REQ-219",
+      "requirement": "'Express Services' section must be added to ExplorerScreen above 'Available now', with horizontal scroll compact cards 140x180px, pulsing gold border animation when locationActive, Haversine distance sorting, and section hidden for non-flash filters. No evidence of ExplorerScreen.tsx modification in the diff.",
+      "reason": "Unspecified reason",
+      "evidence": []
+    },
+    {
+      "id": "REQ-210",
+      "requirement": "'Why NEXUS Pro — discover all features' link must appear below the metric cards in ProDashboardScreen with Inter 500 13px #F2D06B and IconArrowRight size 14. Not confirmed in the truncated ProDashboardScreen diff.",
+      "reason": "Unspecified reason",
       "evidence": [
-        "frontend/src/components/TabBarClient.tsx",
-        "frontend/src/components/TabBarPro.tsx",
-        "frontend/src/components/TabBarAdmin.tsx"
+        "frontend/src/screens/pro/ProDashboardScreen.tsx"
+      ]
+    },
+    {
+      "id": "REQ-212",
+      "requirement": "'View my stats' link must be placed specifically in the Next appointment card footer area in ProDashboardScreen. Not confirmed from the truncated diff.",
+      "reason": "Unspecified reason",
+      "evidence": [
+        "frontend/src/screens/pro/ProDashboardScreen.tsx"
+      ]
+    },
+    {
+      "id": "REQ-214",
+      "requirement": "ProBusinessScreen must show 'Share my profile' button on tabs 1 and 2 only (not all tabs). The diff shows SharePill component but it is unclear if it is tab-conditional.",
+      "reason": "Unspecified reason",
+      "evidence": [
+        "frontend/src/screens/pro/ProBusinessScreen.tsx"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "LoginScreen includes an 'Acces Admin' secondary button that routes to admin_login via update({ role: 'admin' })",
-      "reason": "REQ-184 does not specify an admin access shortcut button on the LoginScreen. This is an additional feature not requested.",
+      "description": "ProStatsScreen conversion rate card shows a '+3% ce mois' delta indicator which was not specified in the requirements.",
+      "reason": "REQ-211 only specifies the label 'Profile views → Bookings', value '24%', and subtitle 'Based on last 30 days' — no delta/trend indicator was requested.",
       "evidence": [
-        "frontend/src/screens/auth/LoginScreen.tsx"
+        "frontend/src/screens/pro/ProStatsScreen.tsx"
       ]
     },
     {
-      "description": "AdminLoginScreen sets role: 'admin' in the update call on successful login in addition to adminAuthenticated: true",
-      "reason": "REQ-197 only specifies calling update({ adminAuthenticated: true }) then go('admin_dashboard'). Setting role:'admin' simultaneously was not part of the specified behavior.",
+      "description": "ProShareScreen uses a clipboard copy SVG icon instead of the specified IconCheck for the 'Copy link' share option.",
+      "reason": "REQ-213 explicitly specifies IconCheck #F2D06B for the Copy link option.",
       "evidence": [
-        "frontend/src/screens/admin/AdminLoginScreen.tsx"
+        "frontend/src/screens/pro/ProShareScreen.tsx"
       ]
     },
     {
-      "description": "Booking2Screen adds two extra time slots 'Demain apres-midi' and 'Apres-demain' beyond the 4 required",
-      "reason": "REQ-195 specifies exactly 4 fixed slots. The implementation provides 6 slots.",
+      "description": "SubscriptionModal back button navigates to 'pro_pitch' — this navigation change was not specified in the requirements for SubscriptionModal.",
+      "reason": "No requirement specifies changing the SubscriptionModal back button destination to 'pro_pitch'.",
       "evidence": [
-        "frontend/src/screens/client/Booking2Screen.tsx"
+        "frontend/src/screens/pro/SubscriptionModal.tsx"
       ]
     }
   ],
@@ -115,37 +178,14 @@
   "changed_files": [
     "frontend-file-summaries.txt",
     "frontend/src/App.tsx",
-    "frontend/src/components/BottomSheet.tsx",
-    "frontend/src/components/BtnPrimary.tsx",
-    "frontend/src/components/Header.tsx",
-    "frontend/src/components/NotifsPanel.tsx",
-    "frontend/src/components/TabBarAdmin.tsx",
-    "frontend/src/components/TabBarClient.tsx",
-    "frontend/src/components/TabBarPro.tsx",
-    "frontend/src/components/Toast.tsx",
-    "frontend/src/screens/admin/AdminBookingsScreen.tsx",
-    "frontend/src/screens/admin/AdminDashboardScreen.tsx",
-    "frontend/src/screens/admin/AdminLoginScreen.tsx",
-    "frontend/src/screens/admin/AdminProsScreen.tsx",
-    "frontend/src/screens/admin/AdminRevenusScreen.tsx",
-    "frontend/src/screens/auth/LoginScreen.tsx",
-    "frontend/src/screens/auth/OTPScreen.tsx",
-    "frontend/src/screens/auth/RoleScreen.tsx",
-    "frontend/src/screens/client/AlertesScreen.tsx",
-    "frontend/src/screens/client/Booking1Screen.tsx",
-    "frontend/src/screens/client/Booking2Screen.tsx",
-    "frontend/src/screens/client/Booking3Screen.tsx",
-    "frontend/src/screens/client/Booking4Screen.tsx",
-    "frontend/src/screens/client/Booking5Screen.tsx",
-    "frontend/src/screens/client/ClientProfilScreen.tsx",
-    "frontend/src/screens/client/ExplorerScreen.tsx",
-    "frontend/src/screens/client/FicheProScreen.tsx",
-    "frontend/src/screens/client/LiveStatusScreen.tsx",
-    "frontend/src/screens/client/ReservationsScreen.tsx",
     "frontend/src/screens/pro/ProBusinessScreen.tsx",
     "frontend/src/screens/pro/ProDashboardScreen.tsx",
-    "frontend/src/screens/pro/ProRadarScreen.tsx",
-    "frontend/src/screens/pro/ProWalletScreen.tsx",
+    "frontend/src/screens/pro/ProNetworkScreen.tsx",
+    "frontend/src/screens/pro/ProPitchScreen.tsx",
+    "frontend/src/screens/pro/ProShareScreen.tsx",
+    "frontend/src/screens/pro/ProStatsScreen.tsx",
+    "frontend/src/screens/pro/SubscriptionModal.tsx",
+    "frontend/src/screens/pro/tabs/TabPaiement.tsx",
     "frontend/src/state/useAppState.ts",
     "project_state.json"
   ]

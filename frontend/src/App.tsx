@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppState } from './state/useAppState';
 import LoginScreen from './screens/auth/LoginScreen';
 import RoleScreen from './screens/auth/RoleScreen';
@@ -18,7 +18,12 @@ import ProDashboardScreen from './screens/pro/ProDashboardScreen';
 import ProRadarScreen from './screens/pro/ProRadarScreen';
 import ProWalletScreen from './screens/pro/ProWalletScreen';
 import ProBusinessScreen from './screens/pro/ProBusinessScreen';
+import SubscriptionModal from './screens/pro/SubscriptionModal';
 import SuccessScreen from './screens/pro/SuccessScreen';
+import ProPitchScreen from './screens/pro/ProPitchScreen';
+import ProStatsScreen from './screens/pro/ProStatsScreen';
+import ProShareScreen from './screens/pro/ProShareScreen';
+import ProNetworkScreen from './screens/pro/ProNetworkScreen';
 import AdminLoginScreen from './screens/admin/AdminLoginScreen';
 import AdminDashboardScreen from './screens/admin/AdminDashboardScreen';
 import AdminProsScreen from './screens/admin/AdminProsScreen';
@@ -26,6 +31,18 @@ import AdminBookingsScreen from './screens/admin/AdminBookingsScreen';
 import AdminRevenusScreen from './screens/admin/AdminRevenusScreen';
 import Toast from './components/Toast';
 import NotifsPanel from './components/NotifsPanel';
+import { IconChevronRight } from './components/icons/index';
+import {
+  IconSearch,
+  IconCalendar,
+  IconBell,
+  IconUser,
+  IconRadar,
+  IconWallet,
+  IconHome,
+  IconBriefcase,
+  IconGrid,
+} from './components/icons/index';
 
 const AUTH_SCREENS = ['login', 'role', 'otp', 'admin_login'];
 
@@ -33,9 +50,26 @@ function isAuthScreen(screen: string) {
   return AUTH_SCREENS.includes(screen);
 }
 
+const SIDEBAR_STORAGE_KEY = 'nexus_sidebar_collapsed';
+
 export default function App() {
   const { state, go, update, showToast, removeToast } = useAppState();
   const [prevScreen, setPrevScreen] = useState<string>('login');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SIDEBAR_STORAGE_KEY, String(sidebarCollapsed));
+    } catch {
+      // ignore
+    }
+  }, [sidebarCollapsed]);
 
   const navigate = (screen: Parameters<typeof go>[0]) => {
     setPrevScreen(state.screen);
@@ -83,9 +117,17 @@ export default function App() {
       case 'pro_business':
         return <ProBusinessScreen {...commonProps} />;
       case 'pro_subscription':
-        return <ProBusinessScreen {...commonProps} />;
+        return <SubscriptionModal {...commonProps} />;
       case 'pro_success':
         return <SuccessScreen {...commonProps} />;
+      case 'pro_pitch':
+        return <ProPitchScreen {...commonProps} />;
+      case 'pro_stats':
+        return <ProStatsScreen {...commonProps} />;
+      case 'pro_share':
+        return <ProShareScreen {...commonProps} />;
+      case 'pro_network':
+        return <ProNetworkScreen {...commonProps} />;
       case 'admin_login':
         return <AdminLoginScreen {...commonProps} />;
       case 'admin_dashboard':
@@ -133,6 +175,7 @@ export default function App() {
 
   const sidebarItems = getSidebarItems();
   const isAdmin = state.role === 'admin';
+  const activeColor = isAdmin ? '#FF3D5A' : '#F2D06B';
 
   return (
     <div style={{
@@ -145,46 +188,111 @@ export default function App() {
     }}>
       {/* Desktop Sidebar */}
       {showSidebar && (
-        <aside style={{
-          display: 'none',
-          width: 220,
-          flexShrink: 0,
-          background: 'rgba(5,5,7,0.97)',
-          borderRight: '1px solid rgba(255,255,255,0.06)',
-          flexDirection: 'column',
-          paddingTop: 72,
-          paddingBottom: 24,
-        }} className="desktop-sidebar">
-          <div style={{ padding: '0 16px 24px' }}>
-            <span style={{
-              fontFamily: 'Inter, sans-serif',
-              fontWeight: 900,
-              fontSize: 22,
-              color: '#F4F4F8',
-              letterSpacing: '-0.05em',
-              cursor: 'pointer',
-            }} onClick={() => {
-              if (state.role === 'client') navigate('explorer');
-              else if (state.role === 'pro') navigate('pro_dashboard');
-              else if (state.role === 'admin') navigate('admin_dashboard');
-            }}>
-              NEXUS<span style={{ color: '#5B7FFF' }}>.</span>
-            </span>
+        <aside
+          className="desktop-sidebar"
+          style={{
+            display: 'none',
+            width: sidebarCollapsed ? 64 : 220,
+            flexShrink: 0,
+            background: 'rgba(5,5,7,0.97)',
+            borderRight: '1px solid rgba(255,255,255,0.06)',
+            flexDirection: 'column',
+            paddingTop: 72,
+            paddingBottom: 24,
+            transition: 'width 220ms ease',
+            overflow: 'hidden',
+          }}
+        >
+          {/* Logo / Toggle row */}
+          <div style={{
+            padding: sidebarCollapsed ? '0 0 24px' : '0 16px 24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: sidebarCollapsed ? 'center' : 'space-between',
+            gap: 8,
+            transition: 'padding 220ms ease',
+          }}>
+            {!sidebarCollapsed && (
+              <span
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontWeight: 900,
+                  fontSize: 22,
+                  color: '#F4F4F8',
+                  letterSpacing: '-0.05em',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                }}
+                onClick={() => {
+                  if (state.role === 'client') navigate('explorer');
+                  else if (state.role === 'pro') navigate('pro_dashboard');
+                  else if (state.role === 'admin') navigate('admin_dashboard');
+                }}
+              >
+                NEXUS<span style={{ color: '#5B7FFF' }}>.</span>
+              </span>
+            )}
+
+            {/* Toggle button */}
+            <button
+              onClick={() => setSidebarCollapsed(prev => !prev)}
+              title={sidebarCollapsed ? 'Ouvrir le menu' : 'Fermer le menu'}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                border: '1px solid rgba(255,255,255,0.08)',
+                background: 'rgba(255,255,255,0.04)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                flexShrink: 0,
+                transition: 'background 150ms ease',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.09)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.04)';
+              }}
+            >
+              <span style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transform: sidebarCollapsed ? 'rotate(0deg)' : 'rotate(180deg)',
+                transition: 'transform 220ms ease',
+              }}>
+                <IconChevronRight size={15} color="#9898B4" />
+              </span>
+            </button>
           </div>
-          <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4, padding: '0 12px' }}>
+
+          {/* Nav items */}
+          <nav style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+            padding: sidebarCollapsed ? '0 8px' : '0 12px',
+            transition: 'padding 220ms ease',
+          }}>
             {sidebarItems.map(item => {
               const active = state.screen === item.screen;
-              const activeColor = isAdmin ? '#FF3D5A' : '#F2D06B';
               return (
                 <button
                   key={item.screen}
                   onClick={() => navigate(item.screen)}
+                  title={sidebarCollapsed ? item.label : undefined}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
                     gap: 12,
                     height: 48,
-                    padding: '0 16px',
+                    padding: sidebarCollapsed ? '0' : '0 16px',
                     borderRadius: 12,
                     border: 'none',
                     background: active ? `rgba(${isAdmin ? '255,61,90' : '242,208,107'},0.08)` : 'transparent',
@@ -193,28 +301,49 @@ export default function App() {
                     fontWeight: 600,
                     fontSize: 14,
                     cursor: 'pointer',
-                    transition: 'all 150ms',
+                    transition: 'all 150ms ease',
                     textAlign: 'left',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    width: '100%',
                   }}
                 >
-                  <item.icon size={18} color={active ? activeColor : '#9898B4'} />
-                  {item.label}
+                  <span style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                    <item.icon size={18} color={active ? activeColor : '#9898B4'} />
+                  </span>
+                  {!sidebarCollapsed && (
+                    <span style={{
+                      opacity: sidebarCollapsed ? 0 : 1,
+                      transition: 'opacity 150ms ease',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}>
+                      {item.label}
+                    </span>
+                  )}
                 </button>
               );
             })}
           </nav>
-          <div style={{ padding: '0 12px' }}>
+
+          {/* Logout */}
+          <div style={{
+            padding: sidebarCollapsed ? '0 8px' : '0 12px',
+            transition: 'padding 220ms ease',
+          }}>
             <button
               onClick={() => {
                 update({ role: null, adminAuthenticated: false });
                 navigate('login');
               }}
+              title={sidebarCollapsed ? 'Deconnexion' : undefined}
               style={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
                 gap: 12,
                 height: 48,
-                padding: '0 16px',
+                padding: sidebarCollapsed ? '0' : '0 16px',
                 borderRadius: 12,
                 border: 'none',
                 background: 'transparent',
@@ -223,131 +352,51 @@ export default function App() {
                 fontWeight: 600,
                 fontSize: 14,
                 cursor: 'pointer',
+                transition: 'all 150ms ease',
                 width: '100%',
               }}
             >
-              <IconLogout size={18} color="#54546C" />
-              Deconnexion
+              <span style={{ flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#54546C" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+              </span>
+              {!sidebarCollapsed && (
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  Deconnexion
+                </span>
+              )}
             </button>
           </div>
         </aside>
       )}
 
-      {/* Main Content */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        position: 'relative',
-      }}>
-        <div
-          key={state.screen}
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            animation: 'fadeIn 200ms ease-out',
-          }}
-        >
-          {renderScreen()}
-        </div>
+      {/* Main content */}
+      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+        {renderScreen()}
       </div>
 
-      {/* Toast Overlay */}
+      {/* Toast notifications */}
       <Toast toasts={state.toasts} removeToast={removeToast} />
 
-      {/* Notifications Panel */}
+      {/* Notifications panel */}
       {state.notifsOpen && (
         <NotifsPanel
           notifications={state.notifications}
           onClose={() => update({ notifsOpen: false })}
           onMarkAllRead={() => update({
-            notifications: state.notifications.map(n => ({ ...n, read: true }))
+            notifications: state.notifications.map(n => ({ ...n, read: true })),
           })}
         />
       )}
 
       <style>{`
         @media (min-width: 900px) {
-          .desktop-sidebar {
-            display: flex !important;
-          }
+          .desktop-sidebar { display: flex !important; }
         }
       `}</style>
     </div>
-  );
-}
-
-// Inline icon components for sidebar
-function IconSearch({ size = 20, color = 'currentColor' }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-    </svg>
-  );
-}
-function IconCalendar({ size = 20, color = 'currentColor' }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
-    </svg>
-  );
-}
-function IconBell({ size = 20, color = 'currentColor' }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
-    </svg>
-  );
-}
-function IconUser({ size = 20, color = 'currentColor' }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
-function IconRadar({ size = 20, color = 'currentColor' }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M19.07 4.93A10 10 0 0 0 6.99 3.34" /><path d="M4 6h.01" /><path d="M2.29 9.62A10 10 0 1 0 21.31 8.35" /><path d="M16.24 7.76A6 6 0 1 0 8.23 16.67" /><path d="M12 18h.01" /><path d="M17.99 11.66A6 6 0 0 1 15.77 16.67" /><circle cx="12" cy="12" r="2" /><path d="m13.41 10.59 5.66-5.66" />
-    </svg>
-  );
-}
-function IconWallet({ size = 20, color = 'currentColor' }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" /><path d="M3 5v14a2 2 0 0 0 2 2h16v-5" /><path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
-    </svg>
-  );
-}
-function IconHome({ size = 20, color = 'currentColor' }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
-    </svg>
-  );
-}
-function IconBriefcase({ size = 20, color = 'currentColor' }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-    </svg>
-  );
-}
-function IconGrid({ size = 20, color = 'currentColor' }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
-    </svg>
-  );
-}
-function IconLogout({ size = 20, color = 'currentColor' }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
-    </svg>
   );
 }

@@ -14,6 +14,7 @@ interface Props {
   state: GlobalState;
   update: (partial: Partial<GlobalState>) => void;
   showToast: (msg: string, type?: ToastType, duration?: number) => void;
+  removeToast?: (id: string) => void;
 }
 
 const TABS = ['Profil', 'Services', 'Tarifs', 'Galerie'];
@@ -46,6 +47,52 @@ function calcProgress(profil: ProfilData, services: ServiceItem[], tarifs: Tarif
   if (photoCount >= 3) score += 15;
   return score;
 }
+
+const SharePill = ({ go }: { go: (screen: Screen) => void }) => (
+  <button
+    onClick={() => go('pro_share')}
+    style={{
+      background: 'rgba(242,208,107,0.08)',
+      border: '1px solid rgba(242,208,107,0.2)',
+      borderRadius: 999,
+      padding: '8px 16px',
+      cursor: 'pointer',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 6,
+      marginBottom: 16,
+    }}
+  >
+    <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13, color: '#F2D06B' }}>Partager mon profil</span>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+      <path d="M5 12h14M12 5l7 7-7 7" stroke="#F2D06B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  </button>
+);
+
+const NetworkRow = ({ go }: { go: (screen: Screen) => void }) => (
+  <button
+    onClick={() => go('pro_network')}
+    style={{
+      width: '100%', background: '#0D0D13', border: '1px solid rgba(255,255,255,0.06)',
+      borderRadius: 16, padding: '0 16px', height: 64,
+      display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', textAlign: 'left',
+      marginTop: 16,
+    }}
+  >
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="2" stroke="#5B7FFF" strokeWidth="2"/>
+      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="#5B7FFF" strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+    <div style={{ flex: 1 }}>
+      <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 13, color: '#F4F4F8' }}>Mon Reseau — invitez des collegues et gagnez des recompenses</div>
+      <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 11, color: '#9898B4' }}>3 pros dans votre reseau</div>
+    </div>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path d="M9 18l6-6-6-6" stroke="#54546C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  </button>
+);
 
 export default function ProBusinessScreen({ go, state, update, showToast }: Props) {
   const [activeTab, setActiveTab] = useState(0);
@@ -168,8 +215,20 @@ export default function ProBusinessScreen({ go, state, update, showToast }: Prop
 
         {/* Tab content */}
         <div key={tabKey} style={{ padding: '0 20px', animation: 'fadeIn 200ms ease-out' }}>
-          {activeTab === 0 && <TabProfil data={profil} onChange={setProfil} />}
-          {activeTab === 1 && <TabServices categorie={profil.categorie} services={services} onChange={setServices} />}
+          {activeTab === 0 && (
+            <>
+              <SharePill go={go} />
+              <TabProfil data={profil} onChange={setProfil} />
+              <NetworkRow go={go} />
+            </>
+          )}
+          {activeTab === 1 && (
+            <>
+              <SharePill go={go} />
+              <TabServices categorie={profil.categorie} services={services} onChange={setServices} />
+              <NetworkRow go={go} />
+            </>
+          )}
           {activeTab === 2 && <TabTarifs data={tarifs} onChange={setTarifs} />}
           {activeTab === 3 && <TabGalerie photos={photos} onChange={setPhotos} />}
         </div>

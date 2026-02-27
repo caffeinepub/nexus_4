@@ -8,6 +8,7 @@ interface Props {
   state: GlobalState;
   update: (partial: Partial<GlobalState>) => void;
   showToast?: (msg: string, type?: ToastType) => void;
+  removeToast?: (id: string) => void;
 }
 
 const AVANTAGES = [
@@ -15,6 +16,8 @@ const AVANTAGES = [
   'Paiements TWINT instantanes',
   'Mode Flash pour demandes urgentes',
   'Tableau de bord et statistiques pro',
+  'Partage de profil multi-reseaux',
+  'Programme de parrainage — gagnez des mois gratuits',
   'Support prioritaire 7j/7',
 ];
 
@@ -48,7 +51,7 @@ export default function SubscriptionModal({ go, state, update }: Props) {
       {/* Back button */}
       <div style={{ padding: '16px 20px 0', flexShrink: 0 }}>
         <button
-          onClick={() => go('pro_business')}
+          onClick={() => go('pro_pitch')}
           style={{ background: 'none', border: 'none', color: 'var(--t3)', fontSize: 13, cursor: 'pointer', padding: 0 }}
         >
           Retour
@@ -78,7 +81,7 @@ export default function SubscriptionModal({ go, state, update }: Props) {
           <div style={{ fontSize: 32, fontWeight: 900, color: 'var(--t1)', fontFamily: 'Inter, sans-serif' }}>
             7 JOURS GRATUITS
           </div>
-          <div style={{ fontSize: 15, color: 'var(--t3)', marginTop: 6 }}>Puis 19.90 CHF / mois</div>
+          <div style={{ fontSize: 15, color: 'var(--t3)', marginTop: 6 }}>Puis 29.90 CHF / mois</div>
         </div>
       </div>
 

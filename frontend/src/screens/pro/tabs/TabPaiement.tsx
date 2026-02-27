@@ -81,7 +81,7 @@ export default function TabPaiement({ data, onChange }: Props) {
         <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--t3)', letterSpacing: 0.5, textTransform: 'uppercase', marginBottom: 12 }}>Recap financier</div>
         {[
           { label: 'Commission NEXUS', value: '15% par reservation' },
-          { label: 'Abonnement mensuel', value: '19.90 CHF / mois' },
+          { label: 'Abonnement mensuel', value: '29.90 CHF / mois' },
           { label: 'Exemple: 10 reservations x 50 CHF', value: 'Net: 405 CHF' },
           { label: 'Virement sous', value: '48h apres prestation' },
         ].map((line, i) => (

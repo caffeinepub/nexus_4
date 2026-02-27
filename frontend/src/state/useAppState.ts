@@ -25,7 +25,11 @@ export type Screen =
   | 'admin_dashboard'
   | 'admin_pros'
   | 'admin_bookings'
-  | 'admin_revenus';
+  | 'admin_revenus'
+  | 'pro_pitch'
+  | 'pro_stats'
+  | 'pro_share'
+  | 'pro_network';
 
 export type Role = 'client' | 'pro' | 'admin' | null;
 export type ToastType = 'success' | 'error' | 'info' | 'sms' | 'warning';

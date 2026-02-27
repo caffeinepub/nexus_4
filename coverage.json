@@ -1,411 +1,173 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-27T19:59:23.182Z",
+  "generatedAt": "2026-02-27T21:18:26.963Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 22,
-    "implemented": 21,
+    "total": 14,
+    "implemented": 12,
     "items": [
       {
-        "id": "REQ-184",
-        "summary": "Rewrite frontend/src/screens/auth/LoginScreen.tsx to eliminate the infinite loop: the 'SE CONNECTER' button must call go('role') directly after a brief loading state (no canister dependency, no async block that re-renders indefinitely). The button must always be clickable, never disabled by default, and the loading state must auto-clear after 800ms if Internet Identity is unavailable. The screen must never redirect back to itself.",
+        "id": "REQ-208",
+        "summary": "Update every occurrence of the subscription price across the entire codebase from 19.90 CHF to 29.90 CHF/month. Specifically update: SubscriptionModal.tsx subtitle text ('Then 29.90 CHF / month'), TabPaiement.tsx financial summary line ('Monthly subscription cost: 29.90 CHF'), ProBusinessScreen.tsx any CTA or label referencing the subscription cost, and any other string in the frontend that displays the old price. The 7-day free trial period remains unchanged.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/screens/auth/LoginScreen.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/screens/auth/LoginScreen.tsx"
-        ]
-      },
-      {
-        "id": "REQ-185",
-        "summary": "Rewrite frontend/src/state/useAppState.ts to guarantee: (1) initialState.screen is always 'login', never 'otp' or any other value; (2) initialState.role is always null; (3) the go() function has no conditional guards — it always sets state.screen to the target value unconditionally; (4) all fields introduced in prior requirements (userLat, userLng, locationActive, bookingCreneau, bookingAdresse, bookingVille, bookingPhone, bookingNote, bookingId, modalOpen, serviceEditorOpen, editingService, adminAuthenticated) are present with correct defaults (null/false); (5) showToast auto-removes after duration and enforces a max of 4 toasts (oldest removed first).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/state/useAppState.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/state/useAppState.ts"
-        ]
-      },
-      {
-        "id": "REQ-186",
-        "summary": "Rewrite frontend/src/App.tsx with a complete, production-ready router: (1) outer wrapper position fixed inset-0 background #050507 overflow hidden; (2) on mobile (<= 899px) inner container max-width 430px width 100% height 100% margin 0 auto display flex flex-direction column overflow hidden position relative; (3) on desktop (>= 900px) inner container max-width 1100px two-column CSS grid — sidebar 220px left, main content right; (4) renderScreen() switch covers all 28 cases with zero fallthrough: login, role, otp, explorer, fiche_pro, booking_1, booking_2, booking_3, booking_4, booking_5, live_status, client_reservations, client_alertes, client_profil, pro_dashboard, pro_radar, pro_wallet, pro_business, pro_subscription, pro_success, admin_login, admin_dashboard, admin_pros, admin_bookings, admin_revenus — default falls back to LoginScreen; (5) screen container uses key={state.screen} with fadeIn 200ms opacity animation on each navigation; (6) sidebar (desktop only) renders role-appropriate vertical nav items (56px height each) matching the current role; (7) bottom tab bars hidden on desktop via display:none at >=900px; (8) Toast and NotifsPanel rendered as overlays; (9) all screens receive go, state, update, showToast, removeToast props.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/App.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/App.tsx"
-        ]
-      },
-      {
-        "id": "REQ-187",
-        "summary": "Audit and fix the root layout of every screen to ensure all content is visible without hidden overflow on both mobile and desktop. Rules for every screen: (1) root element must be position fixed inset-0, display flex, flex-direction column — never a fixed px height; (2) header is position absolute top-0 left-0 right-0 height 56px z-index 100; (3) scroll zone is flex-1 overflow-y auto -webkit-overflow-scrolling touch overscroll-behavior contain padding-top 72px — never overflow hidden, never fixed height; (4) tab bar and CTA zone are flex-shrink-0 in natural flex flow — never position fixed; (5) no black empty space anywhere. Apply to: LoginScreen, RoleScreen, OTPScreen, ExplorerScreen, FicheProScreen, Booking1–5, LiveStatusScreen, ReservationsScreen, AlertesScreen, ClientProfilScreen, ProDashboardScreen, ProRadarScreen, ProWalletScreen, ProBusinessScreen, SubscriptionModal, SuccessScreen, AdminLoginScreen, AdminDashboardScreen, AdminProsScreen, AdminBookingsScreen, AdminRevenusScreen.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/screens/auth/LoginScreen.tsx",
-          "frontend/src/screens/auth/RoleScreen.tsx",
-          "frontend/src/screens/auth/OTPScreen.tsx",
-          "frontend/src/screens/client/ExplorerScreen.tsx",
-          "frontend/src/screens/client/FicheProScreen.tsx",
-          "frontend/src/screens/client/Booking1Screen.tsx",
-          "frontend/src/screens/client/Booking2Screen.tsx",
-          "frontend/src/screens/client/Booking3Screen.tsx",
-          "frontend/src/screens/client/Booking4Screen.tsx",
-          "frontend/src/screens/client/ReservationsScreen.tsx",
-          "frontend/src/screens/client/AlertesScreen.tsx",
-          "frontend/src/screens/client/ClientProfilScreen.tsx",
-          "frontend/src/screens/pro/ProDashboardScreen.tsx",
-          "frontend/src/screens/pro/ProRadarScreen.tsx",
-          "frontend/src/screens/pro/ProWalletScreen.tsx",
-          "frontend/src/screens/pro/ProBusinessScreen.tsx",
           "frontend/src/screens/pro/SubscriptionModal.tsx",
-          "frontend/src/screens/pro/SuccessScreen.tsx",
-          "frontend/src/screens/admin/AdminLoginScreen.tsx",
-          "frontend/src/screens/admin/AdminDashboardScreen.tsx",
-          "frontend/src/screens/admin/AdminProsScreen.tsx",
-          "frontend/src/screens/admin/AdminBookingsScreen.tsx",
-          "frontend/src/screens/admin/AdminRevenusScreen.tsx"
+          "frontend/src/screens/pro/tabs/TabPaiement.tsx",
+          "frontend/src/screens/pro/ProBusinessScreen.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/screens/auth/LoginScreen.tsx",
-          "frontend/src/screens/auth/RoleScreen.tsx",
-          "frontend/src/screens/auth/OTPScreen.tsx",
-          "frontend/src/screens/client/ExplorerScreen.tsx",
-          "frontend/src/screens/client/FicheProScreen.tsx",
-          "frontend/src/screens/client/Booking1Screen.tsx",
-          "frontend/src/screens/client/Booking2Screen.tsx",
-          "frontend/src/screens/client/Booking3Screen.tsx",
-          "frontend/src/screens/client/Booking4Screen.tsx",
-          "frontend/src/screens/client/ReservationsScreen.tsx",
-          "frontend/src/screens/client/AlertesScreen.tsx",
-          "frontend/src/screens/client/ClientProfilScreen.tsx",
-          "frontend/src/screens/pro/ProDashboardScreen.tsx",
-          "frontend/src/screens/pro/ProRadarScreen.tsx",
-          "frontend/src/screens/pro/ProWalletScreen.tsx",
-          "frontend/src/screens/pro/ProBusinessScreen.tsx",
-          "frontend/src/screens/admin/AdminLoginScreen.tsx",
-          "frontend/src/screens/admin/AdminDashboardScreen.tsx",
-          "frontend/src/screens/admin/AdminProsScreen.tsx",
-          "frontend/src/screens/admin/AdminBookingsScreen.tsx",
-          "frontend/src/screens/admin/AdminRevenusScreen.tsx"
+          "frontend/src/screens/pro/SubscriptionModal.tsx",
+          "frontend/src/screens/pro/tabs/TabPaiement.tsx",
+          "frontend/src/screens/pro/ProBusinessScreen.tsx"
         ]
       },
       {
-        "id": "REQ-188",
-        "summary": "Refine frontend/src/styles/globals.css with all missing fixes: (1) add height: 100dvh on the html and body root; (2) add --safe-bottom: env(safe-area-inset-bottom, 8px); (3) .screen-root { position: fixed; inset: 0; display: flex; flex-direction: column; background: var(--void); }; (4) .scroll-zone { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; }; (5) .cta-zone { flex-shrink: 0; padding: 12px 20px calc(12px + var(--safe-bottom)); background: rgba(5,5,7,0.97); border-top: 1px solid rgba(255,255,255,0.04); }; (6) .tab-bar { flex-shrink: 0; }; (7) ensure all keyframe animations (fadeIn, breathe, shimmer, fall, progressFill, scaleIn, slideUp, slideDown, float, spin) are fully defined with correct will-change GPU hints; (8) .glass-card, .gold-text, .glow-gold utility classes correct at all breakpoints; (9) media query breakpoints at 430px, 768px, 900px; (10) body font-size 15px at >= 768px; (11) smooth scroll on html element; (12) overscroll-behavior: contain on all scroll zones.",
+        "id": "REQ-209",
+        "summary": "Create frontend/src/screens/pro/ProPitchScreen.tsx as a full conversion landing screen (screen key: 'pro_pitch') that convinces independent professionals to subscribe to NEXUS Pro. Layout: position fixed inset-0, display flex, flex-direction column, background var(--void), scroll zone flex-1 overflow-y auto. Content sections in order: (1) Hero — four animated blur orbs (same float keyframe as LoginScreen), headline 'The platform that sets you free' Inter 900 48px #F4F4F8 centered, subheadline 'No boss. No commission. Just your clients.' Inter 400 18px #9898B4, gold gradient divider; (2) Three value pillars in glass-card rows with a colored icon circle (40px) left — 'Freedom' (IconHome #F2D06B): 'Work where you want, when you want, at your price'; 'Revenue' (IconWallet #00D97A): 'Keep 85% of every booking — no hidden fees'; 'Network' (IconRadar #5B7FFF): 'Join 500+ independent pros already on NEXUS'; (3) Animated counter showing '500+' active pros (count-up from 0 over 2s on mount) Inter 900 64px #F2D06B centered with label 'professionals trust NEXUS' Inter 400 14px #9898B4; (4) Three testimonial cards horizontal scroll — fictitious pros with Unsplash avatar images, name, category, city, star rating (filled #F2D06B), quote text Inter 400 14px #9898B4 — Unsplash IDs: photo-1570172619644-dfd03ed5d881 (Sophie R., Esthetique, Lausanne, 4.9 stars, 'My revenue doubled in 3 months'), photo-1503951914875-452162b0f3f1 (Karim B., Barber, Geneva, 5.0 stars, 'I work 100% on my own terms now'), photo-1544161515-4ab6ce6db874 (Marc T., Massage, Zurich, 4.8 stars, 'Best investment I made for my practice'); (5) Satisfaction guarantee row: IconShield #00D97A + '30-day money-back guarantee' Inter 600 14px #F4F4F8; (6) CTA zone flex-shrink-0 padding 16px 20px: BtnPrimary 'Start free for 7 days' gold gradient text #050507 onClick calls go('pro_subscription'), below button 'TWINT only · 29.90 CHF/month after trial' Inter 400 12px #54546C centered. Add 'pro_pitch' to the Screen union type in useAppState.ts and add a case in App.tsx renderScreen() switch. Back arrow in header calls go('pro_dashboard'). Zero emoji.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/screens/pro/ProPitchScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/screens/pro/ProPitchScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-210",
+        "summary": "Add a 'View pitch' entry point from ProDashboardScreen: add a secondary link or card below the metric cards labeled 'Why NEXUS Pro — discover all features' Inter 500 13px #F2D06B with IconArrowRight size 14 #F2D06B that calls go('pro_pitch') on click. This must be visible in the scroll zone without requiring scroll on most screens.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/screens/pro/ProDashboardScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/screens/pro/ProDashboardScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-211",
+        "summary": "Create frontend/src/screens/pro/ProStatsScreen.tsx as a dedicated analytics screen (screen key: 'pro_stats'). Layout: position fixed inset-0, display flex, flex-direction column, header absolute 56px with back arrow calling go('pro_dashboard'), scroll zone flex-1 overflow-y auto paddingTop 72px, TabBarPro flex-shrink-0 at bottom with no active tab. Content sections: (1) Conversion rate card glass-card: label 'Profile views → Bookings' Inter 600 12px #54546C uppercase, value '24%' Inter 900 48px #F2D06B, subtitle 'Based on last 30 days' Inter 400 12px #9898B4; (2) Revenue per service bar chart: 6 animated vertical bars (heights animate from 0 on mount), each bar labeled with service name below in Inter 500 10px #54546C and CHF amount above in Inter 700 12px #F2D06B — demo values: Haircut 420 CHF, Beard trim 180 CHF, Hair+Beard 315 CHF, Shave 100 CHF, Kids cut 80 CHF, Other 60 CHF; bars use gradient fill linear-gradient(to top, #D4A050, #F2D06B) border-radius 6px 6px 0 0; (3) Peak hours heatmap: 7 rows (Mon–Sun) x 12 columns (8h–20h) SVG grid — each cell is a 28x20px rectangle, fill color opacity scales from rgba(242,208,107,0.05) to rgba(242,208,107,0.6) based on a demo booking density value, row/column labels Inter 500 10px #54546C; (4) Rating trend card: line chart SVG showing rating over last 30 days (demo values: 4.6, 4.7, 4.7, 4.8, 4.8, 4.9), line stroke #F2D06B 2px, area fill rgba(242,208,107,0.06); (5) Top 3 loyal clients section: 3 glass-card rows showing initials avatar circle 40px #1C1C26 #F2D06B border, name Inter 600 14px #F4F4F8, '# bookings' Inter 400 12px #9898B4 — demo: 'Thomas M. · 8 bookings', 'Julien R. · 5 bookings', 'Sophie L. · 4 bookings'; (6) Monthly revenue projection card: 'Projected this month' Inter 600 12px #54546C, value '340 CHF' Inter 900 36px #00D97A, subtitle 'Based on your current average' Inter 400 12px #9898B4. Add 'pro_stats' to Screen union type in useAppState.ts and case in App.tsx. Zero emoji.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/screens/pro/ProStatsScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/screens/pro/ProStatsScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-212",
+        "summary": "Add a 'View my stats' entry point from ProDashboardScreen: add a link/button labeled 'View my stats' Inter 500 12px #F2D06B with IconArrowRight size 14 in the Next appointment card footer area that calls go('pro_stats') on click.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/screens/pro/ProDashboardScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/screens/pro/ProDashboardScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-213",
+        "summary": "Create frontend/src/screens/pro/ProShareScreen.tsx as a social sharing screen (screen key: 'pro_share'). Layout: position fixed inset-0, display flex, flex-direction column, header absolute 56px with back arrow calling go('pro_dashboard'), scroll zone flex-1 overflow-y auto paddingTop 72px. Content: (1) Share profile preview card glass-card 280px centered: pro cover Unsplash image 120px height with gradient overlay, avatar 60px gold border, pro name Inter 700 18px #F4F4F8, category + city Inter 400 13px #9898B4, star rating row (filled #F2D06B), 'from X CHF' Inter 600 14px #F2D06B, link text 'nexus.app/pro/[state.proData.id ?? demo-001]' Inter 500 11px #54546C; (2) QR code section: generate a dynamic SVG QR code representing the URL 'https://nexus.app/pro/[id]' — implement a minimal QR code SVG generator in pure TypeScript using a simple matrix approach (no external library), render as an SVG 180x180px with dark modules on white/transparent background, center the SVG in a white 200x200px rounded card; (3) Share options grid 2x2: each option is a glass-card button 80px height with colored icon circle 44px and label below Inter 500 12px #F4F4F8 — 'Copy link' (IconCheck #F2D06B, onClick: navigator.clipboard.writeText(url).then(() => showToast('Link copied!', 'success'))), 'WhatsApp' (IconMessage #00D97A, onClick: window.open('https://wa.me/?text=' + encodeURIComponent('Discover my profile on NEXUS: https://nexus.app/pro/[id]'))), 'SMS' (IconPhone #5B7FFF, onClick: window.open('sms:?body=' + encodeURIComponent('Book me on NEXUS: https://nexus.app/pro/[id]'))), 'Instagram' (IconCamera #FF3D5A, onClick: navigator.clipboard.writeText(url).then(() => showToast('Link copied — paste in your bio!', 'info'))). Add 'pro_share' to Screen union type and App.tsx renderScreen() switch. Zero emoji.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/screens/pro/ProShareScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/screens/pro/ProShareScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-214",
+        "summary": "Add 'Share my profile' buttons on ProDashboardScreen and ProBusinessScreen. On ProDashboardScreen: add a secondary action button in the greeting section area labeled 'Share my profile' with IconArrowRight size 14, background rgba(242,208,107,0.08) border 1px solid rgba(242,208,107,0.2) border-radius 999px padding 8px 16px, Inter 600 13px #F2D06B, onClick calls go('pro_share'). On ProBusinessScreen: add the same style button in the CTA zone area (above the main CTA button) on tabs 1 and 2 only, calling go('pro_share'). Zero emoji.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/screens/pro/ProDashboardScreen.tsx",
+          "frontend/src/screens/pro/ProBusinessScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/screens/pro/ProDashboardScreen.tsx",
+          "frontend/src/screens/pro/ProBusinessScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-215",
+        "summary": "Create frontend/src/screens/pro/ProNetworkScreen.tsx as a micro-network / referral screen (screen key: 'pro_network'). Layout: position fixed inset-0, display flex, flex-direction column, header absolute 56px with back arrow calling go('pro_dashboard'), scroll zone flex-1 overflow-y auto paddingTop 72px. Content sections: (1) Referral code card glass-card centered: title 'My referral code' Inter 700 18px #F4F4F8, code value 'NEXUS-[STATE_ID or DEMO42]' Inter 900 32px #F2D06B letter-spacing 0.08em in a bordered box background #1C1C26 border 1px dashed rgba(242,208,107,0.3) border-radius 14px padding 16px, copy button (IconCheck #F2D06B label 'Copy code' Inter 600 13px #F2D06B background rgba(242,208,107,0.08) border 1px solid rgba(242,208,107,0.2) border-radius 999px padding 8px 16px) that calls navigator.clipboard.writeText(code).then(() => showToast('Code copied!', 'success')); (2) Reward explanation card glass-card: IconStar #F2D06B 24px + 'Earn 1 free month for every pro you bring who activates a subscription' Inter 500 14px #F4F4F8; (3) Stats row: two metrics side-by-side — 'Pros invited' Inter 400 12px #54546C with value '3' Inter 800 28px #F4F4F8, 'Months earned' Inter 400 12px #54546C with value '1' Inter 800 28px #00D97A; (4) Network list section title 'My network' Inter 700 16px #F4F4F8 with gold left accent bar 3px; list of 3 demo pros: each glass-card row 72px height showing initials avatar circle 40px, name Inter 600 14px #F4F4F8, category + city Inter 400 12px #9898B4, status badge pill (active: 'Active' background rgba(0,217,122,0.1) text #00D97A; pending: 'Pending' background rgba(242,208,107,0.1) text #F2D06B) — demo: 'Marie L. · Coiffure · Lausanne · Active', 'Sofiane R. · Barber · Geneva · Active', 'Emma D. · Esthetique · Berne · Pending'; (5) Invite CTA: BtnPrimary 'Invite a colleague' gold gradient text #050507 onClick calls go('pro_share'). Add 'pro_network' to Screen union type and App.tsx renderScreen(). Zero emoji.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/screens/pro/ProNetworkScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/screens/pro/ProNetworkScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-216",
+        "summary": "Add a 'My Network' entry point from ProBusinessScreen: in the ProBusinessScreen content zone (visible on all tabs below the active tab content), add a secondary glass-card row 64px height at the bottom of the scroll zone showing IconRadar #5B7FFF 20px, label 'My Network — invite colleagues & earn rewards' Inter 500 13px #F4F4F8, subtitle '3 pros in your network' Inter 400 11px #9898B4, IconChevronRight #54546C 16px on the right edge — onClick calls go('pro_network'). Also add an entry point on ProDashboardScreen as a row card in the scroll zone below the next appointment card with the same styling. Zero emoji.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/screens/pro/ProBusinessScreen.tsx",
+          "frontend/src/screens/pro/ProDashboardScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/screens/pro/ProBusinessScreen.tsx",
+          "frontend/src/screens/pro/ProDashboardScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-217",
+        "summary": "Add a pro badge system to ExplorerScreen and FicheProScreen. Define a getBadges(pro) utility function in ExplorerScreen.tsx that returns an array of badge objects based on the pro's data: (1) 'Top Pro' badge — shown when pro.note >= 4.8 — IconStar size 10 color #050507 background #F2D06B border-radius 999px padding 2px 6px Inter 700 9px #050507; (2) 'Flash Expert' badge — shown when pro.flash === true — IconFlash size 10 color #050507 background #00D97A border-radius 999px padding 2px 6px Inter 700 9px #050507; (3) 'NEXUS Certified' badge — shown when pro.nbAvis >= 50 — IconShield size 10 color #fff background #5B7FFF border-radius 999px padding 2px 6px Inter 700 9px #fff; (4) 'New' badge — shown when a demo flag pro.isNew === true OR pro.nbAvis < 10 — background rgba(255,61,90,0.15) border 1px solid rgba(255,61,90,0.3) text #FF3D5A Inter 700 9px. Render applicable badge pills overlaid at the bottom-left corner of each 'Available now' card and inline below the name in each 'Experts for you' row. In FicheProScreen, render the badge pills inline below the pro name, above the slogan. In PROS_DEMO data, ensure Alexandre (note 4.9 → Top Pro + Flash Expert + NEXUS Certified), Elise (note 4.9, nbAvis 203 → Top Pro + NEXUS Certified), Nadia (note 4.7, flash true → Flash Expert), Karim (note 4.8, flash true → Top Pro + Flash Expert), Marco (note 4.8 → Top Pro), Clara (flash true → Flash Expert) all display correct badges. Zero emoji.",
         "status": "missing",
         "plannedFiles": [
-          "frontend/src/styles/globals.css"
+          "frontend/src/screens/client/ExplorerScreen.tsx",
+          "frontend/src/screens/client/FicheProScreen.tsx"
         ],
         "matchedFiles": []
       },
       {
-        "id": "REQ-189",
-        "summary": "Fix the OTP authentication flow to eliminate infinite loops and blocked navigation: (1) OTPScreen has a role guard at the very top — if state.role is null, call go('role') and return null immediately; (2) the 'Send code' button uses the twilio.ts stub (accepts any 4-digit code) — it must never block on a real network call; (3) on entering all 4 digits, verifyOTP() is called locally — any 4-digit code is accepted in demo mode; (4) on success: if role==='client' call go('explorer'), if role==='pro' call go('pro_dashboard'), if role==='admin' call go('admin_dashboard'); (5) the phone number input with +41 prefix is pre-filled and the step to enter code auto-advances without requiring a real SMS; (6) resend countdown is 60 seconds using setInterval.",
+        "id": "REQ-218",
+        "summary": "Add a pro visibility boost feature to ProDashboardScreen. Add a glass-card section labeled 'Boost my visibility' Inter 700 16px #F4F4F8 with gold left accent bar 3px in the scroll zone below the Flash toggle card. Inside the card, display 3 boost tier rows: (1) 'Standard' row — label Inter 600 13px #9898B4 'Included in your subscription', status pill 'Active' background rgba(0,217,122,0.1) text #00D97A; (2) 'Premium' row — label 'Top of list for 1 week' Inter 600 13px #F4F4F8, price '+5 CHF/week' Inter 500 12px #9898B4, button 'Activate' background rgba(242,208,107,0.1) border 1px solid rgba(242,208,107,0.3) border-radius 999px padding 6px 14px Inter 600 12px #F2D06B — onClick calls showToast('Premium boost activated via TWINT — coming soon', 'info'); (3) 'Flash 24h' row — label 'Appear with BOOST badge in Explorer' Inter 600 13px #F4F4F8, price '+2 CHF/day' Inter 500 12px #9898B4, animated 'BOOST' badge pill background linear-gradient(135deg, #F2D06B, #D4A050) text #050507 Inter 800 9px letter-spacing 0.06em with a subtle breathe animation (scale 1→1.05→1 over 2s), button 'Activate' same pill style as Premium row — onClick calls showToast('Flash 24h boost activated via TWINT — coming soon', 'info'). In ExplorerScreen, for PROS_DEMO entries that have flash === true AND note >= 4.8 (Alexandre, Karim), render an animated 'BOOST' pill badge (same gradient style, breathe animation) on the card overlaid at the top-right corner. Zero emoji.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/screens/auth/OTPScreen.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/screens/auth/OTPScreen.tsx"
-        ]
-      },
-      {
-        "id": "REQ-190",
-        "summary": "Fix all buttons across the entire application: every button must have a functional onClick handler, no button may be permanently disabled without a visible reason, all gold gradient CTA buttons must be visible and tappable. Specifically: (1) every BtnPrimary instance has an onClick that performs a visible action; (2) disabled state only applied when an explicit condition is not met (e.g. no service selected, no address entered) with a visual explanation; (3) no button renders with opacity 0 or visibility hidden; (4) active press state scale(0.96) applies on all buttons.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/BtnPrimary.tsx",
-          "frontend/src/screens/client/Booking1Screen.tsx",
-          "frontend/src/screens/client/Booking2Screen.tsx",
-          "frontend/src/screens/client/Booking3Screen.tsx",
-          "frontend/src/screens/client/Booking4Screen.tsx",
-          "frontend/src/screens/pro/ProBusinessScreen.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/BtnPrimary.tsx",
-          "frontend/src/screens/client/Booking1Screen.tsx",
-          "frontend/src/screens/client/Booking2Screen.tsx",
-          "frontend/src/screens/client/Booking3Screen.tsx",
-          "frontend/src/screens/client/Booking4Screen.tsx",
-          "frontend/src/screens/pro/ProBusinessScreen.tsx"
-        ]
-      },
-      {
-        "id": "REQ-191",
-        "summary": "Fix all form inputs across the entire application: every input and textarea must be fully controlled with value and onChange props, every input must have a visible label above it, placeholder text must be informative, real-time validation with error messages in #FF3D5A below the field, font-size minimum 16px on all inputs and textareas to prevent iOS zoom, height 52px on all inputs.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/screens/auth/OTPScreen.tsx",
-          "frontend/src/screens/client/Booking3Screen.tsx",
-          "frontend/src/screens/client/ClientProfilScreen.tsx",
-          "frontend/src/screens/pro/tabs/TabProfil.tsx",
-          "frontend/src/screens/pro/tabs/TabPaiement.tsx",
-          "frontend/src/screens/pro/tabs/ServiceEditor.tsx",
-          "frontend/src/screens/admin/AdminLoginScreen.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/screens/auth/OTPScreen.tsx",
-          "frontend/src/screens/client/Booking3Screen.tsx",
-          "frontend/src/screens/client/ClientProfilScreen.tsx",
-          "frontend/src/screens/admin/AdminLoginScreen.tsx"
-        ]
-      },
-      {
-        "id": "REQ-192",
-        "summary": "Fix all images across the application: every img tag must have onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.style.display = 'none'; }} AND a sibling gradient fallback div that is always rendered behind the image (using position absolute, inset 0, linear-gradient background). Every image must have loading='lazy' and object-fit='cover'. This applies to ExplorerScreen cards, FicheProScreen cover and gallery, TabGalerie previews, and any other img tags.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/screens/client/ExplorerScreen.tsx",
-          "frontend/src/screens/client/FicheProScreen.tsx",
-          "frontend/src/screens/pro/tabs/TabGalerie.tsx",
-          "frontend/src/screens/client/ClientProfilScreen.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/screens/client/ExplorerScreen.tsx",
-          "frontend/src/screens/client/FicheProScreen.tsx",
-          "frontend/src/screens/client/ClientProfilScreen.tsx"
-        ]
-      },
-      {
-        "id": "REQ-193",
-        "summary": "Ensure demo data is always visible on every screen — no screen ever shows an empty state as its only content on first load. Specifically: ExplorerScreen always shows the 6 PROS_DEMO entries on mount (before any canister call); ProRadarScreen always shows 2 demo booking requests; ProWalletScreen always shows balance 240 CHF, escrow 55 CHF, 5 demo transactions, and 7-bar chart; ReservationsScreen always shows 3 demo upcoming bookings; AlertesScreen always shows 4 demo notifications (3 unread); AdminDashboardScreen always shows demo KPIs (8 pros, 47 clients, 156 CHF revenue, 24 transactions), 3 pending pros, 5 recent bookings; AdminProsScreen always shows demo pros list; AdminBookingsScreen always shows demo bookings; AdminRevenusScreen always shows demo revenue data. All canister calls are wrapped in try/catch — on error or empty result, demo data is used.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/screens/client/ExplorerScreen.tsx",
-          "frontend/src/screens/pro/ProRadarScreen.tsx",
-          "frontend/src/screens/pro/ProWalletScreen.tsx",
-          "frontend/src/screens/client/ReservationsScreen.tsx",
-          "frontend/src/screens/client/AlertesScreen.tsx",
-          "frontend/src/screens/admin/AdminDashboardScreen.tsx",
-          "frontend/src/screens/admin/AdminProsScreen.tsx",
-          "frontend/src/screens/admin/AdminBookingsScreen.tsx",
-          "frontend/src/screens/admin/AdminRevenusScreen.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/screens/client/ExplorerScreen.tsx",
-          "frontend/src/screens/pro/ProRadarScreen.tsx",
-          "frontend/src/screens/pro/ProWalletScreen.tsx",
-          "frontend/src/screens/client/ReservationsScreen.tsx",
-          "frontend/src/screens/client/AlertesScreen.tsx",
-          "frontend/src/screens/admin/AdminDashboardScreen.tsx",
-          "frontend/src/screens/admin/AdminProsScreen.tsx",
-          "frontend/src/screens/admin/AdminBookingsScreen.tsx",
-          "frontend/src/screens/admin/AdminRevenusScreen.tsx"
-        ]
-      },
-      {
-        "id": "REQ-194",
-        "summary": "Fix all navigation inconsistencies: (1) every screen that has a back arrow must call go() with the correct previous screen — no dead-end screens; (2) the NEXUS logo on the Header is always clickable and navigates to the role-appropriate home screen (explorer for client, pro_dashboard for pro, admin_dashboard for admin); (3) the role-switch pill in ExplorerScreen (labeled 'Pro') calls go('pro_dashboard'), and in ProDashboardScreen the client switch pill calls go('explorer'); (4) all 4 tabs in TabBarClient navigate: explorer → go('explorer'), reservations → go('client_reservations'), alertes → go('client_alertes'), profil → go('client_profil'); (5) all 4 TabBarPro tabs navigate: radar → go('pro_radar'), wallet → go('pro_wallet'), dashboard → go('pro_dashboard'), business → go('pro_business'); (6) all 4 TabBarAdmin tabs navigate: dashboard → go('admin_dashboard'), pros → go('admin_pros'), bookings → go('admin_bookings'), revenus → go('admin_revenus').",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/Header.tsx",
-          "frontend/src/screens/client/ExplorerScreen.tsx",
           "frontend/src/screens/pro/ProDashboardScreen.tsx",
-          "frontend/src/components/TabBarClient.tsx",
-          "frontend/src/components/TabBarPro.tsx",
-          "frontend/src/components/TabBarAdmin.tsx",
-          "frontend/src/screens/client/FicheProScreen.tsx",
-          "frontend/src/screens/client/Booking1Screen.tsx",
-          "frontend/src/screens/client/Booking2Screen.tsx",
-          "frontend/src/screens/client/Booking3Screen.tsx",
-          "frontend/src/screens/client/Booking4Screen.tsx"
+          "frontend/src/screens/client/ExplorerScreen.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/Header.tsx",
-          "frontend/src/screens/client/ExplorerScreen.tsx",
-          "frontend/src/screens/pro/ProDashboardScreen.tsx",
-          "frontend/src/components/TabBarClient.tsx",
-          "frontend/src/components/TabBarPro.tsx",
-          "frontend/src/components/TabBarAdmin.tsx",
-          "frontend/src/screens/client/FicheProScreen.tsx",
-          "frontend/src/screens/client/Booking1Screen.tsx",
-          "frontend/src/screens/client/Booking2Screen.tsx",
-          "frontend/src/screens/client/Booking3Screen.tsx",
-          "frontend/src/screens/client/Booking4Screen.tsx"
+          "frontend/src/screens/pro/ProDashboardScreen.tsx"
         ]
       },
       {
-        "id": "REQ-195",
-        "summary": "Fix the complete 5-step booking flow end-to-end: (1) Booking1Screen: services from state.selectedPro.services or 5 category defaults if empty, selecting a service calls update({ selectedService }), Continue active only when service selected, calls go('booking_2'); (2) Booking2Screen: 4 fixed time slots ('In 1 hour', 'In 2 hours', 'This evening', 'Tomorrow morning'), selecting calls update({ bookingCreneau: slot }), Continue calls go('booking_3'); (3) Booking3Screen: phone (optional, validates /^\\+41[0-9]{9}$/ or empty), address (required), city dropdown 12 cities (required), note optional; Continue active only when address and city valid, calls update({ bookingAdresse, bookingVille, bookingPhone, bookingNote }) then go('booking_4'); (4) Booking4Screen: displays full recap (service name, duration, slot, address, city, total price in Inter 800 28px #F2D06B), CTA 'Confirm and pay via TWINT' — on click calls update({ bookingId: 'demo_' + Date.now() }), showToast('Booking request sent', 'success'), go('booking_5'); (5) Booking5Screen: animated SVG hourglass, 30-min countdown, after exactly 8 seconds calls go('live_status') and showToast('Booking confirmed', 'success').",
+        "id": "REQ-219",
+        "summary": "Add an 'Express Services' section to ExplorerScreen as a new content section above 'Available now'. This section appears only when filter is 'All' or 'Flash'. Title 'Express Services' Inter 700 18px #F4F4F8 with a 3px #00D97A left accent bar (instead of gold, to differentiate). Subtitle '< 30 min · Available right now' Inter 400 13px #9898B4. Filter logic: show only PROS_DEMO entries where flash === true (Alexandre, Karim, Nadia, Clara). Display as a horizontal scroll row of compact cards 140x180px: card background linear-gradient(135deg, #0D0D13, #121219) border 1px solid rgba(0,217,122,0.15) border-radius 16px overflow hidden. Top section: pro image 100% width 100px height (Unsplash with onError fallback gradient), overlay gradient bottom linear-gradient(transparent, rgba(5,5,7,0.9)). Bottom section padding 10px: pro name Inter 700 13px #F4F4F8, category Inter 400 11px #9898B4. Bottom row: '< 30 min' pill background rgba(0,217,122,0.1) border 1px solid rgba(0,217,122,0.3) Inter 600 10px #00D97A border-radius 999px padding 2px 8px, and price 'from X CHF' Inter 600 12px #F2D06B. A pulsing gold border animation (box-shadow 0 0 0 1px rgba(242,208,107,0.2) to 0 0 0 3px rgba(242,208,107,0) over 2s keyframe loop) on each card when locationActive is true. Clicking a card calls update({ selectedPro: pro }) then go('fiche_pro'). When locationActive is true, sort express cards by distance (Haversine). Zero emoji.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/screens/client/ExplorerScreen.tsx"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-220",
+        "summary": "Update frontend/src/state/useAppState.ts to add the new screen values to the Screen union type: 'pro_pitch', 'pro_stats', 'pro_share', 'pro_network'. All other fields, defaults, and behaviors remain unchanged. The go() function must handle all new screen values without any guards.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/screens/client/Booking1Screen.tsx",
-          "frontend/src/screens/client/Booking2Screen.tsx",
-          "frontend/src/screens/client/Booking3Screen.tsx",
-          "frontend/src/screens/client/Booking4Screen.tsx",
-          "frontend/src/screens/client/Booking5Screen.tsx",
-          "frontend/src/screens/client/LiveStatusScreen.tsx"
+          "frontend/src/state/useAppState.ts"
         ],
         "matchedFiles": [
-          "frontend/src/screens/client/Booking1Screen.tsx",
-          "frontend/src/screens/client/Booking2Screen.tsx",
-          "frontend/src/screens/client/Booking3Screen.tsx",
-          "frontend/src/screens/client/Booking4Screen.tsx",
-          "frontend/src/screens/client/Booking5Screen.tsx",
-          "frontend/src/screens/client/LiveStatusScreen.tsx"
+          "frontend/src/state/useAppState.ts"
         ]
       },
       {
-        "id": "REQ-196",
-        "summary": "Fix ProBusinessScreen and all 5 tabs to work fully without any canister dependency: (1) ProBusinessScreen layout: position fixed inset-0, flex column, header absolute 56px z-100, tab zone flex-shrink-0 padding-top 72px, scroll zone flex-1 overflow-y auto, CTA zone flex-shrink-0, TabBarPro flex-shrink-0 — zero black empty space; (2) tab pills Profile/Services/Schedule/Payment/Gallery all clickable with correct active styling and completion micro-dots; (3) ProgressCircle and 5-segment bar update based on filled fields; (4) 'Save and continue' button on tabs 1–4 shows spinner 600ms then advances tab and shows showToast('Information saved', 'success'); (5) Tab 5 Gallery: 'Activate my profile' button active when photo count >= 3, calls update({ modalOpen: true }); disabled with 'Profile incomplete X%' text when < 80% completion; (6) SubscriptionModal renders as bottom overlay when state.modalOpen is true; (7) SubscriptionModal 'Start for free' button: if VITE_PAYREXX_SECRET undefined, calls update({ proActif: true }) then go('pro_success').",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/screens/pro/ProBusinessScreen.tsx",
-          "frontend/src/screens/pro/SubscriptionModal.tsx",
-          "frontend/src/screens/pro/tabs/TabGalerie.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/screens/pro/ProBusinessScreen.tsx"
-        ]
-      },
-      {
-        "id": "REQ-197",
-        "summary": "Fix the AdminLoginScreen to use local credential check only: email 'admin@nexus.ch' password 'Admin2024!' — on match calls update({ adminAuthenticated: true }) then go('admin_dashboard'), on mismatch calls showToast('Incorrect credentials', 'error'). Both inputs are fully controlled with onChange. The Sign in button background is #FF3D5A. No canister call. The screen background is #050507 with vertically centered content.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/screens/admin/AdminLoginScreen.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/screens/admin/AdminLoginScreen.tsx"
-        ]
-      },
-      {
-        "id": "REQ-198",
-        "summary": "Enforce global visual consistency across every screen and component: (1) all text on gold (#F2D06B) backgrounds uses color #050507 — no exceptions; (2) all primary text on dark backgrounds uses #F4F4F8; (3) secondary text uses #9898B4; (4) inactive/placeholder text uses #54546C; (5) card backgrounds use #0D0D13 or #121219 — never #000000; (6) all card border-radius: buttons 14px, cards 16–18px, pills 999px, inputs 12px, modals 24px; (7) all input heights 52px; (8) all CTA button heights 56px; (9) all horizontal section padding 20px; (10) all element spacing in multiples of 8px; (11) zero emoji in any user-facing string or JSX text anywhere in the codebase.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/screens/auth/LoginScreen.tsx",
-          "frontend/src/screens/auth/RoleScreen.tsx",
-          "frontend/src/screens/auth/OTPScreen.tsx",
-          "frontend/src/screens/client/ExplorerScreen.tsx",
-          "frontend/src/screens/client/FicheProScreen.tsx",
-          "frontend/src/screens/client/Booking1Screen.tsx",
-          "frontend/src/screens/client/Booking2Screen.tsx",
-          "frontend/src/screens/client/Booking3Screen.tsx",
-          "frontend/src/screens/client/Booking4Screen.tsx",
-          "frontend/src/screens/client/ReservationsScreen.tsx",
-          "frontend/src/screens/client/AlertesScreen.tsx",
-          "frontend/src/screens/client/ClientProfilScreen.tsx",
-          "frontend/src/screens/pro/ProDashboardScreen.tsx",
-          "frontend/src/screens/pro/ProRadarScreen.tsx",
-          "frontend/src/screens/pro/ProWalletScreen.tsx",
-          "frontend/src/screens/pro/ProBusinessScreen.tsx",
-          "frontend/src/screens/admin/AdminDashboardScreen.tsx",
-          "frontend/src/screens/admin/AdminProsScreen.tsx",
-          "frontend/src/screens/admin/AdminBookingsScreen.tsx",
-          "frontend/src/screens/admin/AdminRevenusScreen.tsx",
-          "frontend/src/components/BtnPrimary.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/screens/auth/LoginScreen.tsx",
-          "frontend/src/screens/auth/RoleScreen.tsx",
-          "frontend/src/screens/auth/OTPScreen.tsx",
-          "frontend/src/screens/client/ExplorerScreen.tsx",
-          "frontend/src/screens/client/FicheProScreen.tsx",
-          "frontend/src/screens/client/Booking1Screen.tsx",
-          "frontend/src/screens/client/Booking2Screen.tsx",
-          "frontend/src/screens/client/Booking3Screen.tsx",
-          "frontend/src/screens/client/Booking4Screen.tsx",
-          "frontend/src/screens/client/ReservationsScreen.tsx",
-          "frontend/src/screens/client/AlertesScreen.tsx",
-          "frontend/src/screens/client/ClientProfilScreen.tsx",
-          "frontend/src/screens/pro/ProDashboardScreen.tsx",
-          "frontend/src/screens/pro/ProRadarScreen.tsx",
-          "frontend/src/screens/pro/ProWalletScreen.tsx",
-          "frontend/src/screens/pro/ProBusinessScreen.tsx",
-          "frontend/src/screens/admin/AdminDashboardScreen.tsx",
-          "frontend/src/screens/admin/AdminProsScreen.tsx",
-          "frontend/src/screens/admin/AdminBookingsScreen.tsx",
-          "frontend/src/screens/admin/AdminRevenusScreen.tsx",
-          "frontend/src/components/BtnPrimary.tsx"
-        ]
-      },
-      {
-        "id": "REQ-199",
-        "summary": "Ensure the desktop sidebar in App.tsx renders the correct vertical navigation items based on the current role: (1) for role='client': 4 items matching TabBarClient (Explorer with IconSearch, Reservations with IconCalendar, Alertes with IconBell, Profil with IconUser), each calling the correct go() on click; (2) for role='pro': 4 items matching TabBarPro (Radar with IconRadar, Wallet with IconWallet, Home with IconHome, Business with IconEdit); (3) for role='admin': 4 items matching TabBarAdmin (Dashboard with IconGrid, Pros with IconUser, Bookings with IconCalendar, Revenue with IconWallet) using #FF3D5A active color; (4) sidebar nav items are 56px height, Inter 600 14px, gold (#F2D06B) when active; (5) sidebar only renders on desktop >= 900px — hidden on mobile; (6) sidebar background rgba(5,5,7,0.97), border-right 1px solid rgba(255,255,255,0.04).",
+        "id": "REQ-221",
+        "summary": "Update frontend/src/App.tsx renderScreen() switch to add cases for all new screens: case 'pro_pitch' renders ProPitchScreen, case 'pro_stats' renders ProStatsScreen, case 'pro_share' renders ProShareScreen, case 'pro_network' renders ProNetworkScreen. All cases pass go, state, update, showToast, removeToast props. No fallthrough between cases. The default case continues to fall back to LoginScreen. All existing 28 cases remain intact.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/App.tsx"
         ],
         "matchedFiles": [
           "frontend/src/App.tsx"
-        ]
-      },
-      {
-        "id": "REQ-200",
-        "summary": "Rewrite frontend/src/components/Header.tsx with complete functionality: position absolute top-0 left-0 right-0, height 56px (mobile) / 64px (desktop >= 900px), background rgba(5,5,7,0.97), backdrop-filter blur(32px), border-bottom 1px solid rgba(255,255,255,0.04), z-index 100. Left: if showBack — 40px circle button background #0D0D13 border rgba(255,255,255,0.08) with IconArrowLeft 18px #F4F4F8 onClick onBack; else — 'NEXUS' Inter 900 22px #F4F4F8 + '.' in #5B7FFF letter-spacing -0.05em, onClick onLogoClick. Center: title Inter 700 16px #F4F4F8 with fadeIn 300ms. Right: role-switch pill (transition 150ms border-color) + notification bell (40px circle, badge scaleIn 200ms when notifsCount > 0 in #FF3D5A). All props (showBack, onBack, title, role, notifsCount, onNotifs, onSwitchRole, onLogoClick) typed and functional.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/Header.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/Header.tsx"
-        ]
-      },
-      {
-        "id": "REQ-201",
-        "summary": "Rewrite frontend/src/components/BtnPrimary.tsx: height 56px (non-small), 60px on desktop >= 768px; font-size 15px (mobile) / 16px (desktop); border-radius 14px (mobile) / 16px (desktop); gold gradient background with glow-gold box-shadow 0 6px 28px rgba(242,208,107,0.3); disabled state background #1C1C26 color #54546C box-shadow none cursor not-allowed; danger state background #FF3D5A box-shadow 0 6px 24px rgba(255,61,90,0.3) color #fff; loading state: 18x18px spinner border 2px solid currentColor border-top-color transparent animation spin 0.8s infinite; active press scale(0.96) transition 100ms; flex-shrink 0 always; box-shadow transition 200ms.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/BtnPrimary.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/BtnPrimary.tsx"
-        ]
-      },
-      {
-        "id": "REQ-202",
-        "summary": "Rewrite frontend/src/components/Toast.tsx: container position fixed top 72px, on mobile left 16px right 16px max-width 430px, on desktop >= 768px right-aligned 24px from right edge max-width 360px; each toast backdrop-filter blur(24px) background rgba(9,9,13,0.97) border 1px solid rgba(255,255,255,0.06); type-based icon in 24px circle (IconCheck #00D97A success, IconX #FF3D5A error, IconBell #5B7FFF info, IconFlash #F2D06B sms); text Inter 500 13px #F4F4F8; enter slideDown 300ms exit slideUp 200ms; gap 8px; max 4 toasts (oldest removed); auto-dismiss after duration ?? 3500ms; on desktop border-radius 16px padding 16px 20px.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/Toast.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/Toast.tsx"
-        ]
-      },
-      {
-        "id": "REQ-203",
-        "summary": "Rewrite frontend/src/components/BottomSheet.tsx: on mobile, bottom-anchored border-radius 24px 24px 0 0, max-height calc(100dvh - 64px - env(safe-area-inset-bottom,0px)), slideUp 250ms animation, drag handle visible. On desktop >= 768px: centered modal position fixed top 50% left 50% transform translate(-50%,-50%) max-width 560px border-radius 24px all corners max-height 85vh, enter animation scaleIn. Overlay rgba(5,5,7,0.85) blur(4px). Content scrollable with flex-1 overflow-y auto. Footer slot sticky at bottom. onClick overlay calls onClose, onClick sheet stopPropagation.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/BottomSheet.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/BottomSheet.tsx"
-        ]
-      },
-      {
-        "id": "REQ-204",
-        "summary": "Rewrite frontend/src/components/TabBarClient.tsx, TabBarPro.tsx, and TabBarAdmin.tsx: on desktop >= 900px, hide entirely with display:none (navigation handled by sidebar). On mobile, full polish: gold indicator line width transition 0→24px 200ms on mount, active icon scale(1.1) 150ms transition, inactive icons #2E2E3E, active icons and labels #F2D06B (TabBarAdmin uses #FF3D5A for active). Gradient top border linear-gradient(to right, transparent, rgba(242,208,107,0.15), transparent). Tab press scale(0.9) briefly. All tab onClick handlers call the correct go() navigation. Add aria-label attributes to all tab buttons.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/TabBarClient.tsx",
-          "frontend/src/components/TabBarPro.tsx",
-          "frontend/src/components/TabBarAdmin.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/TabBarClient.tsx",
-          "frontend/src/components/TabBarPro.tsx",
-          "frontend/src/components/TabBarAdmin.tsx"
-        ]
-      },
-      {
-        "id": "REQ-205",
-        "summary": "Rewrite frontend/src/components/NotifsPanel.tsx: on mobile, full-width slide-in from right width 100% max-width 430px. On desktop >= 900px: right-side drawer max-width 400px, semi-transparent left border 1px solid rgba(255,255,255,0.08). Notification items stagger fadeIn 30ms per index. Each type has distinct icon — nouvelle_demande: IconBell, paiement_confirme: IconWallet, fonds_liberes: IconBank, booking_confirme: IconCalendar, avis_recu: IconStar — in correctly colored 36px circles. Panel header: count chip Inter 700 11px #050507 on #F2D06B padding 2px 7px border-radius 999px. Entrance slideUp 300ms cubic-bezier(0.32,0.72,0,1). Thin #2E2E3E bar on left edge as swipe hint.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/NotifsPanel.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/NotifsPanel.tsx"
         ]
       }
     ]
@@ -416,37 +178,14 @@
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/App.tsx",
-    "frontend/src/components/BottomSheet.tsx",
-    "frontend/src/components/BtnPrimary.tsx",
-    "frontend/src/components/Header.tsx",
-    "frontend/src/components/NotifsPanel.tsx",
-    "frontend/src/components/TabBarAdmin.tsx",
-    "frontend/src/components/TabBarClient.tsx",
-    "frontend/src/components/TabBarPro.tsx",
-    "frontend/src/components/Toast.tsx",
-    "frontend/src/screens/admin/AdminBookingsScreen.tsx",
-    "frontend/src/screens/admin/AdminDashboardScreen.tsx",
-    "frontend/src/screens/admin/AdminLoginScreen.tsx",
-    "frontend/src/screens/admin/AdminProsScreen.tsx",
-    "frontend/src/screens/admin/AdminRevenusScreen.tsx",
-    "frontend/src/screens/auth/LoginScreen.tsx",
-    "frontend/src/screens/auth/OTPScreen.tsx",
-    "frontend/src/screens/auth/RoleScreen.tsx",
-    "frontend/src/screens/client/AlertesScreen.tsx",
-    "frontend/src/screens/client/Booking1Screen.tsx",
-    "frontend/src/screens/client/Booking2Screen.tsx",
-    "frontend/src/screens/client/Booking3Screen.tsx",
-    "frontend/src/screens/client/Booking4Screen.tsx",
-    "frontend/src/screens/client/Booking5Screen.tsx",
-    "frontend/src/screens/client/ClientProfilScreen.tsx",
-    "frontend/src/screens/client/ExplorerScreen.tsx",
-    "frontend/src/screens/client/FicheProScreen.tsx",
-    "frontend/src/screens/client/LiveStatusScreen.tsx",
-    "frontend/src/screens/client/ReservationsScreen.tsx",
     "frontend/src/screens/pro/ProBusinessScreen.tsx",
     "frontend/src/screens/pro/ProDashboardScreen.tsx",
-    "frontend/src/screens/pro/ProRadarScreen.tsx",
-    "frontend/src/screens/pro/ProWalletScreen.tsx",
+    "frontend/src/screens/pro/ProNetworkScreen.tsx",
+    "frontend/src/screens/pro/ProPitchScreen.tsx",
+    "frontend/src/screens/pro/ProShareScreen.tsx",
+    "frontend/src/screens/pro/ProStatsScreen.tsx",
+    "frontend/src/screens/pro/SubscriptionModal.tsx",
+    "frontend/src/screens/pro/tabs/TabPaiement.tsx",
     "frontend/src/state/useAppState.ts",
     "project_state.json",
     "scratch/component-selection.json",
