@@ -1,75 +1,104 @@
 import React from 'react';
 
 interface BtnPrimaryProps {
-  onClick: () => void;
-  children: React.ReactNode;
-  loading?: boolean;
+  label: string;
+  onClick?: () => void;
   disabled?: boolean;
+  loading?: boolean;
   danger?: boolean;
   small?: boolean;
   icon?: React.ReactNode;
   style?: React.CSSProperties;
+  type?: 'button' | 'submit' | 'reset';
 }
 
-export default function BtnPrimary({ onClick, children, loading = false, disabled = false, danger = false, small = false, icon, style }: BtnPrimaryProps) {
+export default function BtnPrimary({
+  label,
+  onClick,
+  disabled = false,
+  loading = false,
+  danger = false,
+  small = false,
+  icon,
+  style,
+  type = 'button',
+}: BtnPrimaryProps) {
   const isDisabled = disabled || loading;
 
-  let background = 'linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%)';
+  let background = 'linear-gradient(135deg, #F2D06B 0%, #E8B84B 100%)';
   let color = '#050507';
-  let boxShadow = '0 6px 24px rgba(242,208,107,0.25)';
+  let boxShadow = '0 6px 28px rgba(242,208,107,0.3)';
 
   if (danger) {
-    background = 'var(--alert)';
+    background = '#FF3D5A';
     color = '#fff';
-    boxShadow = '0 6px 24px rgba(255,61,90,0.25)';
+    boxShadow = '0 6px 24px rgba(255,61,90,0.3)';
   }
 
   if (isDisabled) {
-    background = 'var(--d4)';
-    color = 'var(--t3)';
+    background = '#1C1C26';
+    color = '#54546C';
     boxShadow = 'none';
   }
 
   return (
     <button
-      onClick={isDisabled ? undefined : onClick}
+      type={type}
+      onClick={!isDisabled ? onClick : undefined}
       disabled={isDisabled}
       style={{
         width: '100%',
         height: small ? 44 : 56,
-        borderRadius: small ? 12 : 16,
+        borderRadius: 14,
         border: 'none',
         background,
         color,
         fontFamily: 'Inter, sans-serif',
         fontWeight: 700,
-        fontSize: small ? 13 : 15,
-        letterSpacing: 0.2,
+        fontSize: small ? 14 : 15,
         cursor: isDisabled ? 'not-allowed' : 'pointer',
+        boxShadow,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 8,
-        boxShadow,
-        transition: 'all 120ms ease',
+        flexShrink: 0,
+        transition: 'box-shadow 200ms, transform 100ms',
+        letterSpacing: '-0.01em',
         ...style,
+      }}
+      onMouseDown={e => {
+        if (!isDisabled) (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.96)';
+      }}
+      onMouseUp={e => {
+        (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
+      }}
+      onTouchStart={e => {
+        if (!isDisabled) (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.96)';
+      }}
+      onTouchEnd={e => {
+        (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
       }}
     >
       {loading ? (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite' }}>
-          <line x1="12" y1="2" x2="12" y2="6" />
-          <line x1="12" y1="18" x2="12" y2="22" />
-          <line x1="4.93" y1="4.93" x2="7.76" y2="7.76" />
-          <line x1="16.24" y1="16.24" x2="19.07" y2="19.07" />
-          <line x1="2" y1="12" x2="6" y2="12" />
-          <line x1="18" y1="12" x2="22" y2="12" />
-          <line x1="4.93" y1="19.07" x2="7.76" y2="16.24" />
-          <line x1="16.24" y1="7.76" x2="19.07" y2="4.93" />
-        </svg>
-      ) : icon ? (
-        icon
-      ) : null}
-      {children}
+        <span style={{
+          width: 18,
+          height: 18,
+          borderRadius: '50%',
+          border: `2px solid ${color}`,
+          borderTopColor: 'transparent',
+          animation: 'spin 0.8s linear infinite',
+          display: 'inline-block',
+        }} />
+      ) : (
+        <>
+          {icon && <span style={{ display: 'flex', alignItems: 'center' }}>{icon}</span>}
+          {label}
+        </>
+      )}
     </button>
   );
 }

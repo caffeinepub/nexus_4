@@ -11,9 +11,15 @@ interface Props {
 
 const STATUS_FILTERS = ['Tous', 'Actifs', 'En attente'];
 
+const DEMO_PROS: Pro[] = [
+  { id: { toString: () => 'd1' } as any, name: 'Sophie Laurent', categorie: 'coiffure' as any, bio: '', adresse: '', ville: 'Geneve', phone: '', email: '', modeTravail: 'domicile' as any, services: [], photos: [], rating: 4.9, reviewCount: BigInt(127), actif: true, subscriptionActive: true, subscriptionExpiry: BigInt(0), createdAt: BigInt(0) },
+  { id: { toString: () => 'd2' } as any, name: 'Amina Benali', categorie: 'esthetique' as any, bio: '', adresse: '', ville: 'Lausanne', phone: '', email: '', modeTravail: 'both' as any, services: [], photos: [], rating: 4.8, reviewCount: BigInt(89), actif: true, subscriptionActive: false, subscriptionExpiry: BigInt(0), createdAt: BigInt(0) },
+  { id: { toString: () => 'd3' } as any, name: 'Chloe Martin', categorie: 'onglerie' as any, bio: '', adresse: '', ville: 'Zurich', phone: '', email: '', modeTravail: 'domicile' as any, services: [], photos: [], rating: 4.9, reviewCount: BigInt(203), actif: false, subscriptionActive: false, subscriptionExpiry: BigInt(0), createdAt: BigInt(0) },
+];
+
 export default function AdminProsScreen({ go, state }: Props) {
   const { actor } = useActor();
-  const [pros, setPros] = useState<Pro[]>([]);
+  const [pros, setPros] = useState<Pro[]>(DEMO_PROS);
   const [filter, setFilter] = useState('Tous');
   const [villeFilter, setVilleFilter] = useState('Toutes');
 
@@ -38,93 +44,117 @@ export default function AdminProsScreen({ go, state }: Props) {
     return statusOk && villeOk;
   });
 
-  const statusColor = (p: Pro) => p.actif && p.subscriptionActive ? 'var(--flash)' : p.actif ? 'var(--gold)' : 'var(--alert)';
+  const statusColor = (p: Pro) => p.actif && p.subscriptionActive ? '#00D97A' : p.actif ? '#F2D06B' : '#FF3D5A';
   const statusLabel = (p: Pro) => p.actif && p.subscriptionActive ? 'ACTIF' : p.actif ? 'EN ATTENTE' : 'REFUSE';
 
   return (
-    <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', background: 'var(--void)' }}>
+    <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', background: '#050507' }}>
       {/* Header */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', background: 'rgba(5,5,7,0.95)', backdropFilter: 'blur(12px)', zIndex: 100, borderBottom: '1px solid var(--d3)' }}>
-        <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--alert)', letterSpacing: 1 }}>NEXUS ADMIN</div>
-        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--t2)' }}>Professionnels</div>
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: 56,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 20px', background: 'rgba(5,5,7,0.97)',
+        backdropFilter: 'blur(32px)', zIndex: 100,
+        borderBottom: '1px solid rgba(255,255,255,0.04)',
+      }}>
+        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 16, fontWeight: 800, color: '#FF3D5A', letterSpacing: '0.04em' }}>
+          NEXUS ADMIN
+        </div>
+        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 600, color: '#9898B4' }}>Professionnels</div>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', paddingTop: 72, paddingBottom: 16 }}>
+      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' as any, overscrollBehavior: 'contain', paddingTop: 72, paddingBottom: 16 }}>
         {/* Status filters */}
-        <div style={{ display: 'flex', gap: 8, padding: '16px 20px 0', overflowX: 'auto' }}>
+        <div style={{ display: 'flex', gap: 8, padding: '16px 20px 0', overflowX: 'auto', scrollbarWidth: 'none' }}>
           {STATUS_FILTERS.map(f => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               style={{
-                flexShrink: 0, padding: '7px 14px', borderRadius: 20, border: 'none', cursor: 'pointer',
-                background: filter === f ? 'var(--alert)' : 'var(--d2)',
-                color: filter === f ? '#fff' : 'var(--t2)',
-                fontSize: 12, fontWeight: 600,
+                flexShrink: 0, padding: '7px 14px', borderRadius: 999,
+                background: filter === f ? 'rgba(255,61,90,0.12)' : '#0D0D13',
+                border: filter === f ? '1px solid rgba(255,61,90,0.3)' : '1px solid rgba(255,255,255,0.06)',
+                color: filter === f ? '#FF3D5A' : '#9898B4',
+                fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 600, cursor: 'pointer',
               }}
             >
               {f}
             </button>
           ))}
-          {villes.map(v => (
-            <button
-              key={v}
-              onClick={() => setVilleFilter(v)}
-              style={{
-                flexShrink: 0, padding: '7px 14px', borderRadius: 20, border: 'none', cursor: 'pointer',
-                background: villeFilter === v ? 'var(--d4)' : 'var(--d2)',
-                color: villeFilter === v ? 'var(--t1)' : 'var(--t3)',
-                fontSize: 12, fontWeight: 600,
-              }}
-            >
-              {v}
-            </button>
-          ))}
         </div>
 
-        {/* Count */}
-        <div style={{ padding: '12px 20px 0', fontSize: 12, color: 'var(--t3)' }}>
-          {filtered.length} professionnel{filtered.length !== 1 ? 's' : ''}
+        {/* Ville filter */}
+        <div style={{ padding: '12px 20px 16px' }}>
+          <select
+            value={villeFilter}
+            onChange={e => setVilleFilter(e.target.value)}
+            style={{
+              height: 40, background: '#0D0D13', border: '1px solid rgba(255,255,255,0.06)',
+              borderRadius: 10, padding: '0 12px', fontFamily: 'Inter, sans-serif',
+              fontSize: 13, color: '#9898B4', cursor: 'pointer', outline: 'none',
+            }}
+          >
+            {villes.map(v => <option key={v} value={v} style={{ background: '#0D0D13' }}>{v}</option>)}
+          </select>
         </div>
 
-        {/* Empty state */}
-        {filtered.length === 0 && (
-          <div style={{ padding: '40px 20px', textAlign: 'center' }}>
-            <div style={{ fontSize: 13, color: 'var(--t3)' }}>Aucun professionnel</div>
-          </div>
-        )}
-
-        {/* List */}
-        <div style={{ padding: '12px 20px 0' }}>
-          {filtered.map(pro => (
-            <div key={pro.id.toString()} style={{ background: 'var(--d2)', borderRadius: 14, padding: '14px', marginBottom: 10 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                {/* Avatar */}
-                <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--d4)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--t2)' }}>{pro.name.charAt(0)}</span>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)' }}>{pro.name}</span>
-                    <span style={{ fontSize: 9, fontWeight: 700, color: statusColor(pro), background: statusColor(pro) + '22', borderRadius: 6, padding: '2px 6px' }}>{statusLabel(pro)}</span>
-                  </div>
-                  <div style={{ fontSize: 12, color: 'var(--t3)', marginTop: 2 }}>{pro.categorie} · {pro.ville}</div>
-                  <div style={{ fontSize: 11, color: 'var(--t4)', marginTop: 1 }}>Note: {pro.rating.toFixed(1)} · {pro.reviewCount.toString()} avis</div>
-                </div>
-              </div>
-              {!pro.subscriptionActive && (
-                <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                  <button onClick={() => handleValidate(pro.id.toString())} style={{ flex: 1, padding: '8px', borderRadius: 10, border: 'none', background: 'var(--flash)', color: '#050507', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Valider</button>
-                  <button onClick={() => handleRefuse(pro.id.toString())} style={{ flex: 1, padding: '8px', borderRadius: 10, border: 'none', background: 'var(--alert)', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>Refuser</button>
-                </div>
-              )}
+        {/* Pros list */}
+        <div style={{ padding: '0 20px' }}>
+          {filtered.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 0', fontFamily: 'Inter, sans-serif', color: '#54546C', fontSize: 14 }}>
+              Aucun professionnel trouve
             </div>
-          ))}
+          ) : (
+            filtered.map(pro => (
+              <div key={pro.id.toString()} style={{
+                background: '#0D0D13', border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: 14, padding: '14px 16px', marginBottom: 10,
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
+                    background: 'rgba(255,61,90,0.1)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontFamily: 'Inter, sans-serif', fontSize: 16, fontWeight: 700, color: '#FF3D5A',
+                  }}>
+                    {pro.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 700, color: '#F4F4F8', marginBottom: 2 }}>{pro.name}</div>
+                    <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#54546C' }}>{pro.ville} · {String(pro.categorie)}</div>
+                  </div>
+                  <span style={{
+                    fontFamily: 'Inter, sans-serif', fontSize: 10, fontWeight: 700,
+                    padding: '3px 8px', borderRadius: 999,
+                    background: statusColor(pro) + '22', color: statusColor(pro),
+                  }}>
+                    {statusLabel(pro)}
+                  </span>
+                </div>
+                {!pro.subscriptionActive && (
+                  <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                    <button
+                      onClick={() => handleValidate(pro.id.toString())}
+                      style={{ flex: 1, height: 36, borderRadius: 10, border: 'none', background: '#00D97A', color: '#050507', fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+                    >
+                      Valider
+                    </button>
+                    <button
+                      onClick={() => handleRefuse(pro.id.toString())}
+                      style={{ flex: 1, height: 36, borderRadius: 10, border: 'none', background: '#FF3D5A', color: '#fff', fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+                    >
+                      Refuser
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
         </div>
-        <div style={{ height: 20 }} />
+        <div style={{ height: 16 }} />
       </div>
 
-      <TabBarAdmin active="pros" go={go} />
+      <TabBarAdmin current="admin_pros" go={go} />
     </div>
   );
 }

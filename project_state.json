@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 13,
-  "summary": "NEXUS v8.0 — Marketplace beauté et bien-être Suisse romande. React 18 TypeScript strict, backend Motoko ICP mainnet, auth Internet Identity, paiement TWINT exclusif via Payrexx. Design system sombre avec palette gold/void, navigation useState uniquement, icônes SVG inline, zéro emoji, zéro Stripe, zéro React Router, zéro Tailwind. Layout mobile-first max-width 430px avec header absolu 56px, tab bar dans le flux flex, CTA ancré bas avec safe-area iOS.",
+  "projectStateVersion": 25,
+  "summary": "NEXUS v8.0 — Marketplace beauté et bien-être Suisse romande. React 18 TypeScript strict, backend Motoko ICP mainnet, auth Internet Identity, paiement TWINT exclusif via Payrexx. Design system sombre avec palette gold/void, navigation useState uniquement, icônes SVG inline, zéro emoji, zéro Stripe, zéro React Router, zéro Tailwind. Layout responsive : mobile-first max-width 430px avec header absolu 56px, tab bar dans le flux flex, CTA ancré bas avec safe-area iOS — plus adaptation desktop/tablette avec mise en page intelligente.",
   "architectural_notes": [
     "Navigation par useState uniquement — zéro React Router",
     "Paiement TWINT exclusif via Payrexx (psp[0]=twint) — zéro Stripe/Revolut",
@@ -17,7 +17,9 @@
   "known_issues": [
     "Les builds complets (50+ fichiers) dépassent la capacité du moteur — livraison par parties 1/4 nécessaire",
     "Bug OTP/Rôle : screen initial démarre sur 'otp', cards RoleScreen noires (#000 au lieu de #0D0D13), onClick manquants sur cards, OTPScreen s'affiche prématurément — correction en cours (useAppState.ts, RoleScreen.tsx, OTPScreen.tsx, App.tsx)",
-    "Bug Explorer : écran inaccessible après OTP client — go('explorer') manquant, layout scroll cassé, tab bar fixed au lieu de flux flex, images sans fallback — correction en cours (useAppState.ts, ExplorerScreen.tsx, FicheProScreen.tsx, App.tsx)"
+    "Correction finale lancement en cours : 4 problèmes critiques (Booking flow, Espace Pro, Espace Admin, Géolocalisation Explorer) — 24 fichiers à livrer (AR-59)",
+    "Mise en page : certains écrans ne montrent pas tout le contenu visible à l'écran (overflow, hauteurs fixes problématiques) — correction intelligente requise mobile + desktop",
+    "Boucle infinie auth : la connexion tourne en boucle et les étapes suivantes (Role, OTP, Explorer) ne sont pas accessibles — correction en cours (LoginScreen, RoleScreen, OTPScreen, useAppState, App.tsx)"
   ],
   "isFixRequest": true,
   "existing_features": [
@@ -314,6 +316,766 @@
       "title": "In frontend/src/screens/client/FicheProScreen.tsx, add a guard at the top of the component: if state.selectedPro is null or undefined, immediately call go('explorer') and return null. FicheProScreen must never render when selectedPro is null. The component must read pro data from state.selectedPro and display it correctly. The back button in the header must call go('explorer').",
       "reqIds": [
         "REQ-53"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-client-booking1screen-tsx-display-services-from-state-selectedpro-services-if-empty-or-missing-show-demo-services-matching-the-pro-s-category-same-5-service-defaults-per-category-as-tabservices-each-service-card-shows-name-price-chf-duration-min-tapping-a-card-gives-it-a-gold-border-and-saves-the-selection-via-update-selectedservice-service-the-continue-button-is-active-only-when-a-service-is-selected-and-calls-go-booking-2-zero-emoji",
+      "title": "Rewrite frontend/src/screens/client/Booking1Screen.tsx: display services from state.selectedPro.services; if empty or missing, show demo services matching the pro's category (same 5-service defaults per category as TabServices). Each service card shows name, price (CHF), duration (min). Tapping a card gives it a gold border and saves the selection via update({ selectedService: service }). The 'Continue' button is active only when a service is selected and calls go('booking_2'). Zero emoji.",
+      "reqIds": [
+        "REQ-54"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-client-booking2screen-tsx-always-display-exactly-4-time-slots-in-1-hour-in-2-hours-this-evening-tomorrow-morning-tapping-a-slot-applies-a-gold-border-and-saves-the-selection-via-update-bookingcreneau-slot-the-continue-button-calls-go-booking-3-zero-emoji",
+      "title": "Rewrite frontend/src/screens/client/Booking2Screen.tsx: always display exactly 4 time slots: 'In 1 hour', 'In 2 hours', 'This evening', 'Tomorrow morning'. Tapping a slot applies a gold border and saves the selection via update({ bookingCreneau: slot }). The 'Continue' button calls go('booking_3'). Zero emoji.",
+      "reqIds": [
+        "REQ-55"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-client-booking3screen-tsx-phone-input-controlled-onchange-updates-local-state-address-input-controlled-onchange-updates-local-state-city-dropdown-with-exactly-12-cities-geneve-lausanne-berne-zurich-bale-fribourg-neuchatel-sion-monthey-yverdon-morges-nyon-optional-note-textarea-controlled-validation-phone-must-match-41-0-9-9-or-be-empty-address-must-be-non-empty-city-must-be-selected-the-continue-button-is-active-only-when-address-and-city-are-valid-on-click-calls-update-bookingadresse-bookingville-bookingphone-bookingnote-then-go-booking-4-zero-emoji",
+      "title": "Rewrite frontend/src/screens/client/Booking3Screen.tsx: phone input (controlled, onChange updates local state), address input (controlled, onChange updates local state), city dropdown with exactly 12 cities: Geneve, Lausanne, Berne, Zurich, Bale, Fribourg, Neuchatel, Sion, Monthey, Yverdon, Morges, Nyon. Optional note textarea (controlled). Validation: phone must match /^\\+41[0-9]{9}$/ or be empty; address must be non-empty; city must be selected. The 'Continue' button is active only when address and city are valid; on click calls update({ bookingAdresse, bookingVille, bookingPhone, bookingNote }) then go('booking_4'). Zero emoji.",
+      "reqIds": [
+        "REQ-56"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-client-booking4screen-tsx-display-a-full-recap-showing-service-state-selectedservice-nom-duration-state-selectedservice-duree-slot-state-bookingcreneau-address-state-bookingadresse-city-state-bookingville-total-state-selectedservice-prix-chf-in-inter-800-24px-f2d06b-cta-button-confirm-and-pay-via-twint-with-gold-gradient-and-text-color-050507-on-click-attempt-createbooking-on-the-canister-if-canister-is-unavailable-or-throws-call-update-bookingid-demo-date-now-showtoast-booking-request-sent-to-professional-success-and-go-booking-5-zero-emoji-zero-stripe",
+      "title": "Rewrite frontend/src/screens/client/Booking4Screen.tsx: display a full recap showing SERVICE (state.selectedService.nom), DURATION (state.selectedService.duree), SLOT (state.bookingCreneau), ADDRESS (state.bookingAdresse), CITY (state.bookingVille), TOTAL (state.selectedService.prix CHF) in Inter 800 24px #F2D06B. CTA button 'Confirm and pay via TWINT' with gold gradient and text color #050507. On click: attempt createBooking() on the canister; if canister is unavailable or throws, call update({ bookingId: 'demo_' + Date.now() }), showToast('Booking request sent to professional', 'success'), and go('booking_5'). Zero emoji, zero Stripe.",
+      "reqIds": [
+        "REQ-57"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-client-booking5screen-tsx-display-waiting-for-confirmation-message-an-animated-svg-hourglass-and-a-30-minute-countdown-using-setinterval-after-exactly-8-seconds-automatically-call-go-live-status-and-showtoast-booking-confirmed-success-zero-emoji",
+      "title": "Rewrite frontend/src/screens/client/Booking5Screen.tsx: display 'Waiting for confirmation' message, an animated SVG hourglass, and a 30-minute countdown using setInterval. After exactly 8 seconds, automatically call go('live_status') and showToast('Booking confirmed', 'success'). Zero emoji.",
+      "reqIds": [
+        "REQ-58"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-frontend-src-screens-client-livestatusscreen-tsx-layout-fixed-inset-0-flex-flex-col-header-with-back-arrow-scroll-zone-flex-1-overflow-y-auto-padding-top-72px-live-countdown-timer-using-setinterval-every-1-second-displayed-inter-900-52px-var-gold-svg-timeline-with-5-steps-completed-steps-in-var-flash-step-3-expert-en-route-is-the-active-step-in-var-gold-with-breathe-animation-pending-steps-in-var-d4-polls-canister-for-booking-status-every-30-seconds-tabbarclient-at-bottom-with-no-active-tab-highlighted-zero-emoji",
+      "title": "Create frontend/src/screens/client/LiveStatusScreen.tsx: layout fixed inset-0 flex flex-col, header with back arrow, scroll zone flex-1 overflow-y-auto padding-top 72px. Live countdown timer using setInterval every 1 second displayed Inter 900 52px var(--gold). SVG timeline with 5 steps — completed steps in var(--flash), step 3 'Expert en route' is the active step in var(--gold) with breathe animation, pending steps in var(--d4). Polls canister for booking status every 30 seconds. TabBarClient at bottom with no active tab highlighted. Zero emoji.",
+      "reqIds": [
+        "REQ-59"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-pro-probusinessscreen-tsx-with-a-fixed-layout-position-fixed-inset-0-display-flex-flex-col-background-050507-header-absolutely-positioned-at-top-0-height-56px-z-index-100-tab-zone-flex-shrink-0-padding-top-72px-padding-0-20px-title-my-business-visible-progresscircle-with-percentage-5-clickable-tab-pills-profile-services-schedule-payment-gallery-active-tab-inter-700-f2d06b-with-border-bottom-2px-f2d06b-inactive-tab-inter-500-54546c-horizontal-scroll-if-needed-content-zone-flex-1-overflow-y-auto-padding-20px-no-forced-height-renders-the-active-tab-component-tabprofil-tabservices-tabtarifs-tabpaiement-tabgalerie-cta-zone-flex-shrink-0-padding-12px-20px-padding-bottom-calc-12px-env-safe-area-inset-bottom-8px-background-rgba-5-5-7-0-97-border-top-rgba-255-255-255-0-04-gold-button-56px-height-radius-14px-tabs-1-4-show-save-and-continue-onclick-save-tab-data-showtoast-information-saved-success-advance-to-next-tab-tab-5-shows-activate-my-profile-gold-active-if-completion-80-calls-update-modalopen-true-or-profile-incomplete-x-disabled-greyed-if-completion-80-tabbarpro-flex-shrink-0-at-bottom-subscriptionmodal-rendered-as-overlay-when-state-modalopen-is-true-zero-emoji",
+      "title": "Rewrite frontend/src/screens/pro/ProBusinessScreen.tsx with a fixed layout: position fixed inset-0, display flex flex-col, background #050507. Header absolutely positioned at top-0, height 56px, z-index 100. Tab zone (flex-shrink-0, padding-top 72px, padding 0 20px): title 'My Business' visible, ProgressCircle with percentage, 5 clickable tab pills (Profile / Services / Schedule / Payment / Gallery) — active tab: Inter 700 #F2D06B with border-bottom 2px #F2D06B; inactive tab: Inter 500 #54546C; horizontal scroll if needed. Content zone (flex-1 overflow-y auto, padding 20px, no forced height): renders the active tab component (TabProfil, TabServices, TabTarifs, TabPaiement, TabGalerie). CTA zone (flex-shrink-0, padding 12px 20px, padding-bottom calc(12px + env(safe-area-inset-bottom, 8px)), background rgba(5,5,7,0.97), border-top rgba(255,255,255,0.04)): gold button 56px height radius 14px — tabs 1-4 show 'Save and continue' (onClick: save tab data, showToast('Information saved', 'success'), advance to next tab); tab 5 shows 'Activate my profile' (gold active if completion >= 80%, calls update({ modalOpen: true })) or 'Profile incomplete (X%)' disabled/greyed if completion < 80%. TabBarPro (flex-shrink-0) at bottom. SubscriptionModal rendered as overlay when state.modalOpen is true. Zero emoji.",
+      "reqIds": [
+        "REQ-60"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-pro-tabs-tabprofil-tsx-all-inputs-must-be-fully-controlled-with-value-and-onchange-handlers-that-update-state-prodata-first-name-required-marked-with-and-last-name-required-marked-with-are-mandatory-bio-textarea-shows-live-character-counter-0-200-category-selection-2x2-grid-tapping-a-card-updates-state-and-applies-a-gold-border-work-location-cards-home-visit-salon-both-are-each-individually-clickable-and-toggle-selection-city-select-dropdown-is-functional-all-inputs-styled-at-height-52px-font-size-16px-zero-emoji-gold-backgrounds-use-text-050507",
+      "title": "Rewrite frontend/src/screens/pro/tabs/TabProfil.tsx: all inputs must be fully controlled with value and onChange handlers that update state.proData. First Name (required, marked with *) and Last Name (required, marked with *) are mandatory. Bio textarea shows live character counter '0/200'. Category selection (2x2 grid): tapping a card updates state and applies a gold border. Work location cards ('Home visit', 'Salon', 'Both') are each individually clickable and toggle selection. City select dropdown is functional. All inputs styled at height 52px font-size 16px. Zero emoji. Gold backgrounds use text #050507.",
+      "reqIds": [
+        "REQ-61"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-pro-tabs-tabservices-tsx-service-list-reads-from-state-prodata-services-if-empty-pre-populate-with-5-demo-services-based-on-the-pro-s-category-add-service-button-dashed-gold-border-sets-state-serviceeditoropen-true-and-state-editingservice-null-each-service-row-name-price-chf-duration-min-active-inactive-toggle-updates-state-edit-button-opens-serviceeditor-with-existing-service-data-delete-button-shows-confirmation-then-removes-from-list-serviceeditor-saves-a-new-service-by-pushing-to-state-prodata-services-and-shows-showtoast-service-added-success-zero-emoji",
+      "title": "Rewrite frontend/src/screens/pro/tabs/TabServices.tsx: service list reads from state.proData.services; if empty, pre-populate with 5 demo services based on the pro's category. '+ Add service' button (dashed gold border) sets state.serviceEditorOpen = true and state.editingService = null. Each service row: name, price (CHF), duration (min), active/inactive toggle (updates state), edit button (opens ServiceEditor with existing service data), delete button (shows confirmation then removes from list). ServiceEditor saves a new service by pushing to state.proData.services and shows showToast('Service added', 'success'). Zero emoji.",
+      "reqIds": [
+        "REQ-62"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-pro-tabs-serviceeditor-tsx-all-fields-must-be-fully-controlled-with-onchange-handlers-name-field-text-required-price-stepper-chf-min-0-step-5-increment-decrement-buttons-duration-stepper-minutes-min-15-step-15-increment-decrement-buttons-description-textarea-badge-pills-single-select-flash-popular-new-premium-promo-mode-pills-home-visit-salon-both-save-button-gold-gradient-text-050507-if-new-service-pushes-to-state-prodata-services-and-calls-showtoast-service-added-success-if-editing-updates-existing-service-cancel-button-calls-onclose-uses-the-existing-bottomsheet-ui-component-zero-emoji",
+      "title": "Rewrite frontend/src/screens/pro/tabs/ServiceEditor.tsx: all fields must be fully controlled with onChange handlers. Name field (text, required). Price stepper (CHF, min 0, step 5, increment/decrement buttons). Duration stepper (minutes, min 15, step 15, increment/decrement buttons). Description textarea. Badge pills (single-select: Flash, Popular, New, Premium, Promo). Mode pills ('Home visit', 'Salon', 'Both'). Save button (gold gradient, text #050507): if new service, pushes to state.proData.services and calls showToast('Service added', 'success'); if editing, updates existing service. Cancel button calls onClose. Uses the existing BottomSheet UI component. Zero emoji.",
+      "reqIds": [
+        "REQ-63"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-pro-tabs-tabtarifs-tsx-7-day-pills-mon-sun-are-multi-selectable-via-tap-toggle-each-selected-day-reveals-start-time-and-end-time-inputs-controlled-flash-mode-toggle-is-controlled-and-updates-component-state-when-flash-mode-is-enabled-a-chf-supplement-stepper-buttons-is-revealed-and-functional-minimum-notice-5-single-select-pills-immediate-30min-1h-2h-4h-tapping-changes-selection-cancellation-policy-3-single-select-pills-flexible-moderate-strict-tapping-changes-selection-all-state-passed-up-via-onchange-prop-zero-emoji",
+      "title": "Rewrite frontend/src/screens/pro/tabs/TabTarifs.tsx: 7 day pills (Mon-Sun) are multi-selectable via tap toggle; each selected day reveals start time and end time inputs (controlled). Flash mode toggle is controlled and updates component state. When flash mode is enabled, a CHF supplement stepper (+/- buttons) is revealed and functional. Minimum notice: 5 single-select pills (Immediate, 30min, 1h, 2h, 4h) — tapping changes selection. Cancellation policy: 3 single-select pills (Flexible, Moderate, Strict) — tapping changes selection. All state passed up via onChange prop. Zero emoji.",
+      "reqIds": [
+        "REQ-64"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-pro-tabs-tabpaiement-tsx-twint-card-has-onchange-controlled-phone-input-with-41-prefix-validates-swiss-mobile-format-in-real-time-when-valid-card-border-changes-to-00d97a-and-shows-valid-twint-number-in-00d97a-below-iban-card-has-onchange-controlled-input-that-auto-formats-to-ch-xx-xxxx-xxxx-xxxx-xxxx-x-as-user-types-when-valid-starts-with-ch-correct-length-card-border-changes-to-00d97a-and-shows-valid-iban-in-00d97a-financial-summary-section-shows-4-lines-commission-nexus-15-net-earnings-per-booking-example-monthly-subscription-cost-19-90-chf-estimated-monthly-net-zero-emoji-gold-backgrounds-use-text-050507",
+      "title": "Rewrite frontend/src/screens/pro/tabs/TabPaiement.tsx: TWINT card has onChange-controlled phone input with +41 prefix; validates Swiss mobile format in real-time; when valid, card border changes to #00D97A and shows 'Valid TWINT number' in #00D97A below. IBAN card has onChange-controlled input that auto-formats to CH XX XXXX XXXX XXXX XXXX X as user types; when valid (starts with CH, correct length), card border changes to #00D97A and shows 'Valid IBAN' in #00D97A. Financial summary section shows 4 lines: Commission NEXUS (15%), Net earnings per booking example, Monthly subscription cost (19.90 CHF), Estimated monthly net. Zero emoji. Gold backgrounds use text #050507.",
+      "reqIds": [
+        "REQ-65"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-pro-tabs-tabgalerie-tsx-2x2-photo-grid-with-4-slots-each-slot-has-a-hidden-file-input-accessed-via-ref-tapping-an-empty-slot-calls-inputref-current-click-onchange-reads-the-file-with-filereader-readasdataurl-and-updates-photos-slot-dataurl-in-state-showing-the-preview-image-tapping-x-on-a-filled-slot-sets-photos-slot-null-photo-counter-x-4-and-gold-progress-bar-update-in-real-time-activate-profile-button-is-visible-only-when-photo-count-3-zero-emoji",
+      "title": "Rewrite frontend/src/screens/pro/tabs/TabGalerie.tsx: 2x2 photo grid with 4 slots. Each slot has a hidden file input accessed via ref; tapping an empty slot calls inputRef.current.click(). onChange reads the file with FileReader.readAsDataURL and updates photos[slot] = dataUrl in state, showing the preview image. Tapping X on a filled slot sets photos[slot] = null. Photo counter (X/4) and gold progress bar update in real-time. 'Activate profile' button is visible only when photo count >= 3. Zero emoji.",
+      "reqIds": [
+        "REQ-66"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-pro-subscriptionmodal-tsx-renders-as-a-bottomsheet-or-full-screen-bottom-anchored-layout-when-state-modalopen-is-true-lists-5-benefit-rows-with-gold-svg-checkmarks-shows-7-days-free-inter-900-var-t1-and-then-19-90-chf-month-cta-button-start-for-free-gold-gradient-text-050507-if-import-meta-env-vite-payrexx-secret-is-defined-calls-createsubscriptionurl-and-redirects-via-window-location-href-otherwise-calls-update-proactif-true-and-go-pro-success-twint-only-label-in-var-t3-below-button-zero-emoji-zero-stripe-zero-revolut",
+      "title": "Rewrite frontend/src/screens/pro/SubscriptionModal.tsx: renders as a BottomSheet or full-screen bottom-anchored layout when state.modalOpen is true. Lists 5 benefit rows with gold SVG checkmarks. Shows '7 DAYS FREE' Inter 900 var(--t1) and 'Then 19.90 CHF / month'. CTA button 'Start for free' (gold gradient, text #050507): if import.meta.env.VITE_PAYREXX_SECRET is defined, calls createSubscriptionUrl() and redirects via window.location.href; otherwise calls update({ proActif: true }) and go('pro_success'). 'TWINT only' label in var(--t3) below button. Zero emoji, zero Stripe, zero Revolut.",
+      "reqIds": [
+        "REQ-67"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-pro-proradarscreen-tsx-fetch-bookings-from-canister-via-getprobookings-if-canister-returns-an-empty-list-or-throws-an-error-display-2-demo-booking-requests-1-service-haircut-fade-45-chf-client-thomas-m-address-rue-de-rive-12-geneva-countdown-starting-at-28-minutes-2-service-beard-design-30-chf-client-julien-r-address-av-de-la-gare-5-lausanne-countdown-starting-at-14-minutes-countdown-uses-setinterval-every-1-second-when-2-minutes-remaining-color-switches-to-var-alert-with-breathe-animation-accept-button-gold-gradient-text-050507-slides-the-card-out-with-css-animation-and-calls-showtoast-request-accepted-success-decline-button-dark-background-slides-the-card-out-and-calls-showtoast-request-declined-error-confirmed-and-history-tabs-show-booking-cards-with-colored-status-badges-tabbarpro-at-bottom-with-active-radar-zero-emoji",
+      "title": "Rewrite frontend/src/screens/pro/ProRadarScreen.tsx: fetch bookings from canister via getProBookings(). If canister returns an empty list or throws an error, display 2 demo booking requests: (1) Service 'Haircut fade' 45 CHF, Client 'Thomas M.', Address 'Rue de Rive 12, Geneva', countdown starting at 28 minutes; (2) Service 'Beard design' 30 CHF, Client 'Julien R.', Address 'Av. de la Gare 5, Lausanne', countdown starting at 14 minutes. Countdown uses setInterval every 1 second; when < 2 minutes remaining, color switches to var(--alert) with breathe animation. 'Accept' button (gold gradient, text #050507): slides the card out with CSS animation and calls showToast('Request accepted', 'success'). 'Decline' button (dark background): slides the card out and calls showToast('Request declined', 'error'). Confirmed and History tabs show booking cards with colored status badges. TabBarPro at bottom with active='radar'. Zero emoji.",
+      "reqIds": [
+        "REQ-68"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-pro-prowalletscreen-tsx-display-balance-as-state-solde-240-chf-and-escrow-as-state-sequestre-55-chf-revenue-bar-chart-uses-fixed-values-40-65-55-90-110-80-45-for-the-last-7-days-of-the-week-bars-animate-height-from-0-on-mount-demo-transactions-always-visible-payment-received-85-chf-in-var-flash-nexus-commission-1-chf-in-var-alert-funds-released-84-chf-in-var-gold-payment-received-45-chf-in-var-flash-transfer-made-129-chf-in-var-blue-transfer-button-gold-gradient-text-050507-if-virement-is-available-greyed-out-background-var-d4-text-var-t3-during-cooldown-tabbarpro-at-bottom-with-active-wallet-zero-emoji",
+      "title": "Rewrite frontend/src/screens/pro/ProWalletScreen.tsx: display balance as state.solde ?? 240 CHF and escrow as state.sequestre ?? 55 CHF. Revenue bar chart uses fixed values [40, 65, 55, 90, 110, 80, 45] for the last 7 days of the week, bars animate height from 0 on mount. Demo transactions always visible: 'Payment received +85 CHF' in var(--flash), 'NEXUS commission -1 CHF' in var(--alert), 'Funds released +84 CHF' in var(--gold), 'Payment received +45 CHF' in var(--flash), 'Transfer made -129 CHF' in var(--blue). Transfer button: gold gradient (text #050507) if virement is available; greyed out (background var(--d4), text var(--t3)) during cooldown. TabBarPro at bottom with active='wallet'. Zero emoji.",
+      "reqIds": [
+        "REQ-69"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-client-explorerscreen-tsx-to-add-geolocation-based-proximity-search-add-an-around-me-button-inside-the-search-bar-iconmappin-in-f2d06b-label-around-me-inter-600-13px-f2d06b-on-click-call-navigator-geolocation-getcurrentposition-on-success-call-update-userlat-latitude-userlng-longitude-locationactive-true-showtoast-location-activated-success-and-run-filterprosbydistance-on-error-call-showtoast-enable-location-in-your-settings-error-implement-filterprosbydistance-using-the-haversine-formula-r-6371-dlat-dlon-in-radians-a-sin-2-dlat-2-cos-lat1-cos-lat2-sin-2-dlon-2-d-r-2-asin-sqrt-a-when-locationactive-is-true-filter-pros-within-25km-sort-by-distance-display-x-experts-near-you-and-show-a-distance-badge-on-each-card-x-x-km-pill-background-rgba-9-9-13-0-8-blur-inter-600-11px-f4f4f8-top-left-position-add-a-city-pill-in-the-search-bar-showing-the-detected-or-selected-city-tapping-it-opens-a-dropdown-of-12-cities-geneve-lausanne-berne-zurich-bale-fribourg-neuchatel-sion-monthey-yverdon-morges-nyon-selecting-a-city-filters-pros-by-city-when-locationactive-is-false-preserve-all-existing-explorerscreen-functionality-pros-demo-filters-tab-bar-navigation-zero-emoji",
+      "title": "Rewrite frontend/src/screens/client/ExplorerScreen.tsx to add geolocation-based proximity search. Add an 'Around me' button inside the search bar: IconMapPin in #F2D06B, label 'Around me' Inter 600 13px #F2D06B. On click: call navigator.geolocation.getCurrentPosition(); on success, call update({ userLat: latitude, userLng: longitude, locationActive: true }), showToast('Location activated', 'success'), and run filterProsByDistance(). On error, call showToast('Enable location in your settings', 'error'). Implement filterProsByDistance() using the Haversine formula (R=6371, dLat/dLon in radians, a = sin^2(dLat/2) + cos(lat1)*cos(lat2)*sin^2(dLon/2), d = R*2*asin(sqrt(a))). When locationActive is true: filter pros within 25km, sort by distance, display 'X experts near you', and show a distance badge on each card ('X.X km' pill, background rgba(9,9,13,0.8), blur, Inter 600 11px #F4F4F8, top-left position). Add a city pill in the search bar showing the detected or selected city; tapping it opens a dropdown of 12 cities (Geneve, Lausanne, Berne, Zurich, Bale, Fribourg, Neuchatel, Sion, Monthey, Yverdon, Morges, Nyon); selecting a city filters pros by city when locationActive is false. Preserve all existing ExplorerScreen functionality (PROS_DEMO, filters, tab bar, navigation). Zero emoji.",
+      "reqIds": [
+        "REQ-75"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-frontend-src-state-useappstate-ts-add-userlat-number-null-userlng-number-null-locationactive-boolean-bookingcreneau-string-null-bookingadresse-string-null-bookingville-string-null-bookingphone-string-null-bookingnote-string-null-and-bookingid-string-null-fields-to-the-globalstate-interface-and-initialstate-ensure-modalopen-defaults-to-false-ensure-screen-union-type-includes-all-existing-routes-plus-live-status-all-new-fields-must-default-to-null-or-false-the-go-action-must-not-block-any-navigation-zero-emoji",
+      "title": "Update frontend/src/state/useAppState.ts: add userLat (number | null), userLng (number | null), locationActive (boolean), bookingCreneau (string | null), bookingAdresse (string | null), bookingVille (string | null), bookingPhone (string | null), bookingNote (string | null), and bookingId (string | null) fields to the GlobalState interface and initialState. Ensure modalOpen defaults to false. Ensure screen union type includes all existing routes plus 'live_status'. All new fields must default to null or false. The go() action must not block any navigation. Zero emoji.",
+      "reqIds": [
+        "REQ-76"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-frontend-src-app-tsx-ensure-the-renderscreen-switch-has-functional-case-entries-for-booking-1-booking-2-booking-3-booking-4-booking-5-live-status-pro-business-pro-radar-pro-wallet-pro-subscription-pro-success-admin-login-admin-dashboard-admin-pros-admin-bookings-admin-revenus-client-reservations-client-alertes-client-profil-pass-go-state-update-showtoast-to-each-screen-ensure-no-fallthrough-between-cases-default-case-falls-back-to-loginscreen-all-new-state-fields-userlat-userlng-locationactive-bookingcreneau-bookingadresse-bookingville-bookingphone-bookingnote-bookingid-are-available-from-useappstate-zero-emoji",
+      "title": "Update frontend/src/App.tsx: ensure the renderScreen() switch has functional case entries for 'booking_1', 'booking_2', 'booking_3', 'booking_4', 'booking_5', 'live_status', 'pro_business', 'pro_radar', 'pro_wallet', 'pro_subscription', 'pro_success', 'admin_login', 'admin_dashboard', 'admin_pros', 'admin_bookings', 'admin_revenus', 'client_reservations', 'client_alertes', 'client_profil'. Pass go, state, update, showToast to each screen. Ensure no fallthrough between cases. Default case falls back to LoginScreen. All new state fields (userLat, userLng, locationActive, bookingCreneau, bookingAdresse, bookingVille, bookingPhone, bookingNote, bookingId) are available from useAppState. Zero emoji.",
+      "reqIds": [
+        "REQ-77"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-polish-frontend-src-styles-globals-css-add-smooth-css-transitions-on-all-interactive-cards-150ms-ease-add-a-glass-card-utility-class-background-rgba-13-13-19-0-97-backdrop-filter-blur-20px-border-1px-solid-rgba-255-255-255-0-06-border-radius-20px-add-a-gold-text-utility-background-linear-gradient-135deg-f2d06b-d4a050-webkit-background-clip-text-webkit-text-fill-color-transparent-add-a-glow-gold-utility-box-shadow-0-0-24px-rgba-242-208-107-0-18-refine-button-active-scale-to-0-96-with-transition-100ms-ensure-all-keyframe-animations-fadein-breathe-shimmer-fall-progressfill-scalein-slideup-slidedown-float-spin-are-fully-defined-and-working",
+      "title": "Polish frontend/src/styles/globals.css: add smooth CSS transitions on all interactive cards (150ms ease), add a glass-card utility class (background rgba(13,13,19,0.97) backdrop-filter blur(20px) border 1px solid rgba(255,255,255,0.06) border-radius 20px), add a gold-text utility (background: linear-gradient(135deg,#F2D06B,#D4A050); -webkit-background-clip:text; -webkit-text-fill-color:transparent), add a glow-gold utility (box-shadow: 0 0 24px rgba(242,208,107,0.18)), refine button active scale to 0.96 with transition 100ms, ensure all keyframe animations (fadeIn, breathe, shimmer, fall, progressFill, scaleIn, slideUp, slideDown, float, spin) are fully defined and working.",
+      "reqIds": [
+        "REQ-78"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-auth-loginscreen-tsx-with-enhanced-polish-four-animated-blur-orbs-use-distinct-sizes-320px-240px-180px-140px-and-positions-with-staggered-float-animation-delays-0s-1-2s-2-4s-0-8s-orb-colors-are-rgba-242-208-107-0-06-rgba-91-127-255-0-05-rgba-0-217-122-0-04-rgba-255-61-90-0-04-nexus-title-uses-inter-900-72px-with-letter-spacing-0-05em-the-gold-gradient-divider-is-64px-wide-1px-tall-with-0-opacity-sides-fade-to-transparent-the-btnprimary-has-glow-gold-shadow-on-hover-active-add-a-subtle-fadein-animation-0-6s-to-the-entire-centered-content-block-legal-links-at-bottom-use-inter-400-11px-54546c-with-hover-color-9898b4-transition-150ms",
+      "title": "Rewrite frontend/src/screens/auth/LoginScreen.tsx with enhanced polish: four animated blur orbs use distinct sizes (320px, 240px, 180px, 140px) and positions with staggered float animation delays (0s, 1.2s, 2.4s, 0.8s); orb colors are rgba(242,208,107,0.06), rgba(91,127,255,0.05), rgba(0,217,122,0.04), rgba(255,61,90,0.04); 'NEXUS' title uses Inter 900 72px with letter-spacing -0.05em; the gold gradient divider is 64px wide 1px tall with 0 opacity sides (fade to transparent); the BtnPrimary has glow-gold shadow on hover/active; add a subtle fadeIn animation (0.6s) to the entire centered content block; legal links at bottom use Inter 400 11px #54546C with hover color #9898B4 transition 150ms.",
+      "reqIds": [
+        "REQ-79"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-auth-rolescreen-tsx-with-enhanced-polish-each-role-card-client-and-pro-uses-glass-card-style-with-background-0d0d13-border-1px-solid-rgba-255-255-255-0-06-border-radius-20px-padding-24px-min-height-110px-on-tap-the-card-border-animates-to-the-role-color-with-a-150ms-transition-and-a-subtle-scale-0-98-press-effect-add-a-small-category-icon-iconuser-for-client-in-5b7fff-iconedit-for-pro-in-f2d06b-at-40px-diameter-with-a-tinted-circle-background-rgba-color-at-0-1-opacity-card-label-inter-800-20px-f4f4f8-subtitle-inter-400-13px-54546c-screen-background-050507-administration-access-link-inter-400-12px-54546c-centered-below-the-cards",
+      "title": "Rewrite frontend/src/screens/auth/RoleScreen.tsx with enhanced polish: each role card (CLIENT and PRO) uses glass-card style with background #0D0D13, border 1px solid rgba(255,255,255,0.06), border-radius 20px, padding 24px, min-height 110px; on tap, the card border animates to the role color with a 150ms transition and a subtle scale(0.98) press effect; add a small category icon (IconUser for client in #5B7FFF, IconEdit for pro in #F2D06B) at 40px diameter with a tinted circle background (rgba color at 0.1 opacity); card label Inter 800 20px #F4F4F8; subtitle Inter 400 13px #54546C; screen background #050507; 'Administration access' link Inter 400 12px #54546C centered below the cards.",
+      "reqIds": [
+        "REQ-80"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-auth-otpscreen-tsx-with-enhanced-polish-the-phone-input-container-uses-glass-card-style-with-the-41-prefix-in-a-pill-background-1c1c26-border-right-1px-solid-rgba-255-255-255-0-06-padding-0-12px-the-four-otp-digit-inputs-each-have-background-0d0d13-border-1px-solid-rgba-255-255-255-0-08-border-radius-16px-width-64px-height-72px-inter-700-28px-f4f4f8-text-align-center-on-focus-border-changes-to-rgba-242-208-107-0-4-with-transition-150ms-on-fill-all-4-digits-entered-the-inputs-briefly-flash-a-green-border-00d97a-before-verifying-the-resend-countdown-displays-in-9898b4-with-the-seconds-in-f2d06b-role-guard-at-top-if-state-role-is-null-call-go-role-and-return-null",
+      "title": "Rewrite frontend/src/screens/auth/OTPScreen.tsx with enhanced polish: the phone input container uses glass-card style with the +41 prefix in a pill (background #1C1C26 border-right 1px solid rgba(255,255,255,0.06) padding 0 12px); the four OTP digit inputs each have background #0D0D13, border 1px solid rgba(255,255,255,0.08), border-radius 16px, width 64px, height 72px, Inter 700 28px #F4F4F8, text-align center; on focus, border changes to rgba(242,208,107,0.4) with transition 150ms; on fill (all 4 digits entered), the inputs briefly flash a green border (#00D97A) before verifying; the resend countdown displays in #9898B4 with the seconds in #F2D06B; role guard at top: if state.role is null, call go('role') and return null.",
+      "reqIds": [
+        "REQ-81"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-client-explorerscreen-tsx-with-enhanced-polish-hero-section-has-a-multi-layer-gradient-background-radial-gradient-at-top-left-rgba-91-127-255-0-08-radial-at-bottom-right-rgba-242-208-107-0-05-the-rotating-subtitle-uses-a-crossfade-opacity-transition-400ms-instead-of-an-abrupt-switch-the-search-bar-uses-glass-card-style-with-border-radius-999px-filter-pills-use-border-radius-999px-transition-150ms-and-the-active-pill-has-a-subtle-box-shadow-glow-available-now-cards-168x228px-have-border-radius-20px-overflow-hidden-box-shadow-0-8px-32px-rgba-0-0-0-0-4-the-disponible-badge-uses-a-dot-text-layout-with-breathe-animation-on-the-dot-only-experts-for-you-rows-have-a-thin-gold-left-border-2px-f2d06b-on-hover-press-preserve-all-pros-demo-data-geolocation-haversine-logic-city-dropdown-filter-pills-and-navigation",
+      "title": "Rewrite frontend/src/screens/client/ExplorerScreen.tsx with enhanced polish: hero section has a multi-layer gradient background (radial-gradient at top-left rgba(91,127,255,0.08) + radial at bottom-right rgba(242,208,107,0.05)); the rotating subtitle uses a crossfade opacity transition (400ms) instead of an abrupt switch; the search bar uses glass-card style with border-radius 999px; filter pills use border-radius 999px, transition 150ms, and the active pill has a subtle box-shadow glow; 'Available now' cards (168x228px) have border-radius 20px, overflow hidden, box-shadow 0 8px 32px rgba(0,0,0,0.4); the 'Disponible' badge uses a dot + text layout with breathe animation on the dot only; 'Experts for you' rows have a thin gold left border (2px #F2D06B) on hover/press; preserve all PROS_DEMO data, geolocation Haversine logic, city dropdown, filter pills, and navigation.",
+      "reqIds": [
+        "REQ-82"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-client-ficheproscreen-tsx-with-enhanced-polish-cover-image-has-a-stronger-gradient-overlay-linear-gradient-transparent-40-to-050507-100-avatar-uses-a-3px-gold-border-with-a-2px-white-inner-gap-box-shadow-0-0-0-2px-050507-0-0-0-4px-f2d06b-the-stats-bar-uses-inter-800-for-numbers-and-inter-400-12px-54546c-for-labels-separated-by-1px-vertical-dividers-rgba-255-255-255-0-06-each-service-card-uses-glass-card-style-with-height-88px-shows-name-duration-pill-price-in-f2d06b-inter-700-the-photo-gallery-uses-a-4px-gap-and-rounded-corners-12px-reviews-section-shows-star-rating-in-f2d06b-with-inter-500-13px-comment-sticky-cta-zone-has-background-rgba-5-5-7-0-97-backdrop-filter-blur-20px-border-top-rgba-255-255-255-0-06-guard-if-state-selectedpro-is-null-call-go-explorer-and-return-null",
+      "title": "Rewrite frontend/src/screens/client/FicheProScreen.tsx with enhanced polish: cover image has a stronger gradient overlay (linear-gradient transparent 40% to #050507 100%); avatar uses a 3px gold border with a 2px white inner gap (box-shadow 0 0 0 2px #050507, 0 0 0 4px #F2D06B); the stats bar uses Inter 800 for numbers and Inter 400 12px #54546C for labels, separated by 1px vertical dividers (rgba(255,255,255,0.06)); each service card uses glass-card style with height 88px, shows name + duration pill + price in #F2D06B Inter 700; the photo gallery uses a 4px gap and rounded corners 12px; reviews section shows star rating in #F2D06B with Inter 500 13px comment; sticky CTA zone has background rgba(5,5,7,0.97) backdrop-filter blur(20px) border-top rgba(255,255,255,0.06); guard: if state.selectedPro is null, call go('explorer') and return null.",
+      "reqIds": [
+        "REQ-83"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-all-5-booking-screens-booking1-booking5-with-enhanced-polish-shared-step-indicator-uses-4-nodes-connected-by-lines-completed-nodes-are-filled-f2d06b-current-node-has-a-pulse-breathe-animation-pending-nodes-are-2e2e3e-each-screen-s-scroll-zone-has-padding-20px-booking1-service-cards-use-glass-card-style-with-a-duration-pill-background-1c1c26-border-radius-999px-inter-500-11px-9898b4-booking2-time-slot-cards-use-glass-card-80px-height-with-the-slot-time-in-inter-700-16px-f4f4f8-and-a-flash-label-in-00d97a-for-flash-slots-booking3-inputs-use-the-standard-52px-height-with-glass-card-wrapper-per-section-booking4-recap-uses-a-glass-card-container-with-each-line-showing-a-label-in-54546c-and-value-in-f4f4f8-except-price-which-uses-inter-800-28px-f2d06b-booking5-svg-hourglass-animates-with-a-rotation-cycle-countdown-displays-inter-800-48px-f2d06b-auto-navigates-to-live-status-after-8-seconds",
+      "title": "Rewrite all 5 booking screens (Booking1–Booking5) with enhanced polish: shared step indicator uses 4 nodes connected by lines — completed nodes are filled #F2D06B, current node has a pulse breathe animation, pending nodes are #2E2E3E; each screen's scroll zone has padding 20px; Booking1 service cards use glass-card style with a duration pill (background #1C1C26 border-radius 999px Inter 500 11px #9898B4); Booking2 time slot cards use glass-card 80px height with the slot time in Inter 700 16px #F4F4F8 and a flash label in #00D97A for flash slots; Booking3 inputs use the standard 52px height with glass-card wrapper per section; Booking4 recap uses a glass-card container with each line showing a label in #54546C and value in #F4F4F8, except price which uses Inter 800 28px #F2D06B; Booking5 SVG hourglass animates with a rotation cycle, countdown displays Inter 800 48px #F2D06B, auto-navigates to live_status after 8 seconds.",
+      "reqIds": [
+        "REQ-84"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-pro-prodashboardscreen-tsx-with-enhanced-polish-greeting-section-hello-firstname-inter-800-32px-f4f4f8-with-a-subtitle-welcome-back-inter-400-14px-54546c-the-trial-badge-uses-a-6px-pulsing-dot-in-00d97a-with-free-trial-active-7-days-left-label-metric-cards-use-glass-card-style-with-a-colored-top-border-2px-bookings-in-5b7fff-rating-in-f2d06b-revenue-in-00d97a-the-flash-toggle-card-has-a-neon-glow-border-0-0-0-1px-00d97a-0-0-16px-rgba-0-217-122-0-12-when-active-next-appointment-card-shows-pro-name-service-time-with-a-gold-left-border-accent-4px-if-no-appointment-shows-no-upcoming-appointments-in-54546c-centered",
+      "title": "Rewrite frontend/src/screens/pro/ProDashboardScreen.tsx with enhanced polish: greeting section 'Hello [FirstName]' Inter 800 32px #F4F4F8 with a subtitle 'Welcome back' Inter 400 14px #54546C; the trial badge uses a 6px pulsing dot in #00D97A with 'Free trial active — 7 days left' label; metric cards use glass-card style with a colored top border (2px) — bookings in #5B7FFF, rating in #F2D06B, revenue in #00D97A; the Flash toggle card has a neon glow border (0 0 0 1px #00D97A, 0 0 16px rgba(0,217,122,0.12)) when active; next appointment card shows pro name, service, time with a gold left border accent 4px; if no appointment, shows 'No upcoming appointments' in #54546C centered.",
+      "reqIds": [
+        "REQ-89"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-pro-probusinessscreen-tsx-tab-zone-with-enhanced-polish-progresscircle-is-56px-with-strokewidth-4-displayed-to-the-left-of-the-title-my-business-inter-800-20px-f4f4f8-the-5-segment-thin-progress-bar-4px-height-border-radius-2px-sits-below-the-title-row-each-segment-filled-gold-if-that-tab-is-complete-tab-pills-use-inter-600-13px-active-pill-has-border-bottom-2px-f2d06b-and-text-f2d06b-inactive-has-text-54546c-the-cta-zone-button-is-56px-height-border-radius-14px-when-on-tab-5-with-completion-80-the-button-shows-profile-incomplete-x-in-54546c-on-background-1c1c26-ensure-subscriptionmodal-overlay-renders-correctly-over-the-screen",
+      "title": "Rewrite frontend/src/screens/pro/ProBusinessScreen.tsx tab zone with enhanced polish: ProgressCircle is 56px with strokeWidth 4, displayed to the left of the title 'My Business' Inter 800 20px #F4F4F8; the 5-segment thin progress bar (4px height, border-radius 2px) sits below the title row, each segment filled gold if that tab is complete; tab pills use Inter 600 13px, active pill has border-bottom 2px #F2D06B and text #F2D06B, inactive has text #54546C; the CTA zone button is 56px height border-radius 14px; when on tab 5 with completion < 80%, the button shows 'Profile incomplete — X%' in #54546C on background #1C1C26; ensure SubscriptionModal overlay renders correctly over the screen.",
+      "reqIds": [
+        "REQ-92"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-pro-subscriptionmodal-tsx-with-enhanced-polish-renders-as-a-bottom-anchored-overlay-when-state-modalopen-is-true-background-overlay-rgba-5-5-7-0-9-with-blur-8px-sheet-uses-border-radius-28px-28px-0-0-background-090909-benefit-rows-use-a-28px-circle-background-rgba-242-208-107-0-08-with-a-gold-svg-checkmark-stroke-f2d06b-14px-on-the-left-benefit-text-inter-500-15px-f4f4f8-7-days-free-inter-900-40px-uses-gold-text-gradient-style-pricing-subtitle-inter-400-14px-9898b4-cta-button-full-width-56px-twint-only-label-centered-below-button-with-icontwint-size-14-color-9898b4-inline-if-vite-payrexx-secret-undefined-calls-update-proactif-true-and-go-pro-success",
+      "title": "Rewrite frontend/src/screens/pro/SubscriptionModal.tsx with enhanced polish: renders as a bottom-anchored overlay when state.modalOpen is true; background overlay rgba(5,5,7,0.9) with blur(8px); sheet uses border-radius 28px 28px 0 0 background #090909; benefit rows use a 28px circle background rgba(242,208,107,0.08) with a gold SVG checkmark (stroke #F2D06B, 14px) on the left, benefit text Inter 500 15px #F4F4F8; '7 DAYS FREE' Inter 900 40px uses gold-text gradient style; pricing subtitle Inter 400 14px #9898B4; CTA button full width 56px; 'TWINT only' label centered below button with IconTwint size 14 color #9898B4 inline; if VITE_PAYREXX_SECRET undefined, calls update({ proActif: true }) and go('pro_success').",
+      "reqIds": [
+        "REQ-93"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-pro-successscreen-tsx-with-enhanced-polish-progress-bar-is-4px-tall-gold-gradient-border-radius-2px-placed-at-the-very-top-of-the-screen-not-inside-scroll-animated-check-circle-is-96px-diameter-border-3px-solid-00d97a-background-rgba-0-217-122-0-06-svg-checkmark-is-40px-stroke-width-2-5-title-welcome-to-nexus-pro-inter-800-30px-f4f4f8-subtitle-your-profile-is-now-active-inter-400-14px-9898b4-confetti-particles-30-use-fall-animation-with-random-left-positions-and-3-colors-f2d06b-d4a050-rgba-91-127-255-0-8-cta-button-uses-glow-gold-shadow-entire-center-block-uses-scalein-animation-on-mount",
+      "title": "Rewrite frontend/src/screens/pro/SuccessScreen.tsx with enhanced polish: progress bar is 4px tall, gold gradient, border-radius 2px, placed at the very top of the screen (not inside scroll); animated check circle is 96px diameter, border 3px solid #00D97A, background rgba(0,217,122,0.06), SVG checkmark is 40px stroke-width 2.5; title 'Welcome to NEXUS Pro' Inter 800 30px #F4F4F8; subtitle 'Your profile is now active' Inter 400 14px #9898B4; confetti particles (30) use fall animation with random left positions and 3 colors (#F2D06B, #D4A050, rgba(91,127,255,0.8)); CTA button uses glow-gold shadow; entire center block uses scaleIn animation on mount.",
+      "reqIds": [
+        "REQ-94"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-header-tsx-frontend-src-components-header-tsx-not-in-immutable-paths-with-enhanced-polish-ensure-backdrop-filter-blur-32px-is-applied-the-nexus-logo-uses-letter-spacing-0-05em-the-back-button-circle-uses-background-0d0d13-with-a-subtle-border-rgba-255-255-255-0-08-the-role-switch-pill-has-a-transition-150ms-on-border-color-and-background-the-notification-bell-badge-uses-animation-scalein-200ms-on-mount-when-count-0-center-title-uses-fadein-300ms-animation-ensure-all-props-showback-onback-title-role-notifscount-onnotifs-onswitchrole-onlogoclick-are-correctly-typed-and-functional",
+      "title": "Rewrite frontend/src/components/Header.tsx (frontend/src/components/Header.tsx, not in immutable paths) with enhanced polish: ensure backdrop-filter blur(32px) is applied; the NEXUS logo uses letter-spacing -0.05em; the back button circle uses background #0D0D13 with a subtle border rgba(255,255,255,0.08); the role switch pill has a transition 150ms on border-color and background; the notification bell badge uses animation scaleIn 200ms on mount when count > 0; center title uses fadeIn 300ms animation; ensure all props (showBack, onBack, title, role, notifsCount, onNotifs, onSwitchRole, onLogoClick) are correctly typed and functional.",
+      "reqIds": [
+        "REQ-96"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-tabbarclient-tsx-not-in-immutable-paths-with-enhanced-polish-the-gold-indicator-line-on-active-tab-uses-a-width-transition-from-0-to-24px-200ms-ease-on-mount-active-icon-scales-up-to-1-1-via-transform-with-150ms-transition-inactive-icons-use-color-2e2e3e-active-icons-and-labels-use-f2d06b-the-tab-bar-wrapper-has-a-gradient-top-border-linear-gradient-to-right-transparent-rgba-242-208-107-0-15-transparent-instead-of-a-flat-border-tab-press-uses-scale-0-9-transform-briefly-ensure-all-4-tabs-navigate-correctly-explorer-reservations-alertes-profil",
+      "title": "Rewrite frontend/src/components/TabBarClient.tsx (not in immutable paths) with enhanced polish: the gold indicator line on active tab uses a width transition from 0 to 24px (200ms ease) on mount; active icon scales up to 1.1 via transform with 150ms transition; inactive icons use color #2E2E3E; active icons and labels use #F2D06B; the tab bar wrapper has a gradient top border (linear-gradient to right transparent, rgba(242,208,107,0.15), transparent) instead of a flat border; tab press uses scale(0.9) transform briefly; ensure all 4 tabs navigate correctly: explorer, reservations, alertes, profil.",
+      "reqIds": [
+        "REQ-97"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-tabbarpro-tsx-not-in-immutable-paths-with-the-same-enhanced-polish-as-tabbarclient-animated-gold-indicator-icon-scale-on-active-gradient-top-border-press-scale-micro-interaction-ensure-the-4-tabs-navigate-correctly-via-onchange-radar-go-pro-radar-wallet-go-pro-wallet-dashboard-go-pro-dashboard-business-go-pro-business",
+      "title": "Rewrite frontend/src/components/TabBarPro.tsx (not in immutable paths) with the same enhanced polish as TabBarClient: animated gold indicator, icon scale on active, gradient top border, press scale micro-interaction. Ensure the 4 tabs navigate correctly via onChange: radar → go('pro_radar'), wallet → go('pro_wallet'), dashboard → go('pro_dashboard'), business → go('pro_business').",
+      "reqIds": [
+        "REQ-98"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-btnprimary-tsx-not-in-immutable-paths-with-enhanced-polish-add-glow-gold-box-shadow-0-6px-28px-rgba-242-208-107-0-3-on-the-default-gold-gradient-state-add-transition-on-box-shadow-200ms-disabled-state-uses-background-1c1c26-color-54546c-box-shadow-none-cursor-not-allowed-danger-state-uses-background-ff3d5a-with-box-shadow-0-6px-24px-rgba-255-61-90-0-3-loading-spinner-is-18x18px-with-2px-border-active-press-uses-scale-0-96-transition-100ms-button-border-radius-14px-ensure-flex-shrink-0-is-always-applied",
+      "title": "Rewrite frontend/src/components/BtnPrimary.tsx (not in immutable paths) with enhanced polish: add glow-gold box-shadow (0 6px 28px rgba(242,208,107,0.3)) on the default gold gradient state; add transition on box-shadow 200ms; disabled state uses background #1C1C26, color #54546C, box-shadow none, cursor not-allowed; danger state uses background #FF3D5A with box-shadow 0 6px 24px rgba(255,61,90,0.3); loading spinner is 18x18px with 2px border; active press uses scale(0.96) transition 100ms; button border-radius 14px; ensure flex-shrink 0 is always applied.",
+      "reqIds": [
+        "REQ-99"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-toast-tsx-not-in-immutable-paths-with-enhanced-polish-toast-items-use-backdrop-filter-blur-24px-each-toast-has-a-small-icon-on-the-left-matching-its-type-iconcheck-for-success-in-00d97a-iconx-for-error-in-ff3d5a-iconbell-for-info-in-5b7fff-iconflash-for-sms-in-f2d06b-in-a-24px-circle-toast-text-is-inter-500-13px-f4f4f8-toast-enter-uses-slidedown-300ms-exit-uses-slideup-200ms-toasts-stack-from-top-with-gap-8px-max-4-toasts-visible-at-once-oldest-removed-if-exceeded-auto-dismiss-after-duration-3500ms",
+      "title": "Rewrite frontend/src/components/Toast.tsx (not in immutable paths) with enhanced polish: toast items use backdrop-filter blur(24px); each toast has a small icon on the left matching its type (IconCheck for success in #00D97A, IconX for error in #FF3D5A, IconBell for info in #5B7FFF, IconFlash for sms in #F2D06B) in a 24px circle; toast text is Inter 500 13px #F4F4F8; toast enter uses slideDown 300ms, exit uses slideUp 200ms; toasts stack from top with gap 8px; max 4 toasts visible at once (oldest removed if exceeded); auto-dismiss after duration ?? 3500ms.",
+      "reqIds": [
+        "REQ-100"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-app-tsx-ensure-all-28-screen-cases-in-the-renderscreen-switch-are-present-and-correct-with-no-fallthrough-add-a-subtle-screen-transition-wrapper-using-css-opacity-fadein-200ms-applied-to-the-rendered-screen-container-on-each-screen-change-use-a-key-state-screen-on-the-screen-container-div-pass-go-state-update-showtoast-removetoast-props-consistently-to-all-screens-outer-container-is-position-fixed-inset-0-background-050507-inner-container-is-maxwidth-430px-width-100-height-100-margin-0-auto-display-flex-flexdirection-column-overflow-hidden-position-relative-toast-and-notifspanel-render-as-overlays-above-the-screen-container",
+      "title": "Enhance frontend/src/App.tsx: ensure all 28 screen cases in the renderScreen() switch are present and correct with no fallthrough; add a subtle screen transition wrapper using CSS opacity fadeIn 200ms applied to the rendered screen container on each screen change (use a key={state.screen} on the screen container div); pass go, state, update, showToast, removeToast props consistently to all screens; outer container is position fixed inset 0 background #050507; inner container is maxWidth 430px width 100% height 100% margin 0 auto display flex flexDirection column overflow hidden position relative; Toast and NotifsPanel render as overlays above the screen container.",
+      "reqIds": [
+        "REQ-103"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-frontend-src-app-tsx-and-frontend-src-styles-globals-css-to-introduce-a-responsive-desktop-layout-when-viewport-width-430px-the-inner-container-must-expand-beyond-430px-up-to-a-max-width-of-1100px-use-a-two-column-grid-sidebar-navigation-on-the-left-220px-main-content-on-the-right-on-screens-900px-and-a-single-column-centered-layout-on-screens-430-899px-the-background-must-fill-the-full-viewport-with-the-existing-void-color-the-sidebar-desktop-only-must-replicate-the-relevant-tab-bar-tabbarclient-tabbarpro-or-tabbaradmin-as-a-vertical-nav-with-labels-replacing-the-bottom-tab-bar-which-must-be-hidden-on-desktop-all-spacing-font-sizes-and-card-widths-must-scale-gracefully",
+      "title": "Update frontend/src/App.tsx and frontend/src/styles/globals.css to introduce a responsive desktop layout: when viewport width > 430px, the inner container must expand beyond 430px up to a max-width of 1100px, use a two-column grid (sidebar navigation on the left ~220px, main content on the right) on screens >= 900px, and a single-column centered layout on screens 430–899px. The background must fill the full viewport with the existing --void color. The sidebar (desktop only) must replicate the relevant tab bar (TabBarClient, TabBarPro, or TabBarAdmin) as a vertical nav with labels, replacing the bottom tab bar which must be hidden on desktop. All spacing, font sizes, and card widths must scale gracefully.",
+      "reqIds": [
+        "REQ-104"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-refine-frontend-src-styles-globals-css-with-additional-desktop-responsive-utilities-add-css-custom-properties-sidebar-width-220px-and-content-max-880px-add-media-query-breakpoints-at-430px-768px-and-900px-increase-base-font-sizes-by-1-2px-on-desktop-body-font-size-15px-on-768px-ensure-all-existing-keyframe-animations-fadein-breathe-shimmer-fall-progressfill-scalein-slideup-slidedown-float-spin-have-correct-will-change-hints-for-gpu-acceleration-add-smooth-scroll-behavior-on-the-html-element-ensure-the-glass-card-gold-text-glow-gold-utility-classes-work-correctly-at-all-breakpoints",
+      "title": "Refine frontend/src/styles/globals.css with additional desktop-responsive utilities: add CSS custom properties --sidebar-width: 220px and --content-max: 880px; add media query breakpoints at 430px, 768px, and 900px; increase base font sizes by 1–2px on desktop (body font-size 15px on >= 768px); ensure all existing keyframe animations (fadeIn, breathe, shimmer, fall, progressFill, scaleIn, slideUp, slideDown, float, spin) have correct will-change hints for GPU acceleration; add smooth scroll behavior on the html element; ensure the glass-card, gold-text, glow-gold utility classes work correctly at all breakpoints.",
+      "reqIds": [
+        "REQ-105"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-screens-auth-loginscreen-tsx-for-desktop-on-viewport-768px-the-centered-content-block-must-be-contained-in-a-400px-wide-glass-card-panel-with-extra-vertical-padding-48px-the-four-background-orbs-must-be-positioned-across-the-full-viewport-not-clipped-to-430px-the-legal-links-at-the-bottom-must-align-to-the-bottom-of-the-panel-not-the-full-viewport",
+      "title": "Enhance frontend/src/screens/auth/LoginScreen.tsx for desktop: on viewport >= 768px, the centered content block must be contained in a 400px wide glass-card panel with extra vertical padding 48px; the four background orbs must be positioned across the full viewport (not clipped to 430px); the legal links at the bottom must align to the bottom of the panel, not the full viewport.",
+      "reqIds": [
+        "REQ-110"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-screens-auth-rolescreen-tsx-for-desktop-on-viewport-768px-the-two-role-cards-display-side-by-side-in-a-flex-row-with-gap-16px-each-card-taking-equal-width-with-max-width-280px-the-overall-content-block-is-centered-vertically-and-horizontally-in-the-viewport-with-max-width-600px",
+      "title": "Enhance frontend/src/screens/auth/RoleScreen.tsx for desktop: on viewport >= 768px, the two role cards display side-by-side in a flex row with gap 16px, each card taking equal width with max-width 280px; the overall content block is centered vertically and horizontally in the viewport with max-width 600px.",
+      "reqIds": [
+        "REQ-111"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-screens-auth-otpscreen-tsx-for-desktop-on-viewport-768px-the-phone-input-and-otp-digit-inputs-are-displayed-inside-a-400px-centered-glass-card-panel-the-four-digit-inputs-increase-to-72px-wide-80px-tall-on-desktop-the-overall-layout-remains-vertically-centered",
+      "title": "Enhance frontend/src/screens/auth/OTPScreen.tsx for desktop: on viewport >= 768px, the phone input and OTP digit inputs are displayed inside a 400px centered glass-card panel; the four digit inputs increase to 72px wide 80px tall on desktop; the overall layout remains vertically centered.",
+      "reqIds": [
+        "REQ-112"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-components-toast-tsx-for-desktop-on-viewport-768px-the-toast-container-is-right-aligned-at-24px-from-the-right-edge-instead-of-full-width-left-right-max-width-360px-each-toast-increases-border-radius-to-16px-and-padding-to-16px-20px-enter-exit-animations-are-the-same-slidedown-slideup-all-existing-type-based-icons-and-auto-dismiss-logic-preserved",
+      "title": "Enhance frontend/src/components/Toast.tsx for desktop: on viewport >= 768px, the toast container is right-aligned at 24px from the right edge (instead of full-width left/right), max-width 360px; each toast increases border-radius to 16px and padding to 16px 20px; enter/exit animations are the same (slideDown/slideUp). All existing type-based icons and auto-dismiss logic preserved.",
+      "reqIds": [
+        "REQ-133"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-components-bottomsheet-tsx-for-desktop-on-viewport-768px-the-sheet-renders-as-a-centered-modal-position-fixed-top-50-left-50-transform-translate-50-50-max-width-560px-border-radius-24px-on-all-corners-max-height-85vh-instead-of-a-bottom-anchored-sheet-the-overlay-and-all-content-footer-slots-are-preserved-enter-animation-uses-scalein-instead-of-slideup-on-desktop",
+      "title": "Enhance frontend/src/components/BottomSheet.tsx for desktop: on viewport >= 768px, the sheet renders as a centered modal (position fixed, top 50%, left 50%, transform translate(-50%,-50%), max-width 560px, border-radius 24px on all corners, max-height 85vh) instead of a bottom-anchored sheet; the overlay and all content/footer slots are preserved; enter animation uses scaleIn instead of slideUp on desktop.",
+      "reqIds": [
+        "REQ-134"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-components-notifspanel-tsx-for-desktop-on-viewport-900px-the-panel-renders-as-a-right-side-drawer-with-max-width-400px-and-a-semi-transparent-left-border-on-mobile-it-preserves-the-full-width-slide-in-behavior-all-existing-notification-list-logic-markread-and-close-behavior-preserved",
+      "title": "Enhance frontend/src/components/NotifsPanel.tsx for desktop: on viewport >= 900px, the panel renders as a right-side drawer with max-width 400px and a semi-transparent left border; on mobile it preserves the full-width slide-in behavior. All existing notification list logic, markRead, and close behavior preserved.",
+      "reqIds": [
+        "REQ-135"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-screens-pro-tabs-serviceeditor-tsx-for-desktop-on-viewport-768px-the-bottomsheet-renders-in-centered-modal-mode-as-per-req-134-the-name-field-price-stepper-and-duration-stepper-display-in-a-2-column-layout-badge-pills-and-mode-pills-use-larger-padding-12px-20px-all-controlled-fields-validation-and-save-cancel-logic-preserved",
+      "title": "Enhance frontend/src/screens/pro/tabs/ServiceEditor.tsx for desktop: on viewport >= 768px, the BottomSheet renders in centered modal mode (as per REQ-134); the name field, price stepper, and duration stepper display in a 2-column layout; badge pills and mode pills use larger padding (12px 20px). All controlled fields, validation, and save/cancel logic preserved.",
+      "reqIds": [
+        "REQ-136"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-screens-client-explorerscreen-tsx-with-deeper-visual-polish-add-a-parallax-style-subtle-background-shift-on-scroll-translatey-of-hero-orbs-by-0-3x-scroll-offset-increase-hero-heading-to-inter-900-40px-on-mobile-52px-on-desktop-add-a-shimmer-loading-skeleton-3-cards-shown-for-800ms-on-first-mount-before-pros-demo-renders-available-now-section-title-uses-inter-700-18px-f4f4f8-with-a-gold-left-accent-bar-3px-f2d06b-experts-for-you-section-title-same-style-pro-card-hover-press-state-adds-a-gold-border-glow-box-shadow-0-0-0-1px-rgba-242-208-107-0-3-preserve-all-pros-demo-data-geolocation-haversine-city-dropdown-filter-pills-and-navigation",
+      "title": "Enhance frontend/src/screens/client/ExplorerScreen.tsx with deeper visual polish: add a parallax-style subtle background shift on scroll (translateY of hero orbs by 0.3x scroll offset); increase hero heading to Inter 900 40px on mobile, 52px on desktop; add a shimmer loading skeleton (3 cards) shown for 800ms on first mount before PROS_DEMO renders; 'Available now' section title uses Inter 700 18px #F4F4F8 with a gold left accent bar (3px #F2D06B); 'Experts for you' section title same style; pro card hover/press state adds a gold border glow (box-shadow 0 0 0 1px rgba(242,208,107,0.3)); preserve all PROS_DEMO data, geolocation Haversine, city dropdown, filter pills, and navigation.",
+      "reqIds": [
+        "REQ-137"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-screens-client-ficheproscreen-tsx-with-deeper-visual-polish-pro-name-section-adds-a-verified-badge-iconshield-size-16-color-00d97a-inline-after-the-name-when-pro-actif-is-true-the-stats-bar-numbers-use-a-count-up-animation-starting-from-0-over-1-2s-on-mount-each-service-card-adds-a-hover-press-lift-effect-translatey-2px-box-shadow-0-8px-24px-rgba-0-0-0-0-4-transition-150ms-the-photo-gallery-images-use-object-fit-cover-with-a-subtle-zoom-on-hover-scale-1-03-transition-300ms-the-reviews-section-shows-star-icons-filled-f2d06b-not-text-sticky-cta-shows-the-selected-service-name-in-small-inter-400-12px-9898b4-above-the-price-when-a-service-is-selected",
+      "title": "Enhance frontend/src/screens/client/FicheProScreen.tsx with deeper visual polish: pro name section adds a verified badge (IconShield size 16 color #00D97A) inline after the name when pro.actif is true; the stats bar numbers use a count-up animation starting from 0 over 1.2s on mount; each service card adds a hover/press lift effect (translateY -2px, box-shadow 0 8px 24px rgba(0,0,0,0.4), transition 150ms); the photo gallery images use object-fit cover with a subtle zoom on hover (scale 1.03 transition 300ms); the reviews section shows star icons (filled #F2D06B) not text; sticky CTA shows the selected service name in small Inter 400 12px #9898B4 above the price when a service is selected.",
+      "reqIds": [
+        "REQ-138"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-screens-pro-prodashboardscreen-tsx-with-deeper-visual-polish-add-a-welcome-banner-at-the-very-top-of-the-scroll-zone-under-greeting-showing-today-s-date-in-inter-400-13px-54546c-metric-card-numbers-use-count-up-animation-over-1-5s-on-mount-the-flash-toggle-card-shows-a-animated-radio-wave-ripple-effect-css-keyframe-expanding-rings-from-the-dot-when-flash-mode-is-active-next-appointment-card-adds-a-view-details-link-in-inter-500-12px-f2d06b-that-calls-go-pro-radar-add-a-quick-stats-subtitle-inter-400-13px-54546c-above-the-3-metric-cards",
+      "title": "Enhance frontend/src/screens/pro/ProDashboardScreen.tsx with deeper visual polish: add a welcome banner at the very top of the scroll zone (under greeting) showing today's date in Inter 400 13px #54546C; metric card numbers use count-up animation over 1.5s on mount; the Flash toggle card shows a animated radio-wave ripple effect (CSS keyframe expanding rings from the dot) when flash mode is active; next appointment card adds a 'View details' link in Inter 500 12px #F2D06B that calls go('pro_radar'); add a 'Quick stats' subtitle Inter 400 13px #54546C above the 3 metric cards.",
+      "reqIds": [
+        "REQ-139"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-screens-pro-prowalletscreen-tsx-with-deeper-visual-polish-balance-card-adds-a-frosted-glass-effect-with-border-1px-solid-rgba-242-208-107-0-12-and-a-subtle-gold-gradient-top-edge-height-2px-linear-gradient-f2d06b-d4a050-escrow-section-adds-an-animated-progress-bar-showing-percentage-released-sequestre-solde-sequestre-in-gold-each-transaction-row-adds-a-press-highlight-background-rgba-255-255-255-0-03-on-active-the-revenue-bar-chart-adds-day-of-week-labels-mon-sun-below-each-bar-in-inter-500-10px-54546c-transfer-button-shows-a-tooltip-available-in-xh-xmin-on-hover-when-in-cooldown-state",
+      "title": "Enhance frontend/src/screens/pro/ProWalletScreen.tsx with deeper visual polish: balance card adds a frosted glass effect with border 1px solid rgba(242,208,107,0.12) and a subtle gold gradient top edge (height 2px linear-gradient #F2D06B #D4A050); escrow section adds an animated progress bar showing percentage released (sequestre / (solde + sequestre)) in gold; each transaction row adds a press highlight (background rgba(255,255,255,0.03) on active); the revenue bar chart adds day-of-week labels (Mon–Sun) below each bar in Inter 500 10px #54546C; transfer button shows a tooltip 'Available in Xh Xmin' on hover when in cooldown state.",
+      "reqIds": [
+        "REQ-140"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-screens-pro-proradarscreen-tsx-with-deeper-visual-polish-the-radar-header-section-adds-a-pulsing-radar-dot-animation-svg-circle-expanding-and-fading-2s-loop-next-to-the-title-pending-request-cards-add-a-priority-indicator-strip-on-the-left-edge-red-ff3d5a-if-countdown-5-minutes-gold-f2d06b-if-15-minutes-transparent-otherwise-confirmed-booking-cards-show-a-green-checkmark-circle-20px-00d97a-on-the-right-history-tab-cards-show-a-faded-opacity-0-7-with-a-completed-badge-in-54546c-add-a-counter-badge-on-the-pending-tab-label-showing-the-count-of-pending-items-in-a-red-pill",
+      "title": "Enhance frontend/src/screens/pro/ProRadarScreen.tsx with deeper visual polish: the 'Radar' header section adds a pulsing radar dot animation (SVG circle expanding and fading, 2s loop) next to the title; pending request cards add a priority indicator strip on the left edge — red (#FF3D5A) if countdown < 5 minutes, gold (#F2D06B) if < 15 minutes, transparent otherwise; confirmed booking cards show a green checkmark circle (20px #00D97A) on the right; history tab cards show a faded opacity (0.7) with a 'Completed' badge in #54546C; add a counter badge on the 'Pending' tab label showing the count of pending items in a red pill.",
+      "reqIds": [
+        "REQ-141"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-screens-pro-probusinessscreen-tsx-tab-zone-and-overall-layout-with-deeper-polish-each-tab-pill-adds-a-completion-micro-badge-tiny-green-dot-6px-00d97a-when-that-tab-s-required-fields-are-filled-the-progresscircle-adds-a-subtle-glow-filter-drop-shadow-0-0-8px-rgba-242-208-107-0-3-when-percentage-80-the-content-zone-adds-a-smooth-crossfade-transition-opacity-0-1-200ms-when-switching-between-tabs-using-a-key-prop-on-the-content-container-the-cta-zone-button-adds-a-loading-spinner-state-while-saving-shows-spinner-for-600ms-before-advancing-tab-the-5-segment-progress-bar-animates-segment-fill-width-from-0-to-100-over-400ms-when-a-tab-is-completed",
+      "title": "Enhance frontend/src/screens/pro/ProBusinessScreen.tsx tab zone and overall layout with deeper polish: each tab pill adds a completion micro-badge (tiny green dot 6px #00D97A) when that tab's required fields are filled; the ProgressCircle adds a subtle glow (filter drop-shadow(0 0 8px rgba(242,208,107,0.3))) when percentage >= 80; the content zone adds a smooth crossfade transition (opacity 0→1 200ms) when switching between tabs using a key prop on the content container; the CTA zone button adds a loading spinner state while saving (shows spinner for 600ms before advancing tab); the 5-segment progress bar animates segment fill width from 0 to 100% over 400ms when a tab is completed.",
+      "reqIds": [
+        "REQ-142"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-screens-client-reservationsscreen-tsx-with-deeper-visual-polish-upcoming-booking-cards-add-a-visual-countdown-chip-showing-in-x-days-or-today-or-tomorrow-in-a-pill-today-uses-00d97a-background-rgba-0-217-122-0-1-text-00d97a-tomorrow-uses-f2d06b-background-rgba-242-208-107-0-1-future-uses-9898b4-each-card-adds-a-chevron-right-icon-iconchevronright-size-16-54546c-on-the-right-edge-cancelled-bookings-in-completed-tab-are-shown-with-strikethrough-service-name-in-54546c-add-a-total-count-subtitle-under-the-tab-label-showing-x-reservations",
+      "title": "Enhance frontend/src/screens/client/ReservationsScreen.tsx with deeper visual polish: upcoming booking cards add a visual countdown chip showing 'In X days' or 'Today' or 'Tomorrow' in a pill — 'Today' uses #00D97A background rgba(0,217,122,0.1) text #00D97A, 'Tomorrow' uses #F2D06B background rgba(242,208,107,0.1), future uses #9898B4; each card adds a chevron right icon (IconChevronRight size 16 #54546C) on the right edge; cancelled bookings in completed tab are shown with strikethrough service name in #54546C; add a total count subtitle under the tab label showing 'X reservations'.",
+      "reqIds": [
+        "REQ-143"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-screens-client-alertesscreen-tsx-with-deeper-visual-polish-add-a-header-subtitle-showing-x-unread-in-inter-400-13px-9898b4-or-all-read-in-00d97a-when-none-unread-notification-items-animate-in-with-a-staggered-slidedown-50ms-delay-per-item-index-on-first-render-tapping-a-notification-marks-it-as-read-individually-opacity-1-0-8-transition-200ms-on-the-unread-indicator-dot-add-an-empty-state-illustration-when-all-notifications-are-read-a-large-iconbell-size-64-color-1c1c26-with-text-you-are-all-caught-up-inter-500-14px-54546c",
+      "title": "Enhance frontend/src/screens/client/AlertesScreen.tsx with deeper visual polish: add a header subtitle showing 'X unread' in Inter 400 13px #9898B4 (or 'All read' in #00D97A when none unread); notification items animate in with a staggered slideDown (50ms delay per item index) on first render; tapping a notification marks it as read individually (opacity 1→0.8 transition 200ms on the unread indicator dot); add an empty state illustration when all notifications are read — a large IconBell (size 64 color #1C1C26) with text 'You are all caught up' Inter 500 14px #54546C.",
+      "reqIds": [
+        "REQ-144"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-screens-client-clientprofilscreen-tsx-with-deeper-visual-polish-the-avatar-circle-adds-a-gradient-ring-animation-rotating-conic-gradient-f2d06b-to-d4a050-to-transparent-on-hover-focus-each-editable-field-section-uses-a-glass-card-wrapper-with-a-subtle-border-color-transition-from-rgba-255-255-255-0-08-to-rgba-242-208-107-0-4-on-focus-payment-history-rows-use-alternating-backgrounds-090909-and-transparent-add-a-member-since-line-below-the-user-name-showing-the-join-date-in-inter-400-12px-54546c-logout-button-adds-a-confirmation-step-first-press-shows-confirm-logout-text-inside-the-button-second-press-executes-logout",
+      "title": "Enhance frontend/src/screens/client/ClientProfilScreen.tsx with deeper visual polish: the avatar circle adds a gradient ring animation (rotating conic-gradient #F2D06B to #D4A050 to transparent) on hover/focus; each editable field section uses a glass-card wrapper with a subtle border-color transition from rgba(255,255,255,0.08) to rgba(242,208,107,0.4) on focus; payment history rows use alternating backgrounds (#090909 and transparent); add a 'Member since' line below the user name showing the join date in Inter 400 12px #54546C; logout button adds a confirmation step (first press shows 'Confirm logout?' text inside the button, second press executes logout).",
+      "reqIds": [
+        "REQ-145"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-screens-admin-admindashboardscreen-tsx-with-deeper-visual-polish-the-header-nexus-admin-text-uses-a-subtle-red-glow-text-shadow-0-0-20px-rgba-255-61-90-0-4-kpi-card-values-animate-with-count-up-over-1-5s-on-mount-each-kpi-card-adds-a-sparkline-mini-chart-5-data-points-svg-polyline-matching-card-color-at-50-opacity-below-the-number-the-pros-awaiting-validation-section-adds-a-blinking-red-dot-breathe-animation-next-to-the-section-title-when-count-0-action-buttons-approve-refuse-add-a-brief-scale-0-95-press-animation-with-100ms-transition",
+      "title": "Enhance frontend/src/screens/admin/AdminDashboardScreen.tsx with deeper visual polish: the header 'NEXUS ADMIN' text uses a subtle red glow (text-shadow 0 0 20px rgba(255,61,90,0.4)); KPI card values animate with count-up over 1.5s on mount; each KPI card adds a sparkline mini-chart (5 data points, SVG polyline, matching card color at 50% opacity) below the number; the 'Pros awaiting validation' section adds a blinking red dot (breathe animation) next to the section title when count > 0; action buttons (Approve/Refuse) add a brief scale(0.95) press animation with 100ms transition.",
+      "reqIds": [
+        "REQ-146"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-frontend-src-components-notifspanel-tsx-with-deeper-visual-polish-notification-items-animate-in-with-staggered-fadein-30ms-delay-per-index-each-notification-type-gets-a-distinct-icon-nouvelle-demande-uses-iconbell-paiement-confirme-uses-iconwallet-fonds-liberes-uses-iconbank-booking-confirme-uses-iconcalendar-avis-recu-uses-iconstar-all-in-correctly-colored-36px-circles-the-panel-header-adds-a-notification-count-chip-inter-700-11px-050507-on-background-f2d06b-border-radius-999px-padding-2px-7px-next-to-notifications-title-add-a-subtle-entrance-animation-slideup-300ms-cubic-bezier-0-32-0-72-0-1-for-the-panel-itself-swipe-right-gesture-hint-a-thin-2e2e3e-bar-on-the-left-edge-of-the-panel-for-closing",
+      "title": "Enhance frontend/src/components/NotifsPanel.tsx with deeper visual polish: notification items animate in with staggered fadeIn (30ms delay per index); each notification type gets a distinct icon — nouvelle_demande uses IconBell, paiement_confirme uses IconWallet, fonds_liberes uses IconBank, booking_confirme uses IconCalendar, avis_recu uses IconStar — all in correctly colored 36px circles; the panel header adds a notification count chip (Inter 700 11px #050507 on background #F2D06B border-radius 999px padding 2px 7px) next to 'Notifications' title; add a subtle entrance animation (slideUp 300ms cubic-bezier(0.32,0.72,0,1)) for the panel itself; swipe-right gesture hint (a thin #2E2E3E bar on the left edge of the panel) for closing.",
+      "reqIds": [
+        "REQ-151"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-audit-and-fix-every-screen-s-root-layout-so-that-all-content-is-visible-without-hidden-overflow-on-both-mobile-and-desktop-each-screen-must-use-position-fixed-inset-0-display-flex-flexdirection-column-height-100-never-a-fixed-px-height-on-the-root-the-scroll-zone-must-be-flex-1-overflow-y-auto-with-webkit-overflow-scrolling-touch-the-header-56px-must-be-position-absolute-top-0-and-the-scroll-zone-must-have-paddingtop-72px-the-tab-bar-and-cta-zone-must-be-flex-shrink-0-in-the-natural-flex-flow-never-position-fixed-verify-every-screen-loginscreen-rolescreen-otpscreen-explorerscreen-ficheproscreen-booking1-5-livestatusscreen-reservationsscreen-alertesscreen-clientprofilscreen-prodashboardscreen-proradarscreen-prowalletscreen-probusinessscreen-subscriptionmodal-successscreen-adminloginscreen-admindashboardscreen-adminprosscreen-adminbookingsscreen-adminrevenusscreen-fix-any-screen-that-violates-these-rules",
+      "title": "Audit and fix every screen's root layout so that all content is visible without hidden overflow on both mobile and desktop. Each screen must use: position fixed inset-0, display flex, flexDirection column, height 100% (never a fixed px height on the root). The scroll zone must be flex-1 overflow-y auto with -webkit-overflow-scrolling touch. The header (56px) must be position absolute top-0 and the scroll zone must have paddingTop 72px. The tab bar and CTA zone must be flex-shrink-0 in the natural flex flow — never position fixed. Verify every screen: LoginScreen, RoleScreen, OTPScreen, ExplorerScreen, FicheProScreen, Booking1–5, LiveStatusScreen, ReservationsScreen, AlertesScreen, ClientProfilScreen, ProDashboardScreen, ProRadarScreen, ProWalletScreen, ProBusinessScreen, SubscriptionModal, SuccessScreen, AdminLoginScreen, AdminDashboardScreen, AdminProsScreen, AdminBookingsScreen, AdminRevenusScreen. Fix any screen that violates these rules.",
+      "reqIds": [
+        "REQ-152"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-refine-frontend-src-styles-globals-css-with-comprehensive-mobile-first-layout-fixes-ensure-all-screens-never-exceed-100dvh-use-height-100dvh-on-the-root-wrapper-add-a-safe-bottom-css-custom-property-defaulting-to-env-safe-area-inset-bottom-8px-add-utility-class-screen-root-position-fixed-inset-0-display-flex-flex-direction-column-background-var-void-add-scroll-zone-flex-1-overflow-y-auto-webkit-overflow-scrolling-touch-add-cta-zone-flex-shrink-0-padding-12px-20px-calc-12px-var-safe-bottom-background-rgba-5-5-7-0-97-border-top-1px-solid-rgba-255-255-255-0-04-add-tab-bar-flex-shrink-0-ensure-touch-action-pan-y-on-all-scroll-zones-ensure-webkit-tap-highlight-color-transparent-on-all-interactive-elements-add-overscroll-behavior-contain-on-scroll-zones-to-prevent-pull-to-refresh-bleeding",
+      "title": "Refine frontend/src/styles/globals.css with comprehensive mobile-first layout fixes: ensure all screens never exceed 100dvh (use height: 100dvh on the root wrapper); add a --safe-bottom CSS custom property defaulting to env(safe-area-inset-bottom, 8px); add utility class .screen-root { position: fixed; inset: 0; display: flex; flex-direction: column; background: var(--void); }; add .scroll-zone { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }; add .cta-zone { flex-shrink: 0; padding: 12px 20px calc(12px + var(--safe-bottom)); background: rgba(5,5,7,0.97); border-top: 1px solid rgba(255,255,255,0.04); }; add .tab-bar { flex-shrink: 0; }; ensure touch-action: pan-y on all scroll zones; ensure -webkit-tap-highlight-color: transparent on all interactive elements; add overscroll-behavior: contain on scroll zones to prevent pull-to-refresh bleeding.",
+      "reqIds": [
+        "REQ-153"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-app-tsx-inner-container-for-full-responsive-layout-outer-wrapper-is-position-fixed-inset-0-background-var-void-overflow-hidden-on-mobile-899px-inner-container-is-max-width-430px-width-100-height-100-margin-0-auto-display-flex-flexdirection-column-overflow-hidden-position-relative-on-desktop-900px-inner-container-expands-to-max-width-1100px-with-a-two-column-css-grid-sidebar-220px-fixed-left-main-content-filling-remaining-width-the-sidebar-renders-the-role-appropriate-vertical-nav-client-tabbarclient-items-as-vertical-list-pro-tabbarpro-items-admin-tabbaradmin-items-with-labels-and-icons-each-nav-item-56px-height-bottom-tab-bars-must-be-hidden-on-desktop-via-css-media-query-display-none-at-900px-on-430px-899px-single-column-max-width-768px-centered-no-sidebar-tab-bar-visible-screen-transition-wrapper-uses-key-state-screen-with-opacity-fadein-200ms-animation",
+      "title": "Rewrite frontend/src/App.tsx inner container for full responsive layout: outer wrapper is position fixed inset-0, background var(--void), overflow hidden. On mobile (<= 899px): inner container is max-width 430px, width 100%, height 100%, margin 0 auto, display flex, flexDirection column, overflow hidden, position relative. On desktop (>= 900px): inner container expands to max-width 1100px with a two-column CSS grid — sidebar 220px fixed left, main content filling remaining width. The sidebar renders the role-appropriate vertical nav (client: TabBarClient items as vertical list, pro: TabBarPro items, admin: TabBarAdmin items) with labels and icons, each nav item 56px height. Bottom tab bars must be hidden on desktop via CSS media query (display: none at >= 900px). On 430px–899px: single column, max-width 768px centered, no sidebar, tab bar visible. Screen transition wrapper uses key={state.screen} with opacity fadeIn 200ms animation.",
+      "reqIds": [
+        "REQ-154"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-auth-loginscreen-tsx-for-full-mobile-desktop-polish-mobile-layout-centers-content-vertically-in-a-flex-column-with-padding-0-24px-on-desktop-768px-content-is-in-a-420px-wide-glass-card-panel-background-rgba-13-13-19-0-97-backdrop-filter-blur-20px-border-1px-solid-rgba-255-255-255-0-06-border-radius-24px-padding-48px-40px-four-animated-blur-orbs-are-positioned-across-the-full-viewport-not-clipped-with-sizes-320px-240px-180px-140px-and-float-animation-nexus-title-inter-900-72px-on-desktop-64px-on-mobile-the-glass-card-on-desktop-contains-title-tagline-gold-divider-btnprimary-legal-links-all-vertically-stacked-with-correct-spacing-legal-links-sit-at-the-bottom-of-the-panel-on-desktop-position-relative-margin-top-auto-btnprimary-has-glow-gold-shadow-fadein-0-6s-on-content-block-mount",
+      "title": "Rewrite frontend/src/screens/auth/LoginScreen.tsx for full mobile + desktop polish: mobile layout centers content vertically in a flex column with padding 0 24px; on desktop (>= 768px), content is in a 420px wide glass-card panel (background rgba(13,13,19,0.97), backdrop-filter blur(20px), border 1px solid rgba(255,255,255,0.06), border-radius 24px, padding 48px 40px). Four animated blur orbs are positioned across the full viewport (not clipped) with sizes 320px, 240px, 180px, 140px and float animation. NEXUS title Inter 900 72px on desktop, 64px on mobile. The glass-card on desktop contains: title, tagline, gold divider, BtnPrimary, legal links — all vertically stacked with correct spacing. Legal links sit at the bottom of the panel on desktop (position relative, margin-top auto). BtnPrimary has glow-gold shadow. fadeIn 0.6s on content block mount.",
+      "reqIds": [
+        "REQ-155"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-auth-rolescreen-tsx-for-full-mobile-desktop-polish-on-mobile-two-role-cards-stack-vertically-with-gap-16px-each-card-min-height-110px-full-width-with-padding-24px-on-desktop-768px-cards-display-side-by-side-in-a-flex-row-each-max-width-280px-centered-block-max-width-600px-both-cards-use-glass-card-style-background-0d0d13-border-radius-20px-border-1px-solid-rgba-255-255-255-0-06-gold-border-on-client-tap-blue-border-on-pro-tap-scale-0-98-press-effect-150ms-transition-iconuser-for-client-in-5b7fff-and-iconedit-for-pro-in-f2d06b-each-in-a-40px-tinted-circle-card-label-inter-800-20px-f4f4f8-subtitle-inter-400-13px-54546c-administration-access-link-inter-400-12px-54546c-centered-below",
+      "title": "Rewrite frontend/src/screens/auth/RoleScreen.tsx for full mobile + desktop polish: on mobile, two role cards stack vertically with gap 16px, each card min-height 110px, full-width with padding 24px. On desktop (>= 768px), cards display side-by-side in a flex row, each max-width 280px, centered block max-width 600px. Both cards use glass-card style (background #0D0D13, border-radius 20px, border 1px solid rgba(255,255,255,0.06)), gold border on CLIENT tap, blue border on PRO tap, scale(0.98) press effect, 150ms transition. IconUser for CLIENT in #5B7FFF and IconEdit for PRO in #F2D06B each in a 40px tinted circle. Card label Inter 800 20px #F4F4F8, subtitle Inter 400 13px #54546C. 'Administration access' link Inter 400 12px #54546C centered below.",
+      "reqIds": [
+        "REQ-156"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-auth-otpscreen-tsx-for-full-mobile-desktop-polish-role-guard-at-top-if-state-role-is-null-go-role-and-return-null-on-mobile-content-scrolls-naturally-from-padding-top-72px-on-desktop-768px-all-content-is-inside-a-420px-centered-glass-card-panel-same-style-as-loginscreen-panel-phone-input-container-uses-glass-card-style-with-41-prefix-pill-background-1c1c26-border-right-1px-solid-rgba-255-255-255-0-06-four-otp-digit-inputs-64px-wide-72px-tall-on-mobile-72px-wide-80px-tall-on-desktop-background-0d0d13-border-1px-solid-rgba-255-255-255-0-08-border-radius-16px-inter-700-28px-f4f4f8-focus-border-rgba-242-208-107-0-4-transition-150ms-on-all-4-digits-filled-flash-green-border-00d97a-then-auto-verify-resend-countdown-in-9898b4-with-seconds-in-f2d06b",
+      "title": "Rewrite frontend/src/screens/auth/OTPScreen.tsx for full mobile + desktop polish: role guard at top (if state.role is null, go('role') and return null). On mobile, content scrolls naturally from padding-top 72px. On desktop (>= 768px), all content is inside a 420px centered glass-card panel (same style as LoginScreen panel). Phone input container uses glass-card style with +41 prefix pill (background #1C1C26, border-right 1px solid rgba(255,255,255,0.06)). Four OTP digit inputs: 64px wide 72px tall on mobile, 72px wide 80px tall on desktop; background #0D0D13, border 1px solid rgba(255,255,255,0.08), border-radius 16px, Inter 700 28px #F4F4F8; focus border rgba(242,208,107,0.4) transition 150ms; on all-4-digits-filled flash green border #00D97A then auto-verify. Resend countdown in #9898B4 with seconds in #F2D06B.",
+      "reqIds": [
+        "REQ-157"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-client-explorerscreen-tsx-for-full-mobile-desktop-polish-root-is-position-fixed-inset-0-display-flex-flexdirection-column-header-absolute-56px-z-index-100-scroll-zone-flex-1-overflow-y-auto-paddingtop-72px-tabbarclient-flex-shrink-0-never-fixed-on-desktop-900px-available-now-cards-200x280px-experts-for-you-uses-2-column-grid-hero-heading-inter-900-52px-search-bar-max-width-700px-centered-on-mobile-hero-heading-inter-900-40px-cards-168x228px-single-column-list-shimmer-skeleton-3-cards-shows-for-800ms-on-mount-section-titles-available-now-experts-for-you-use-inter-700-18px-f4f4f8-with-3px-f2d06b-left-accent-bar-hero-section-has-radial-gradient-top-left-rgba-91-127-255-0-08-bottom-right-rgba-242-208-107-0-05-search-bar-glass-card-style-border-radius-999px-active-filter-pill-has-glow-box-shadow-around-me-button-and-city-dropdown-preserved-pros-demo-6-entries-preserved-all-navigation-preserved",
+      "title": "Rewrite frontend/src/screens/client/ExplorerScreen.tsx for full mobile + desktop polish: root is position fixed inset-0, display flex, flexDirection column. Header absolute 56px z-index 100. Scroll zone flex-1 overflow-y auto, paddingTop 72px. TabBarClient flex-shrink-0 (never fixed). On desktop >= 900px: 'Available now' cards 200x280px, 'Experts for you' uses 2-column grid, hero heading Inter 900 52px, search bar max-width 700px centered. On mobile: hero heading Inter 900 40px, cards 168x228px, single column list. Shimmer skeleton (3 cards) shows for 800ms on mount. Section titles ('Available now', 'Experts for you') use Inter 700 18px #F4F4F8 with 3px #F2D06B left accent bar. Hero section has radial gradient top-left rgba(91,127,255,0.08) + bottom-right rgba(242,208,107,0.05). Search bar glass-card style border-radius 999px. Active filter pill has glow box-shadow. 'Around me' button and city dropdown preserved. PROS_DEMO 6 entries preserved. All navigation preserved.",
+      "reqIds": [
+        "REQ-158"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-client-ficheproscreen-tsx-for-full-mobile-desktop-polish-guard-if-state-selectedpro-is-null-go-explorer-and-return-null-root-position-fixed-inset-0-display-flex-flexdirection-column-scroll-zone-flex-1-overflow-y-auto-paddingtop-56px-cover-starts-under-header-sticky-cta-flex-shrink-0-background-rgba-5-5-7-0-97-backdrop-filter-blur-20px-on-desktop-900px-two-column-layout-left-column-cover-360px-avatar-stats-reviews-right-column-services-gallery-cta-button-fixed-to-bottom-of-right-column-cover-image-stronger-gradient-overlay-linear-gradient-transparent-40-050507-100-avatar-92px-box-shadow-0-0-0-2px-050507-0-0-0-4px-f2d06b-stats-bar-count-up-over-1-2s-service-cards-glass-card-88px-with-lift-on-hover-gallery-images-object-fit-cover-zoom-scale-1-03-on-hover-verified-badge-iconshield-00d97a-when-pro-actif-star-icons-filled-f2d06b-in-reviews",
+      "title": "Rewrite frontend/src/screens/client/FicheProScreen.tsx for full mobile + desktop polish: guard (if state.selectedPro is null, go('explorer') and return null). Root: position fixed inset-0, display flex, flexDirection column. Scroll zone flex-1 overflow-y auto, paddingTop 56px (cover starts under header). Sticky CTA flex-shrink-0, background rgba(5,5,7,0.97), backdrop-filter blur(20px). On desktop >= 900px: two-column layout — left column (cover 360px + avatar + stats + reviews), right column (services + gallery + CTA button fixed to bottom of right column). Cover image stronger gradient overlay linear-gradient(transparent 40%, #050507 100%). Avatar 92px, box-shadow 0 0 0 2px #050507, 0 0 0 4px #F2D06B. Stats bar count-up over 1.2s. Service cards glass-card 88px with lift on hover. Gallery images object-fit cover, zoom scale 1.03 on hover. Verified badge IconShield #00D97A when pro.actif. Star icons filled #F2D06B in reviews.",
+      "reqIds": [
+        "REQ-159"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-all-5-booking-screens-booking1screen-through-booking5screen-for-full-mobile-desktop-polish-all-share-position-fixed-inset-0-flex-flex-col-header-absolute-56px-scroll-zone-flex-1-overflow-y-auto-paddingtop-72px-cta-flex-shrink-0-at-bottom-never-position-fixed-on-desktop-768px-scroll-content-max-width-560px-centered-step-indicator-4-nodes-connected-by-lines-completed-nodes-filled-f2d06b-current-node-has-breathe-pulse-animation-pending-nodes-2e2e3e-node-size-16px-mobile-20px-desktop-booking1-service-cards-glass-card-2-column-grid-on-desktop-duration-pill-background-1c1c26-border-radius-999px-booking2-time-slot-glass-card-80px-height-2-column-grid-on-desktop-flash-label-00d97a-booking3-inputs-52px-height-glass-card-wrappers-per-section-booking4-glass-card-recap-price-inter-800-28px-f2d06b-cta-confirm-and-pay-via-twint-gold-gradient-booking5-animated-svg-hourglass-rotation-countdown-inter-800-48px-f2d06b-auto-navigate-live-status-after-8s",
+      "title": "Rewrite all 5 booking screens (Booking1Screen through Booking5Screen) for full mobile + desktop polish: all share position fixed inset-0 flex flex-col, header absolute 56px, scroll zone flex-1 overflow-y auto paddingTop 72px, CTA flex-shrink-0 at bottom (never position fixed). On desktop >= 768px, scroll content max-width 560px centered. Step indicator: 4 nodes connected by lines, completed nodes filled #F2D06B, current node has breathe pulse animation, pending nodes #2E2E3E, node size 16px mobile / 20px desktop. Booking1: service cards glass-card 2-column grid on desktop, duration pill background #1C1C26 border-radius 999px. Booking2: time slot glass-card 80px height, 2-column grid on desktop, flash label #00D97A. Booking3: inputs 52px height, glass-card wrappers per section. Booking4: glass-card recap, price Inter 800 28px #F2D06B, CTA 'Confirm and pay via TWINT' gold gradient. Booking5: animated SVG hourglass rotation, countdown Inter 800 48px #F2D06B, auto-navigate live_status after 8s.",
+      "reqIds": [
+        "REQ-160"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-client-reservationsscreen-tsx-for-full-mobile-desktop-polish-root-position-fixed-inset-0-flex-flex-col-header-56px-absolute-scroll-zone-flex-1-overflow-y-auto-paddingtop-72px-tabbarclient-flex-shrink-0-bottom-active-reservations-two-tabs-upcoming-completed-with-f2d06b-active-underline-booking-cards-glass-card-90px-mobile-110px-desktop-service-name-inter-700-15px-f4f4f8-pro-inter-400-13px-9898b4-date-inter-500-12px-54546c-colored-status-badge-pill-countdown-chip-today-rgba-0-217-122-0-1-text-00d97a-tomorrow-rgba-242-208-107-0-1-text-f2d06b-future-9898b4-chevronright-icon-on-right-edge-on-desktop-768px-2-column-card-grid-total-count-subtitle-x-reservations-below-tab-label-demo-bookings-when-canister-empty-3-upcoming-2-completed-cancelled-bookings-show-strikethrough-service-name",
+      "title": "Rewrite frontend/src/screens/client/ReservationsScreen.tsx for full mobile + desktop polish: root position fixed inset-0 flex flex-col. Header 56px absolute. Scroll zone flex-1 overflow-y auto paddingTop 72px. TabBarClient flex-shrink-0 bottom active='reservations'. Two tabs 'Upcoming' / 'Completed' with #F2D06B active underline. Booking cards glass-card 90px mobile, 110px desktop; service name Inter 700 15px #F4F4F8, pro Inter 400 13px #9898B4, date Inter 500 12px #54546C, colored status badge pill. Countdown chip: 'Today' rgba(0,217,122,0.1) text #00D97A, 'Tomorrow' rgba(242,208,107,0.1) text #F2D06B, future #9898B4. ChevronRight icon on right edge. On desktop >= 768px: 2-column card grid. Total count subtitle 'X reservations' below tab label. Demo bookings when canister empty: 3 upcoming + 2 completed. Cancelled bookings show strikethrough service name.",
+      "reqIds": [
+        "REQ-162"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-client-alertesscreen-tsx-for-full-mobile-desktop-polish-root-position-fixed-inset-0-flex-flex-col-header-56px-absolute-scroll-zone-flex-1-overflow-y-auto-paddingtop-72px-tabbarclient-flex-shrink-0-bottom-active-alertes-header-subtitle-x-unread-inter-400-13px-9898b4-or-all-read-00d97a-notification-items-glass-card-border-radius-16px-unread-left-border-3px-f2d06b-background-rgba-242-208-107-0-03-type-based-icon-circles-36px-mobile-44px-desktop-items-stagger-animate-with-slidedown-50ms-delay-per-index-tapping-marks-individual-notification-read-indicator-dot-opacity-1-0-8-transition-200ms-mark-all-read-button-f2d06b-top-right-empty-state-iconbell-size-64-1c1c26-you-are-all-caught-up-inter-500-14px-54546c-on-desktop-768px-max-width-680px-centered-column-search-input-44px-glass-card-style-with-iconsearch-9898b4-filters-in-real-time-demo-notifications-4-entries-when-canister-empty",
+      "title": "Rewrite frontend/src/screens/client/AlertesScreen.tsx for full mobile + desktop polish: root position fixed inset-0 flex flex-col. Header 56px absolute. Scroll zone flex-1 overflow-y auto paddingTop 72px. TabBarClient flex-shrink-0 bottom active='alertes'. Header subtitle 'X unread' Inter 400 13px #9898B4 (or 'All read' #00D97A). Notification items glass-card border-radius 16px; unread: left border 3px #F2D06B, background rgba(242,208,107,0.03); type-based icon circles 36px (mobile) / 44px (desktop). Items stagger-animate with slideDown 50ms delay per index. Tapping marks individual notification read (indicator dot opacity 1→0.8 transition 200ms). Mark-all-read button #F2D06B top-right. Empty state: IconBell size 64 #1C1C26 + 'You are all caught up' Inter 500 14px #54546C. On desktop >= 768px: max-width 680px centered column. Search input 44px glass-card style with IconSearch #9898B4 filters in real-time. Demo notifications (4 entries) when canister empty.",
+      "reqIds": [
+        "REQ-163"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-client-clientprofilscreen-tsx-for-full-mobile-desktop-polish-root-position-fixed-inset-0-flex-flex-col-header-56px-absolute-title-my-profile-scroll-zone-flex-1-overflow-y-auto-paddingtop-72px-tabbarclient-flex-shrink-0-bottom-active-profil-avatar-80px-on-mobile-100px-on-desktop-initials-inter-700-28px-f2d06b-on-1c1c26-with-2px-gold-border-rotating-conic-gradient-ring-on-hover-username-inter-700-20px-f4f4f8-phone-email-inter-400-14px-9898b4-member-since-inter-400-12px-54546c-on-desktop-768px-two-column-layout-left-avatar-name-stats-right-editable-fields-payment-history-editable-field-glass-cards-with-border-color-transition-on-focus-payment-history-3-demo-entries-with-color-coded-amounts-logout-btnprimary-danger-first-press-shows-confirm-logout-second-press-calls-logout-then-go-login",
+      "title": "Rewrite frontend/src/screens/client/ClientProfilScreen.tsx for full mobile + desktop polish: root position fixed inset-0 flex flex-col. Header 56px absolute, title 'My Profile'. Scroll zone flex-1 overflow-y auto paddingTop 72px. TabBarClient flex-shrink-0 bottom active='profil'. Avatar 80px on mobile, 100px on desktop, initials Inter 700 28px #F2D06B on #1C1C26 with 2px gold border, rotating conic-gradient ring on hover. Username Inter 700 20px #F4F4F8, phone/email Inter 400 14px #9898B4, 'Member since' Inter 400 12px #54546C. On desktop >= 768px: two-column layout (left: avatar+name+stats, right: editable fields+payment history). Editable field glass-cards with border-color transition on focus. Payment history: 3 demo entries with color-coded amounts. Logout BtnPrimary danger — first press shows 'Confirm logout?', second press calls logout() then go('login').",
+      "reqIds": [
+        "REQ-164"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-header-tsx-for-full-responsive-polish-background-rgba-5-5-7-0-97-backdrop-filter-blur-32px-border-bottom-1px-solid-rgba-255-255-255-0-04-height-56px-on-mobile-64px-on-desktop-900px-nexus-logo-inter-900-22px-on-mobile-26px-on-desktop-letter-spacing-0-05em-back-button-circle-40px-mobile-44px-desktop-background-0d0d13-border-rgba-255-255-255-0-08-iconarrowleft-18px-mobile-20px-desktop-role-switch-pill-transition-150ms-border-color-and-background-notification-bell-badge-uses-scalein-200ms-animation-when-count-0-center-title-uses-fadein-300ms-animation-props-showback-onback-title-role-notifscount-onnotifs-onswitchrole-onlogoclick-all-typed-and-functional-header-stretches-full-container-width-on-all-breakpoints",
+      "title": "Rewrite frontend/src/components/Header.tsx for full responsive polish: background rgba(5,5,7,0.97), backdrop-filter blur(32px), border-bottom 1px solid rgba(255,255,255,0.04). Height 56px on mobile, 64px on desktop >= 900px. NEXUS logo Inter 900 22px on mobile, 26px on desktop, letter-spacing -0.05em. Back button circle 40px mobile / 44px desktop, background #0D0D13, border rgba(255,255,255,0.08), IconArrowLeft 18px mobile / 20px desktop. Role switch pill transition 150ms border-color and background. Notification bell badge uses scaleIn 200ms animation when count > 0. Center title uses fadeIn 300ms animation. Props (showBack, onBack, title, role, notifsCount, onNotifs, onSwitchRole, onLogoClick) all typed and functional. Header stretches full container width on all breakpoints.",
+      "reqIds": [
+        "REQ-178"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-tabbarclient-tsx-and-tabbarpro-tsx-and-tabbaradmin-tsx-on-desktop-900px-hide-entirely-display-none-navigation-handled-by-app-tsx-sidebar-on-mobile-preserve-full-polish-gold-indicator-line-width-transition-0-24px-200ms-on-mount-active-icon-scale-1-1-150ms-inactive-icons-2e2e3e-active-f2d06b-gradient-top-border-linear-gradient-to-right-transparent-rgba-242-208-107-0-15-transparent-tab-press-scale-0-9-briefly-all-tab-onclick-handlers-correct-add-aria-label-attributes-to-each-tab-button-tabbaradmin-uses-ff3d5a-for-active-indicator-instead-of-gold",
+      "title": "Rewrite frontend/src/components/TabBarClient.tsx and TabBarPro.tsx and TabBarAdmin.tsx: on desktop >= 900px, hide entirely (display: none) — navigation handled by App.tsx sidebar. On mobile, preserve full polish: gold indicator line width transition 0→24px 200ms on mount, active icon scale(1.1) 150ms, inactive icons #2E2E3E, active #F2D06B, gradient top border (linear-gradient to right transparent rgba(242,208,107,0.15) transparent), tab press scale(0.9) briefly. All tab onClick handlers correct. Add aria-label attributes to each tab button. TabBarAdmin uses #FF3D5A for active indicator instead of gold.",
+      "reqIds": [
+        "REQ-179"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-btnprimary-tsx-for-full-responsive-polish-height-56px-on-mobile-non-small-60px-on-desktop-768px-font-size-15px-mobile-16px-desktop-border-radius-14px-mobile-16px-desktop-gold-gradient-state-glow-gold-box-shadow-0-6px-28px-rgba-242-208-107-0-3-on-mobile-0-8px-32px-rgba-242-208-107-0-35-on-desktop-disabled-background-1c1c26-color-54546c-box-shadow-none-cursor-not-allowed-danger-background-ff3d5a-box-shadow-0-6px-24px-rgba-255-61-90-0-3-loading-spinner-18x18px-2px-border-spin-active-press-scale-0-96-100ms-flex-shrink-0-always-box-shadow-transition-200ms",
+      "title": "Rewrite frontend/src/components/BtnPrimary.tsx for full responsive polish: height 56px on mobile (non-small), 60px on desktop >= 768px. Font-size 15px mobile, 16px desktop. Border-radius 14px mobile, 16px desktop. Gold gradient state: glow-gold box-shadow 0 6px 28px rgba(242,208,107,0.3) on mobile, 0 8px 32px rgba(242,208,107,0.35) on desktop. Disabled: background #1C1C26, color #54546C, box-shadow none, cursor not-allowed. Danger: background #FF3D5A, box-shadow 0 6px 24px rgba(255,61,90,0.3). Loading spinner 18x18px 2px border spin. Active press scale(0.96) 100ms. flex-shrink: 0 always. box-shadow transition 200ms.",
+      "reqIds": [
+        "REQ-180"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-toast-tsx-for-full-responsive-polish-each-toast-backdrop-filter-blur-24px-type-based-icon-in-24px-circle-iconcheck-00d97a-success-iconx-ff3d5a-error-iconbell-5b7fff-info-iconflash-f2d06b-sms-text-inter-500-13px-f4f4f8-enter-slidedown-300ms-exit-slideup-200ms-gap-8px-max-4-toasts-oldest-removed-on-mobile-container-top-72px-left-16px-right-16px-max-width-430px-on-desktop-768px-container-right-aligned-24px-from-right-edge-max-width-360px-toast-border-radius-16px-padding-16px-20px-auto-dismiss-after-duration-3500ms",
+      "title": "Rewrite frontend/src/components/Toast.tsx for full responsive polish: each toast backdrop-filter blur(24px), type-based icon in 24px circle (IconCheck #00D97A success, IconX #FF3D5A error, IconBell #5B7FFF info, IconFlash #F2D06B sms), text Inter 500 13px #F4F4F8, enter slideDown 300ms exit slideUp 200ms, gap 8px, max 4 toasts (oldest removed). On mobile: container top 72px left 16px right 16px max-width 430px. On desktop >= 768px: container right-aligned 24px from right edge, max-width 360px, toast border-radius 16px, padding 16px 20px. Auto-dismiss after duration ?? 3500ms.",
+      "reqIds": [
+        "REQ-181"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-bottomsheet-tsx-for-full-responsive-polish-on-mobile-bottom-anchored-border-radius-24px-24px-0-0-max-height-calc-100dvh-64px-env-safe-area-inset-bottom-0px-slideup-250ms-animation-on-desktop-768px-renders-as-centered-modal-position-fixed-top-50-left-50-transform-translate-50-50-max-width-560px-border-radius-24px-all-corners-max-height-85vh-enter-animation-scalein-instead-of-slideup-overlay-rgba-5-5-7-0-85-blur-4px-content-scrollable-footer-sticky-drag-handle-on-mobile-only",
+      "title": "Rewrite frontend/src/components/BottomSheet.tsx for full responsive polish: on mobile, bottom-anchored, border-radius 24px 24px 0 0, max-height calc(100dvh - 64px - env(safe-area-inset-bottom,0px)), slideUp 250ms animation. On desktop >= 768px: renders as centered modal — position fixed, top 50%, left 50%, transform translate(-50%,-50%), max-width 560px, border-radius 24px all corners, max-height 85vh, enter animation scaleIn instead of slideUp. Overlay rgba(5,5,7,0.85) blur(4px). Content scrollable, footer sticky. Drag handle on mobile only.",
+      "reqIds": [
+        "REQ-182"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-notifspanel-tsx-for-full-responsive-polish-notification-items-stagger-fadein-30ms-per-index-each-type-has-distinct-icon-nouvelle-demande-iconbell-paiement-confirme-iconwallet-fonds-liberes-iconbank-booking-confirme-iconcalendar-avis-recu-iconstar-in-correctly-colored-36px-circles-panel-header-count-chip-inter-700-11px-050507-on-f2d06b-border-radius-999px-padding-2px-7px-panel-entrance-slideup-300ms-cubic-bezier-0-32-0-72-0-1-on-mobile-full-width-slide-in-from-right-width-100-max-width-430px-on-desktop-900px-right-side-drawer-max-width-400px-semi-transparent-left-border-1px-solid-rgba-255-255-255-0-08-thin-2e2e3e-bar-on-left-edge-as-swipe-hint",
+      "title": "Rewrite frontend/src/components/NotifsPanel.tsx for full responsive polish: notification items stagger fadeIn 30ms per index. Each type has distinct icon (nouvelle_demande IconBell, paiement_confirme IconWallet, fonds_liberes IconBank, booking_confirme IconCalendar, avis_recu IconStar) in correctly colored 36px circles. Panel header: count chip Inter 700 11px #050507 on #F2D06B border-radius 999px padding 2px 7px. Panel entrance: slideUp 300ms cubic-bezier(0.32,0.72,0,1). On mobile: full-width slide-in from right, width 100%, max-width 430px. On desktop >= 900px: right-side drawer, max-width 400px, semi-transparent left border 1px solid rgba(255,255,255,0.08). Thin #2E2E3E bar on left edge as swipe hint.",
+      "reqIds": [
+        "REQ-183"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-screens-auth-loginscreen-tsx-to-eliminate-the-infinite-loop-the-se-connecter-button-must-call-go-role-directly-after-a-brief-loading-state-no-canister-dependency-no-async-block-that-re-renders-indefinitely-the-button-must-always-be-clickable-never-disabled-by-default-and-the-loading-state-must-auto-clear-after-800ms-if-internet-identity-is-unavailable-the-screen-must-never-redirect-back-to-itself",
+      "title": "Rewrite frontend/src/screens/auth/LoginScreen.tsx to eliminate the infinite loop: the 'SE CONNECTER' button must call go('role') directly after a brief loading state (no canister dependency, no async block that re-renders indefinitely). The button must always be clickable, never disabled by default, and the loading state must auto-clear after 800ms if Internet Identity is unavailable. The screen must never redirect back to itself.",
+      "reqIds": [
+        "REQ-184"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-state-useappstate-ts-to-guarantee-1-initialstate-screen-is-always-login-never-otp-or-any-other-value-2-initialstate-role-is-always-null-3-the-go-function-has-no-conditional-guards-it-always-sets-state-screen-to-the-target-value-unconditionally-4-all-fields-introduced-in-prior-requirements-userlat-userlng-locationactive-bookingcreneau-bookingadresse-bookingville-bookingphone-bookingnote-bookingid-modalopen-serviceeditoropen-editingservice-adminauthenticated-are-present-with-correct-defaults-null-false-5-showtoast-auto-removes-after-duration-and-enforces-a-max-of-4-toasts-oldest-removed-first",
+      "title": "Rewrite frontend/src/state/useAppState.ts to guarantee: (1) initialState.screen is always 'login', never 'otp' or any other value; (2) initialState.role is always null; (3) the go() function has no conditional guards — it always sets state.screen to the target value unconditionally; (4) all fields introduced in prior requirements (userLat, userLng, locationActive, bookingCreneau, bookingAdresse, bookingVille, bookingPhone, bookingNote, bookingId, modalOpen, serviceEditorOpen, editingService, adminAuthenticated) are present with correct defaults (null/false); (5) showToast auto-removes after duration and enforces a max of 4 toasts (oldest removed first).",
+      "reqIds": [
+        "REQ-185"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-app-tsx-with-a-complete-production-ready-router-1-outer-wrapper-position-fixed-inset-0-background-050507-overflow-hidden-2-on-mobile-899px-inner-container-max-width-430px-width-100-height-100-margin-0-auto-display-flex-flex-direction-column-overflow-hidden-position-relative-3-on-desktop-900px-inner-container-max-width-1100px-two-column-css-grid-sidebar-220px-left-main-content-right-4-renderscreen-switch-covers-all-28-cases-with-zero-fallthrough-login-role-otp-explorer-fiche-pro-booking-1-booking-2-booking-3-booking-4-booking-5-live-status-client-reservations-client-alertes-client-profil-pro-dashboard-pro-radar-pro-wallet-pro-business-pro-subscription-pro-success-admin-login-admin-dashboard-admin-pros-admin-bookings-admin-revenus-default-falls-back-to-loginscreen-5-screen-container-uses-key-state-screen-with-fadein-200ms-opacity-animation-on-each-navigation-6-sidebar-desktop-only-renders-role-appropriate-vertical-nav-items-56px-height-each-matching-the-current-role-7-bottom-tab-bars-hidden-on-desktop-via-display-none-at-900px-8-toast-and-notifspanel-rendered-as-overlays-9-all-screens-receive-go-state-update-showtoast-removetoast-props",
+      "title": "Rewrite frontend/src/App.tsx with a complete, production-ready router: (1) outer wrapper position fixed inset-0 background #050507 overflow hidden; (2) on mobile (<= 899px) inner container max-width 430px width 100% height 100% margin 0 auto display flex flex-direction column overflow hidden position relative; (3) on desktop (>= 900px) inner container max-width 1100px two-column CSS grid — sidebar 220px left, main content right; (4) renderScreen() switch covers all 28 cases with zero fallthrough: login, role, otp, explorer, fiche_pro, booking_1, booking_2, booking_3, booking_4, booking_5, live_status, client_reservations, client_alertes, client_profil, pro_dashboard, pro_radar, pro_wallet, pro_business, pro_subscription, pro_success, admin_login, admin_dashboard, admin_pros, admin_bookings, admin_revenus — default falls back to LoginScreen; (5) screen container uses key={state.screen} with fadeIn 200ms opacity animation on each navigation; (6) sidebar (desktop only) renders role-appropriate vertical nav items (56px height each) matching the current role; (7) bottom tab bars hidden on desktop via display:none at >=900px; (8) Toast and NotifsPanel rendered as overlays; (9) all screens receive go, state, update, showToast, removeToast props.",
+      "reqIds": [
+        "REQ-186"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-audit-and-fix-the-root-layout-of-every-screen-to-ensure-all-content-is-visible-without-hidden-overflow-on-both-mobile-and-desktop-rules-for-every-screen-1-root-element-must-be-position-fixed-inset-0-display-flex-flex-direction-column-never-a-fixed-px-height-2-header-is-position-absolute-top-0-left-0-right-0-height-56px-z-index-100-3-scroll-zone-is-flex-1-overflow-y-auto-webkit-overflow-scrolling-touch-overscroll-behavior-contain-padding-top-72px-never-overflow-hidden-never-fixed-height-4-tab-bar-and-cta-zone-are-flex-shrink-0-in-natural-flex-flow-never-position-fixed-5-no-black-empty-space-anywhere-apply-to-loginscreen-rolescreen-otpscreen-explorerscreen-ficheproscreen-booking1-5-livestatusscreen-reservationsscreen-alertesscreen-clientprofilscreen-prodashboardscreen-proradarscreen-prowalletscreen-probusinessscreen-subscriptionmodal-successscreen-adminloginscreen-admindashboardscreen-adminprosscreen-adminbookingsscreen-adminrevenusscreen",
+      "title": "Audit and fix the root layout of every screen to ensure all content is visible without hidden overflow on both mobile and desktop. Rules for every screen: (1) root element must be position fixed inset-0, display flex, flex-direction column — never a fixed px height; (2) header is position absolute top-0 left-0 right-0 height 56px z-index 100; (3) scroll zone is flex-1 overflow-y auto -webkit-overflow-scrolling touch overscroll-behavior contain padding-top 72px — never overflow hidden, never fixed height; (4) tab bar and CTA zone are flex-shrink-0 in natural flex flow — never position fixed; (5) no black empty space anywhere. Apply to: LoginScreen, RoleScreen, OTPScreen, ExplorerScreen, FicheProScreen, Booking1–5, LiveStatusScreen, ReservationsScreen, AlertesScreen, ClientProfilScreen, ProDashboardScreen, ProRadarScreen, ProWalletScreen, ProBusinessScreen, SubscriptionModal, SuccessScreen, AdminLoginScreen, AdminDashboardScreen, AdminProsScreen, AdminBookingsScreen, AdminRevenusScreen.",
+      "reqIds": [
+        "REQ-187"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-otp-authentication-flow-to-eliminate-infinite-loops-and-blocked-navigation-1-otpscreen-has-a-role-guard-at-the-very-top-if-state-role-is-null-call-go-role-and-return-null-immediately-2-the-send-code-button-uses-the-twilio-ts-stub-accepts-any-4-digit-code-it-must-never-block-on-a-real-network-call-3-on-entering-all-4-digits-verifyotp-is-called-locally-any-4-digit-code-is-accepted-in-demo-mode-4-on-success-if-role-client-call-go-explorer-if-role-pro-call-go-pro-dashboard-if-role-admin-call-go-admin-dashboard-5-the-phone-number-input-with-41-prefix-is-pre-filled-and-the-step-to-enter-code-auto-advances-without-requiring-a-real-sms-6-resend-countdown-is-60-seconds-using-setinterval",
+      "title": "Fix the OTP authentication flow to eliminate infinite loops and blocked navigation: (1) OTPScreen has a role guard at the very top — if state.role is null, call go('role') and return null immediately; (2) the 'Send code' button uses the twilio.ts stub (accepts any 4-digit code) — it must never block on a real network call; (3) on entering all 4 digits, verifyOTP() is called locally — any 4-digit code is accepted in demo mode; (4) on success: if role==='client' call go('explorer'), if role==='pro' call go('pro_dashboard'), if role==='admin' call go('admin_dashboard'); (5) the phone number input with +41 prefix is pre-filled and the step to enter code auto-advances without requiring a real SMS; (6) resend countdown is 60 seconds using setInterval.",
+      "reqIds": [
+        "REQ-189"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-all-buttons-across-the-entire-application-every-button-must-have-a-functional-onclick-handler-no-button-may-be-permanently-disabled-without-a-visible-reason-all-gold-gradient-cta-buttons-must-be-visible-and-tappable-specifically-1-every-btnprimary-instance-has-an-onclick-that-performs-a-visible-action-2-disabled-state-only-applied-when-an-explicit-condition-is-not-met-e-g-no-service-selected-no-address-entered-with-a-visual-explanation-3-no-button-renders-with-opacity-0-or-visibility-hidden-4-active-press-state-scale-0-96-applies-on-all-buttons",
+      "title": "Fix all buttons across the entire application: every button must have a functional onClick handler, no button may be permanently disabled without a visible reason, all gold gradient CTA buttons must be visible and tappable. Specifically: (1) every BtnPrimary instance has an onClick that performs a visible action; (2) disabled state only applied when an explicit condition is not met (e.g. no service selected, no address entered) with a visual explanation; (3) no button renders with opacity 0 or visibility hidden; (4) active press state scale(0.96) applies on all buttons.",
+      "reqIds": [
+        "REQ-190"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-all-form-inputs-across-the-entire-application-every-input-and-textarea-must-be-fully-controlled-with-value-and-onchange-props-every-input-must-have-a-visible-label-above-it-placeholder-text-must-be-informative-real-time-validation-with-error-messages-in-ff3d5a-below-the-field-font-size-minimum-16px-on-all-inputs-and-textareas-to-prevent-ios-zoom-height-52px-on-all-inputs",
+      "title": "Fix all form inputs across the entire application: every input and textarea must be fully controlled with value and onChange props, every input must have a visible label above it, placeholder text must be informative, real-time validation with error messages in #FF3D5A below the field, font-size minimum 16px on all inputs and textareas to prevent iOS zoom, height 52px on all inputs.",
+      "reqIds": [
+        "REQ-191"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-all-images-across-the-application-every-img-tag-must-have-onerror-e-e-currenttarget-onerror-null-e-currenttarget-style-display-none-and-a-sibling-gradient-fallback-div-that-is-always-rendered-behind-the-image-using-position-absolute-inset-0-linear-gradient-background-every-image-must-have-loading-lazy-and-object-fit-cover-this-applies-to-explorerscreen-cards-ficheproscreen-cover-and-gallery-tabgalerie-previews-and-any-other-img-tags",
+      "title": "Fix all images across the application: every img tag must have onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.style.display = 'none'; }} AND a sibling gradient fallback div that is always rendered behind the image (using position absolute, inset 0, linear-gradient background). Every image must have loading='lazy' and object-fit='cover'. This applies to ExplorerScreen cards, FicheProScreen cover and gallery, TabGalerie previews, and any other img tags.",
+      "reqIds": [
+        "REQ-192"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-demo-data-is-always-visible-on-every-screen-no-screen-ever-shows-an-empty-state-as-its-only-content-on-first-load-specifically-explorerscreen-always-shows-the-6-pros-demo-entries-on-mount-before-any-canister-call-proradarscreen-always-shows-2-demo-booking-requests-prowalletscreen-always-shows-balance-240-chf-escrow-55-chf-5-demo-transactions-and-7-bar-chart-reservationsscreen-always-shows-3-demo-upcoming-bookings-alertesscreen-always-shows-4-demo-notifications-3-unread-admindashboardscreen-always-shows-demo-kpis-8-pros-47-clients-156-chf-revenue-24-transactions-3-pending-pros-5-recent-bookings-adminprosscreen-always-shows-demo-pros-list-adminbookingsscreen-always-shows-demo-bookings-adminrevenusscreen-always-shows-demo-revenue-data-all-canister-calls-are-wrapped-in-try-catch-on-error-or-empty-result-demo-data-is-used",
+      "title": "Ensure demo data is always visible on every screen — no screen ever shows an empty state as its only content on first load. Specifically: ExplorerScreen always shows the 6 PROS_DEMO entries on mount (before any canister call); ProRadarScreen always shows 2 demo booking requests; ProWalletScreen always shows balance 240 CHF, escrow 55 CHF, 5 demo transactions, and 7-bar chart; ReservationsScreen always shows 3 demo upcoming bookings; AlertesScreen always shows 4 demo notifications (3 unread); AdminDashboardScreen always shows demo KPIs (8 pros, 47 clients, 156 CHF revenue, 24 transactions), 3 pending pros, 5 recent bookings; AdminProsScreen always shows demo pros list; AdminBookingsScreen always shows demo bookings; AdminRevenusScreen always shows demo revenue data. All canister calls are wrapped in try/catch — on error or empty result, demo data is used.",
+      "reqIds": [
+        "REQ-193"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-all-navigation-inconsistencies-1-every-screen-that-has-a-back-arrow-must-call-go-with-the-correct-previous-screen-no-dead-end-screens-2-the-nexus-logo-on-the-header-is-always-clickable-and-navigates-to-the-role-appropriate-home-screen-explorer-for-client-pro-dashboard-for-pro-admin-dashboard-for-admin-3-the-role-switch-pill-in-explorerscreen-labeled-pro-calls-go-pro-dashboard-and-in-prodashboardscreen-the-client-switch-pill-calls-go-explorer-4-all-4-tabs-in-tabbarclient-navigate-explorer-go-explorer-reservations-go-client-reservations-alertes-go-client-alertes-profil-go-client-profil-5-all-4-tabbarpro-tabs-navigate-radar-go-pro-radar-wallet-go-pro-wallet-dashboard-go-pro-dashboard-business-go-pro-business-6-all-4-tabbaradmin-tabs-navigate-dashboard-go-admin-dashboard-pros-go-admin-pros-bookings-go-admin-bookings-revenus-go-admin-revenus",
+      "title": "Fix all navigation inconsistencies: (1) every screen that has a back arrow must call go() with the correct previous screen — no dead-end screens; (2) the NEXUS logo on the Header is always clickable and navigates to the role-appropriate home screen (explorer for client, pro_dashboard for pro, admin_dashboard for admin); (3) the role-switch pill in ExplorerScreen (labeled 'Pro') calls go('pro_dashboard'), and in ProDashboardScreen the client switch pill calls go('explorer'); (4) all 4 tabs in TabBarClient navigate: explorer → go('explorer'), reservations → go('client_reservations'), alertes → go('client_alertes'), profil → go('client_profil'); (5) all 4 TabBarPro tabs navigate: radar → go('pro_radar'), wallet → go('pro_wallet'), dashboard → go('pro_dashboard'), business → go('pro_business'); (6) all 4 TabBarAdmin tabs navigate: dashboard → go('admin_dashboard'), pros → go('admin_pros'), bookings → go('admin_bookings'), revenus → go('admin_revenus').",
+      "reqIds": [
+        "REQ-194"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-complete-5-step-booking-flow-end-to-end-1-booking1screen-services-from-state-selectedpro-services-or-5-category-defaults-if-empty-selecting-a-service-calls-update-selectedservice-continue-active-only-when-service-selected-calls-go-booking-2-2-booking2screen-4-fixed-time-slots-in-1-hour-in-2-hours-this-evening-tomorrow-morning-selecting-calls-update-bookingcreneau-slot-continue-calls-go-booking-3-3-booking3screen-phone-optional-validates-41-0-9-9-or-empty-address-required-city-dropdown-12-cities-required-note-optional-continue-active-only-when-address-and-city-valid-calls-update-bookingadresse-bookingville-bookingphone-bookingnote-then-go-booking-4-4-booking4screen-displays-full-recap-service-name-duration-slot-address-city-total-price-in-inter-800-28px-f2d06b-cta-confirm-and-pay-via-twint-on-click-calls-update-bookingid-demo-date-now-showtoast-booking-request-sent-success-go-booking-5-5-booking5screen-animated-svg-hourglass-30-min-countdown-after-exactly-8-seconds-calls-go-live-status-and-showtoast-booking-confirmed-success",
+      "title": "Fix the complete 5-step booking flow end-to-end: (1) Booking1Screen: services from state.selectedPro.services or 5 category defaults if empty, selecting a service calls update({ selectedService }), Continue active only when service selected, calls go('booking_2'); (2) Booking2Screen: 4 fixed time slots ('In 1 hour', 'In 2 hours', 'This evening', 'Tomorrow morning'), selecting calls update({ bookingCreneau: slot }), Continue calls go('booking_3'); (3) Booking3Screen: phone (optional, validates /^\\+41[0-9]{9}$/ or empty), address (required), city dropdown 12 cities (required), note optional; Continue active only when address and city valid, calls update({ bookingAdresse, bookingVille, bookingPhone, bookingNote }) then go('booking_4'); (4) Booking4Screen: displays full recap (service name, duration, slot, address, city, total price in Inter 800 28px #F2D06B), CTA 'Confirm and pay via TWINT' — on click calls update({ bookingId: 'demo_' + Date.now() }), showToast('Booking request sent', 'success'), go('booking_5'); (5) Booking5Screen: animated SVG hourglass, 30-min countdown, after exactly 8 seconds calls go('live_status') and showToast('Booking confirmed', 'success').",
+      "reqIds": [
+        "REQ-195"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-probusinessscreen-and-all-5-tabs-to-work-fully-without-any-canister-dependency-1-probusinessscreen-layout-position-fixed-inset-0-flex-column-header-absolute-56px-z-100-tab-zone-flex-shrink-0-padding-top-72px-scroll-zone-flex-1-overflow-y-auto-cta-zone-flex-shrink-0-tabbarpro-flex-shrink-0-zero-black-empty-space-2-tab-pills-profile-services-schedule-payment-gallery-all-clickable-with-correct-active-styling-and-completion-micro-dots-3-progresscircle-and-5-segment-bar-update-based-on-filled-fields-4-save-and-continue-button-on-tabs-1-4-shows-spinner-600ms-then-advances-tab-and-shows-showtoast-information-saved-success-5-tab-5-gallery-activate-my-profile-button-active-when-photo-count-3-calls-update-modalopen-true-disabled-with-profile-incomplete-x-text-when-80-completion-6-subscriptionmodal-renders-as-bottom-overlay-when-state-modalopen-is-true-7-subscriptionmodal-start-for-free-button-if-vite-payrexx-secret-undefined-calls-update-proactif-true-then-go-pro-success",
+      "title": "Fix ProBusinessScreen and all 5 tabs to work fully without any canister dependency: (1) ProBusinessScreen layout: position fixed inset-0, flex column, header absolute 56px z-100, tab zone flex-shrink-0 padding-top 72px, scroll zone flex-1 overflow-y auto, CTA zone flex-shrink-0, TabBarPro flex-shrink-0 — zero black empty space; (2) tab pills Profile/Services/Schedule/Payment/Gallery all clickable with correct active styling and completion micro-dots; (3) ProgressCircle and 5-segment bar update based on filled fields; (4) 'Save and continue' button on tabs 1–4 shows spinner 600ms then advances tab and shows showToast('Information saved', 'success'); (5) Tab 5 Gallery: 'Activate my profile' button active when photo count >= 3, calls update({ modalOpen: true }); disabled with 'Profile incomplete X%' text when < 80% completion; (6) SubscriptionModal renders as bottom overlay when state.modalOpen is true; (7) SubscriptionModal 'Start for free' button: if VITE_PAYREXX_SECRET undefined, calls update({ proActif: true }) then go('pro_success').",
+      "reqIds": [
+        "REQ-196"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-adminloginscreen-to-use-local-credential-check-only-email-admin-nexus-ch-password-admin2024-on-match-calls-update-adminauthenticated-true-then-go-admin-dashboard-on-mismatch-calls-showtoast-incorrect-credentials-error-both-inputs-are-fully-controlled-with-onchange-the-sign-in-button-background-is-ff3d5a-no-canister-call-the-screen-background-is-050507-with-vertically-centered-content",
+      "title": "Fix the AdminLoginScreen to use local credential check only: email 'admin@nexus.ch' password 'Admin2024!' — on match calls update({ adminAuthenticated: true }) then go('admin_dashboard'), on mismatch calls showToast('Incorrect credentials', 'error'). Both inputs are fully controlled with onChange. The Sign in button background is #FF3D5A. No canister call. The screen background is #050507 with vertically centered content.",
+      "reqIds": [
+        "REQ-197"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enforce-global-visual-consistency-across-every-screen-and-component-1-all-text-on-gold-f2d06b-backgrounds-uses-color-050507-no-exceptions-2-all-primary-text-on-dark-backgrounds-uses-f4f4f8-3-secondary-text-uses-9898b4-4-inactive-placeholder-text-uses-54546c-5-card-backgrounds-use-0d0d13-or-121219-never-000000-6-all-card-border-radius-buttons-14px-cards-16-18px-pills-999px-inputs-12px-modals-24px-7-all-input-heights-52px-8-all-cta-button-heights-56px-9-all-horizontal-section-padding-20px-10-all-element-spacing-in-multiples-of-8px-11-zero-emoji-in-any-user-facing-string-or-jsx-text-anywhere-in-the-codebase",
+      "title": "Enforce global visual consistency across every screen and component: (1) all text on gold (#F2D06B) backgrounds uses color #050507 — no exceptions; (2) all primary text on dark backgrounds uses #F4F4F8; (3) secondary text uses #9898B4; (4) inactive/placeholder text uses #54546C; (5) card backgrounds use #0D0D13 or #121219 — never #000000; (6) all card border-radius: buttons 14px, cards 16–18px, pills 999px, inputs 12px, modals 24px; (7) all input heights 52px; (8) all CTA button heights 56px; (9) all horizontal section padding 20px; (10) all element spacing in multiples of 8px; (11) zero emoji in any user-facing string or JSX text anywhere in the codebase.",
+      "reqIds": [
+        "REQ-198"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-desktop-sidebar-in-app-tsx-renders-the-correct-vertical-navigation-items-based-on-the-current-role-1-for-role-client-4-items-matching-tabbarclient-explorer-with-iconsearch-reservations-with-iconcalendar-alertes-with-iconbell-profil-with-iconuser-each-calling-the-correct-go-on-click-2-for-role-pro-4-items-matching-tabbarpro-radar-with-iconradar-wallet-with-iconwallet-home-with-iconhome-business-with-iconedit-3-for-role-admin-4-items-matching-tabbaradmin-dashboard-with-icongrid-pros-with-iconuser-bookings-with-iconcalendar-revenue-with-iconwallet-using-ff3d5a-active-color-4-sidebar-nav-items-are-56px-height-inter-600-14px-gold-f2d06b-when-active-5-sidebar-only-renders-on-desktop-900px-hidden-on-mobile-6-sidebar-background-rgba-5-5-7-0-97-border-right-1px-solid-rgba-255-255-255-0-04",
+      "title": "Ensure the desktop sidebar in App.tsx renders the correct vertical navigation items based on the current role: (1) for role='client': 4 items matching TabBarClient (Explorer with IconSearch, Reservations with IconCalendar, Alertes with IconBell, Profil with IconUser), each calling the correct go() on click; (2) for role='pro': 4 items matching TabBarPro (Radar with IconRadar, Wallet with IconWallet, Home with IconHome, Business with IconEdit); (3) for role='admin': 4 items matching TabBarAdmin (Dashboard with IconGrid, Pros with IconUser, Bookings with IconCalendar, Revenue with IconWallet) using #FF3D5A active color; (4) sidebar nav items are 56px height, Inter 600 14px, gold (#F2D06B) when active; (5) sidebar only renders on desktop >= 900px — hidden on mobile; (6) sidebar background rgba(5,5,7,0.97), border-right 1px solid rgba(255,255,255,0.04).",
+      "reqIds": [
+        "REQ-199"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-header-tsx-with-complete-functionality-position-absolute-top-0-left-0-right-0-height-56px-mobile-64px-desktop-900px-background-rgba-5-5-7-0-97-backdrop-filter-blur-32px-border-bottom-1px-solid-rgba-255-255-255-0-04-z-index-100-left-if-showback-40px-circle-button-background-0d0d13-border-rgba-255-255-255-0-08-with-iconarrowleft-18px-f4f4f8-onclick-onback-else-nexus-inter-900-22px-f4f4f8-in-5b7fff-letter-spacing-0-05em-onclick-onlogoclick-center-title-inter-700-16px-f4f4f8-with-fadein-300ms-right-role-switch-pill-transition-150ms-border-color-notification-bell-40px-circle-badge-scalein-200ms-when-notifscount-0-in-ff3d5a-all-props-showback-onback-title-role-notifscount-onnotifs-onswitchrole-onlogoclick-typed-and-functional",
+      "title": "Rewrite frontend/src/components/Header.tsx with complete functionality: position absolute top-0 left-0 right-0, height 56px (mobile) / 64px (desktop >= 900px), background rgba(5,5,7,0.97), backdrop-filter blur(32px), border-bottom 1px solid rgba(255,255,255,0.04), z-index 100. Left: if showBack — 40px circle button background #0D0D13 border rgba(255,255,255,0.08) with IconArrowLeft 18px #F4F4F8 onClick onBack; else — 'NEXUS' Inter 900 22px #F4F4F8 + '.' in #5B7FFF letter-spacing -0.05em, onClick onLogoClick. Center: title Inter 700 16px #F4F4F8 with fadeIn 300ms. Right: role-switch pill (transition 150ms border-color) + notification bell (40px circle, badge scaleIn 200ms when notifsCount > 0 in #FF3D5A). All props (showBack, onBack, title, role, notifsCount, onNotifs, onSwitchRole, onLogoClick) typed and functional.",
+      "reqIds": [
+        "REQ-200"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-btnprimary-tsx-height-56px-non-small-60px-on-desktop-768px-font-size-15px-mobile-16px-desktop-border-radius-14px-mobile-16px-desktop-gold-gradient-background-with-glow-gold-box-shadow-0-6px-28px-rgba-242-208-107-0-3-disabled-state-background-1c1c26-color-54546c-box-shadow-none-cursor-not-allowed-danger-state-background-ff3d5a-box-shadow-0-6px-24px-rgba-255-61-90-0-3-color-fff-loading-state-18x18px-spinner-border-2px-solid-currentcolor-border-top-color-transparent-animation-spin-0-8s-infinite-active-press-scale-0-96-transition-100ms-flex-shrink-0-always-box-shadow-transition-200ms",
+      "title": "Rewrite frontend/src/components/BtnPrimary.tsx: height 56px (non-small), 60px on desktop >= 768px; font-size 15px (mobile) / 16px (desktop); border-radius 14px (mobile) / 16px (desktop); gold gradient background with glow-gold box-shadow 0 6px 28px rgba(242,208,107,0.3); disabled state background #1C1C26 color #54546C box-shadow none cursor not-allowed; danger state background #FF3D5A box-shadow 0 6px 24px rgba(255,61,90,0.3) color #fff; loading state: 18x18px spinner border 2px solid currentColor border-top-color transparent animation spin 0.8s infinite; active press scale(0.96) transition 100ms; flex-shrink 0 always; box-shadow transition 200ms.",
+      "reqIds": [
+        "REQ-201"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-toast-tsx-container-position-fixed-top-72px-on-mobile-left-16px-right-16px-max-width-430px-on-desktop-768px-right-aligned-24px-from-right-edge-max-width-360px-each-toast-backdrop-filter-blur-24px-background-rgba-9-9-13-0-97-border-1px-solid-rgba-255-255-255-0-06-type-based-icon-in-24px-circle-iconcheck-00d97a-success-iconx-ff3d5a-error-iconbell-5b7fff-info-iconflash-f2d06b-sms-text-inter-500-13px-f4f4f8-enter-slidedown-300ms-exit-slideup-200ms-gap-8px-max-4-toasts-oldest-removed-auto-dismiss-after-duration-3500ms-on-desktop-border-radius-16px-padding-16px-20px",
+      "title": "Rewrite frontend/src/components/Toast.tsx: container position fixed top 72px, on mobile left 16px right 16px max-width 430px, on desktop >= 768px right-aligned 24px from right edge max-width 360px; each toast backdrop-filter blur(24px) background rgba(9,9,13,0.97) border 1px solid rgba(255,255,255,0.06); type-based icon in 24px circle (IconCheck #00D97A success, IconX #FF3D5A error, IconBell #5B7FFF info, IconFlash #F2D06B sms); text Inter 500 13px #F4F4F8; enter slideDown 300ms exit slideUp 200ms; gap 8px; max 4 toasts (oldest removed); auto-dismiss after duration ?? 3500ms; on desktop border-radius 16px padding 16px 20px.",
+      "reqIds": [
+        "REQ-202"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-bottomsheet-tsx-on-mobile-bottom-anchored-border-radius-24px-24px-0-0-max-height-calc-100dvh-64px-env-safe-area-inset-bottom-0px-slideup-250ms-animation-drag-handle-visible-on-desktop-768px-centered-modal-position-fixed-top-50-left-50-transform-translate-50-50-max-width-560px-border-radius-24px-all-corners-max-height-85vh-enter-animation-scalein-overlay-rgba-5-5-7-0-85-blur-4px-content-scrollable-with-flex-1-overflow-y-auto-footer-slot-sticky-at-bottom-onclick-overlay-calls-onclose-onclick-sheet-stoppropagation",
+      "title": "Rewrite frontend/src/components/BottomSheet.tsx: on mobile, bottom-anchored border-radius 24px 24px 0 0, max-height calc(100dvh - 64px - env(safe-area-inset-bottom,0px)), slideUp 250ms animation, drag handle visible. On desktop >= 768px: centered modal position fixed top 50% left 50% transform translate(-50%,-50%) max-width 560px border-radius 24px all corners max-height 85vh, enter animation scaleIn. Overlay rgba(5,5,7,0.85) blur(4px). Content scrollable with flex-1 overflow-y auto. Footer slot sticky at bottom. onClick overlay calls onClose, onClick sheet stopPropagation.",
+      "reqIds": [
+        "REQ-203"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-tabbarclient-tsx-tabbarpro-tsx-and-tabbaradmin-tsx-on-desktop-900px-hide-entirely-with-display-none-navigation-handled-by-sidebar-on-mobile-full-polish-gold-indicator-line-width-transition-0-24px-200ms-on-mount-active-icon-scale-1-1-150ms-transition-inactive-icons-2e2e3e-active-icons-and-labels-f2d06b-tabbaradmin-uses-ff3d5a-for-active-gradient-top-border-linear-gradient-to-right-transparent-rgba-242-208-107-0-15-transparent-tab-press-scale-0-9-briefly-all-tab-onclick-handlers-call-the-correct-go-navigation-add-aria-label-attributes-to-all-tab-buttons",
+      "title": "Rewrite frontend/src/components/TabBarClient.tsx, TabBarPro.tsx, and TabBarAdmin.tsx: on desktop >= 900px, hide entirely with display:none (navigation handled by sidebar). On mobile, full polish: gold indicator line width transition 0→24px 200ms on mount, active icon scale(1.1) 150ms transition, inactive icons #2E2E3E, active icons and labels #F2D06B (TabBarAdmin uses #FF3D5A for active). Gradient top border linear-gradient(to right, transparent, rgba(242,208,107,0.15), transparent). Tab press scale(0.9) briefly. All tab onClick handlers call the correct go() navigation. Add aria-label attributes to all tab buttons.",
+      "reqIds": [
+        "REQ-204"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-rewrite-frontend-src-components-notifspanel-tsx-on-mobile-full-width-slide-in-from-right-width-100-max-width-430px-on-desktop-900px-right-side-drawer-max-width-400px-semi-transparent-left-border-1px-solid-rgba-255-255-255-0-08-notification-items-stagger-fadein-30ms-per-index-each-type-has-distinct-icon-nouvelle-demande-iconbell-paiement-confirme-iconwallet-fonds-liberes-iconbank-booking-confirme-iconcalendar-avis-recu-iconstar-in-correctly-colored-36px-circles-panel-header-count-chip-inter-700-11px-050507-on-f2d06b-padding-2px-7px-border-radius-999px-entrance-slideup-300ms-cubic-bezier-0-32-0-72-0-1-thin-2e2e3e-bar-on-left-edge-as-swipe-hint",
+      "title": "Rewrite frontend/src/components/NotifsPanel.tsx: on mobile, full-width slide-in from right width 100% max-width 430px. On desktop >= 900px: right-side drawer max-width 400px, semi-transparent left border 1px solid rgba(255,255,255,0.08). Notification items stagger fadeIn 30ms per index. Each type has distinct icon — nouvelle_demande: IconBell, paiement_confirme: IconWallet, fonds_liberes: IconBank, booking_confirme: IconCalendar, avis_recu: IconStar — in correctly colored 36px circles. Panel header: count chip Inter 700 11px #050507 on #F2D06B padding 2px 7px border-radius 999px. Entrance slideUp 300ms cubic-bezier(0.32,0.72,0,1). Thin #2E2E3E bar on left edge as swipe hint.",
+      "reqIds": [
+        "REQ-205"
       ],
       "version": 1
     }
@@ -631,6 +1393,486 @@
       "id": "AR-58",
       "summary": "Fix Explorer client bug: useAppState go('explorer') après OTP client, clientTab:'explorer' par défaut, App.tsx case 'explorer' exact minuscule, ExplorerScreen layout flex column/scroll correct, tab bar dans flux jamais fixed, PROS_DEMO 6 entrées Unsplash toujours visibles, onError images, FicheProScreen accessible depuis tap card avec guard selectedPro null → go('explorer')",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-59",
+      "summary": "CORRECTION FINALE LANCEMENT: Booking 1-5 flow complet (services démo si vide, créneaux fixes, validation, recap, TWINT fallback demo, booking_5 auto→live_status 8s), LiveStatusScreen timeline étape 3 active, ProBusiness 5 tabs 100% fonctionnel avec sauvegarde+toast+navigation auto, SubscriptionModal fallback demo sans Payrexx, ProRadar 2 demandes démo, ProWallet données démo, AdminLogin credentials démo admin@nexus.ch/Admin2024!, AdminDashboard données démo + Valider/Refuser, ExplorerScreen géolocalisation Haversine 25km + badge distance + pill ville dropdown 12 villes. Zéro emoji, zéro écran noir, zéro bouton sans onClick, données démo partout si canister vide. Fichiers: ExplorerScreen, Booking1-5, LiveStatus, ProBusiness+5tabs+ServiceEditor+SubscriptionModal, ProRadar, ProWallet, Admin4screens, useAppState, App.tsx",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-76",
+      "summary": "Rewrite frontend/src/screens/admin/AdminLoginScreen.tsx: demo credentials are email 'admin@nexus.ch' and password 'Admin2024!'. The login button (labeled 'Sign in', background var(--alert)): if credentials match, calls update({ adminAuthenticated: true }) and go('admin_dashboard'); if they do not match, calls showToast('Incorrect credentials', 'error'). Email input and password input (type='password') are fully controlled with onChange. No canister call required — use local credential check only. Zero emoji.",
+      "reqIds": [
+        "REQ-70"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-77",
+      "summary": "Rewrite frontend/src/screens/admin/AdminDashboardScreen.tsx: always show demo KPI data — Active pros: 8, Registered clients: 47, Monthly revenue: 156 CHF, Transactions: 24. 'Pros awaiting validation' section shows 3 demo entries: 'Sarah M. · Coiffure · Lausanne', 'Youssef B. · Barber · Geneva', 'Camille D. · Esthetique · Berne'. 'Approve' button (var(--flash) background, text #050507): removes the pro from the local list and shows showToast('Pro approved', 'success'). 'Refuse' button (var(--alert) background): removes from list and shows showToast('Pro refused', 'error'). 'Recent bookings' section shows 5 demo bookings each with a colored status badge: pending (#F2D06B), confirmed (#5B7FFF), paid (#00D97A), completed (#9898B4), cancelled (#FF3D5A). NEXUS commissions section shows total 24 CHF this month with 5 recent lines. TabBarAdmin has 4 functional tabs: onClick go('admin_dashboard'), go('admin_pros'), go('admin_bookings'), go('admin_revenus'). Header 'NEXUS ADMIN' is clickable and calls go('admin_dashboard'). Logout button calls update({ adminAuthenticated: false }) then go('login'). Zero emoji.",
+      "reqIds": [
+        "REQ-71"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-78",
+      "summary": "Rewrite frontend/src/screens/admin/AdminProsScreen.tsx: pros list is fetched from canister via listPros(); if canister fails, show demo pros. Filter pills (All, Active, Pending, city pills) are clickable and filter the displayed list. Each pro row shows initials avatar circle, name, category, city, status badge (active=var(--flash), pending=var(--gold), refused=var(--alert)). Pending rows have inline 'Approve' (var(--flash)) and 'Refuse' (var(--alert)) buttons. All 4 TabBarAdmin tabs are functional with correct go() calls. Header logout button calls update({ adminAuthenticated: false }) then go('login'). Zero emoji.",
+      "reqIds": [
+        "REQ-72"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-79",
+      "summary": "Rewrite frontend/src/screens/admin/AdminBookingsScreen.tsx: bookings list is fetched from canister; if canister fails, show demo bookings. Filter pills (All, Pending, Confirmed, Completed, Cancelled) are clickable and filter the displayed list. Each row shows booking ID (truncated), client name, pro name, service, date, amount in CHF, and a colored status badge. All 4 TabBarAdmin tabs are functional with correct go() calls. Zero emoji.",
+      "reqIds": [
+        "REQ-73"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-80",
+      "summary": "Rewrite frontend/src/screens/admin/AdminRevenusScreen.tsx: total commissions summary card shows demo data. Revenue bar chart has 7 animated bars for the last 7 months with month abbreviation labels; bars animate height from 0 on mount. NEXUS transaction list shows demo entries. All 4 TabBarAdmin tabs are functional with correct go() calls. Zero emoji.",
+      "reqIds": [
+        "REQ-74"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-81",
+      "summary": "Version améliorée et peaufinée du site NEXUS : polish général UX/UI, animations plus fluides, micro-interactions, cohérence visuelle complète, corrections de tous les écrans existants, données démo enrichies, navigation sans friction",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-89",
+      "summary": "Rewrite frontend/src/screens/client/LiveStatusScreen.tsx with enhanced polish: the countdown timer uses Inter 900 64px #F2D06B with letter-spacing -0.04em; the SVG timeline is vertical, 5 steps connected by animated dashed lines — each step has a 40px circle (completed: #00D97A filled, active: #F2D06B with breathe animation and outer ring, pending: #1C1C26); step labels are Inter 600 14px, step 3 label 'Expert en route' uses #F2D06B; a live 'LIVE' badge with red dot breathe animation shows in the header area; booking details card (service, pro name, address) uses glass-card style below the timeline.",
+      "reqIds": [
+        "REQ-85"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-90",
+      "summary": "Rewrite frontend/src/screens/client/ReservationsScreen.tsx with enhanced polish: two tabs 'Upcoming' / 'Completed' with active tab underline indicator in #F2D06B; if canister fails or returns empty, show 3 demo bookings in 'Upcoming': (1) Haircut fade · Alexandre Studio Blade · Today 14:00 · confirmed, (2) Facial · Nadia Beauty · Tomorrow 10:30 · pending, (3) Swedish massage · Zen by Marco · Fri 16:00 · confirmed; each booking card uses glass-card style 90px height with service name Inter 700 15px #F4F4F8, pro name Inter 400 13px #9898B4, date/time Inter 500 12px #54546C, and a colored status badge pill; 'Completed' tab shows 2 demo entries with 'completed' status badges.",
+      "reqIds": [
+        "REQ-86"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-91",
+      "summary": "Rewrite frontend/src/screens/client/AlertesScreen.tsx with enhanced polish: notification items use glass-card style with 16px border-radius; unread items have a left border 3px #F2D06B and background rgba(242,208,107,0.03); notification icon circles (36px) use type-based colors matching NotifsPanel; if canister fails or returns empty, show 4 demo notifications: (1) type=booking_confirme 'Your Haircut with Alexandre has been confirmed' unread, (2) type=paiement_confirme 'Payment of 45 CHF received' read, (3) type=fonds_liberes 'Funds released: 44 CHF transferred' read, (4) type=nouvelle_demande 'New review received: 5 stars' read; mark-all-read button in #F2D06B top-right.",
+      "reqIds": [
+        "REQ-87"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-92",
+      "summary": "Rewrite frontend/src/screens/client/ClientProfilScreen.tsx with enhanced polish: avatar circle 80px uses user initials (first+last name) in Inter 700 28px #F2D06B on background #1C1C26 with a 2px gold border; user name Inter 700 20px #F4F4F8, phone and email Inter 400 14px #9898B4; editable fields use glass-card sections with inline edit toggle (pencil icon to enable, check to save); payment history section shows 3 demo entries (Payment 45 CHF, Payment 70 CHF, Refund -20 CHF) using transaction rows with color-coded amounts; logout button uses BtnPrimary danger style (background #FF3D5A) and calls logout() from actor.ts then go('login').",
+      "reqIds": [
+        "REQ-88"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-94",
+      "summary": "Rewrite frontend/src/screens/pro/ProRadarScreen.tsx with enhanced polish: each pending booking request card uses glass-card style with border-radius 20px, padding 20px; service name Inter 700 16px #F4F4F8, amount in Inter 700 18px #F2D06B; client name + address in Inter 400 13px #9898B4; countdown timer Inter 800 24px, normal color #F4F4F8, switches to #FF3D5A with breathe animation when < 2 minutes; card slides out leftward (translateX -100% opacity 0 transition 300ms) on Decline and rightward (translateX 100%) on Accept; if all cards accepted/declined, show empty state 'No pending requests' Inter 500 14px #54546C; demo bookings always shown when canister is empty.",
+      "reqIds": [
+        "REQ-90"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-95",
+      "summary": "Rewrite frontend/src/screens/pro/ProWalletScreen.tsx with enhanced polish: balance card has a shimmer gradient animation using the shimmer keyframe, Inter 900 56px #F4F4F8 for the balance amount, a subtle gradient background (linear-gradient 135deg #0D0D13 #121219); escrow line uses a lock icon (IconLock size 14 #9898B4) before the text; revenue bar chart section title 'This week' Inter 700 16px #F4F4F8; bars use border-radius 6px 6px 0 0 and a gradient fill (linear-gradient to top #F2D06B #D4A050); day labels below bars in Inter 500 11px #54546C; transaction rows have a colored amount pill on the right side; balance defaults to state.solde ?? 240 and escrow to state.sequestre ?? 55.",
+      "reqIds": [
+        "REQ-91"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-99",
+      "summary": "Rewrite frontend/src/screens/admin/AdminDashboardScreen.tsx with enhanced polish: KPI cards use glass-card style with a colored icon circle (40px) at top-left — Total pros #5B7FFF, Monthly revenue #00D97A, Transactions #F2D06B, Active clients #9898B4; count-up animation uses 1.2s duration; 'Pros awaiting validation' section title uses Inter 700 16px #F4F4F8 with a count badge in #FF3D5A; each pending pro row uses glass-card style 72px height; 'Recent bookings' rows use alternating backgrounds (#090909 and transparent); status badges are pills with border-radius 999px and correct colors; commissions total uses Inter 800 24px #F2D06B.",
+      "reqIds": [
+        "REQ-95"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-105",
+      "summary": "Rewrite frontend/src/components/pro/tabs/TabProfil.tsx with enhanced polish: section headers use Inter 600 11px #54546C uppercase letter-spacing 0.08em; input fields use background #0D0D13 border 1px solid rgba(255,255,255,0.08) border-radius 14px padding 0 16px height 52px, on focus border-color rgba(242,208,107,0.4) transition 150ms; bio textarea shows character counter bottom-right '0/200' in #9898B4; category cards have a category-specific icon (IconEdit for Barber, IconStar for Coiffure, IconCamera for Esthetique, IconUser for Massage) centered; work location cards are 88px height with rounded 16px corners; city dropdown uses glass-card style.",
+      "reqIds": [
+        "REQ-101"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-106",
+      "summary": "Rewrite frontend/src/screens/pro/tabs/ServiceEditor.tsx with enhanced polish: bottom sheet title shows 'New service' or 'Edit service' based on whether editing; name field shows a validation error message in #FF3D5A Inter 400 12px below the input if submitted empty; price and duration steppers use 44px circular decrement/increment buttons with background #1C1C26 and icon ±; badge pills use border-radius 999px and transition border-color 150ms on select; mode pills use the same pill style; footer has 'Cancel' button background #1C1C26 color #9898B4 flex-1 and 'Save' button gold gradient flex-2; all fields are fully controlled.",
+      "reqIds": [
+        "REQ-102"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-107",
+      "summary": "Peaufinage global UX/UI : adapter toutes les pages et fonctionnalités pour desktop et mobile, améliorer chaque détail visuel, mise en page responsive intelligente, animations plus fluides, micro-interactions soignées sur tous les écrans",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-110",
+      "summary": "Rewrite frontend/src/components/Header.tsx for full responsive behavior: on desktop (>= 900px), increase height to 64px, increase logo Inter size to 26px, increase back button circle to 44px, increase icon sizes to 20px, ensure backdrop-filter blur(32px) is preserved. The header must stretch full width of its container on all breakpoints. Role switch pill and notification bell must remain correctly positioned at all widths. All existing props and functionality must be preserved.",
+      "reqIds": [
+        "REQ-106"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-111",
+      "summary": "Rewrite frontend/src/components/TabBarClient.tsx for responsive behavior: on desktop (>= 900px), hide the bottom tab bar entirely (display: none) — navigation is handled by the sidebar. On mobile, preserve all existing polish (gold indicator, scale animation, gradient top border). Add aria-label attributes to each tab button for accessibility.",
+      "reqIds": [
+        "REQ-107"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-112",
+      "summary": "Rewrite frontend/src/components/TabBarPro.tsx for responsive behavior: on desktop (>= 900px), hide the bottom tab bar entirely — navigation is handled by the sidebar. On mobile, preserve all existing polish. Add aria-label attributes to each tab button.",
+      "reqIds": [
+        "REQ-108"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-113",
+      "summary": "Rewrite frontend/src/components/TabBarAdmin.tsx for responsive behavior: on desktop (>= 900px), hide the bottom tab bar entirely. On mobile, preserve all existing styles and navigation. Add aria-label attributes.",
+      "reqIds": [
+        "REQ-109"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-117",
+      "summary": "Enhance frontend/src/screens/client/ExplorerScreen.tsx for desktop: on viewport >= 900px, 'Available now' cards increase to 200x280px with larger font sizes; 'Experts for you' vertical list uses a 2-column grid; the hero heading increases to Inter 900 52px; the search bar max-width is 700px centered; filter pills have more horizontal spacing (gap 10px); preserve all existing PROS_DEMO data, geolocation Haversine, city dropdown, filter, and navigation logic.",
+      "reqIds": [
+        "REQ-113"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-118",
+      "summary": "Enhance frontend/src/screens/client/FicheProScreen.tsx for desktop: on viewport >= 900px, use a two-column layout (left: cover+avatar+stats+reviews, right: services+gallery+CTA); cover image height increases to 360px; service cards use a 2-column grid on desktop; the sticky CTA zone becomes a fixed right-column bottom button (not a full-width bottom strip); all existing polish, guard for selectedPro, and navigation are preserved.",
+      "reqIds": [
+        "REQ-114"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-119",
+      "summary": "Enhance all 5 booking screens (Booking1Screen through Booking5Screen) for desktop: on viewport >= 768px, the scroll content max-width is 560px centered; service/slot cards use a 2-column grid on Booking1 and Booking2 on desktop; all glass-card padding increases by 4px; the step indicator nodes increase to 20px diameter; the sticky bottom CTA becomes a 560px max-width centered button with more vertical padding. All existing logic, state updates, and navigation preserved.",
+      "reqIds": [
+        "REQ-115"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-120",
+      "summary": "Enhance frontend/src/screens/client/LiveStatusScreen.tsx for desktop: on viewport >= 900px, use a two-column layout (left: countdown + LIVE badge, right: timeline); the countdown font increases to Inter 900 80px; the SVG timeline circles increase to 52px diameter; the booking details card uses full glass-card width on the right column.",
+      "reqIds": [
+        "REQ-116"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-121",
+      "summary": "Enhance frontend/src/screens/client/ReservationsScreen.tsx for desktop: booking cards use a 2-column grid on viewport >= 768px; card height increases to 110px; the tab underline indicator width scales to 40px on desktop. Demo bookings preserved.",
+      "reqIds": [
+        "REQ-117"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-122",
+      "summary": "Enhance frontend/src/screens/client/AlertesScreen.tsx for desktop: notification items use a max-width 680px centered column on viewport >= 768px; unread item left border increases to 4px; notification icon circles increase to 44px on desktop. Demo notifications preserved.",
+      "reqIds": [
+        "REQ-118"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-123",
+      "summary": "Enhance frontend/src/screens/client/ClientProfilScreen.tsx for desktop: on viewport >= 768px, use a two-column layout (left: avatar + name + stats, right: editable fields + payment history); the avatar circle increases to 100px diameter; editable field glass-cards stack in the right column; the logout button is at the bottom of the right column. All existing logic preserved.",
+      "reqIds": [
+        "REQ-119"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-124",
+      "summary": "Enhance frontend/src/screens/pro/ProDashboardScreen.tsx for desktop: on viewport >= 900px, metric cards use a 3-column row with increased card heights (120px); the Flash toggle card and Next appointment card are displayed side-by-side; the greeting section font increases to Inter 800 40px; the scroll content max-width is 800px centered. All existing animations and data preserved.",
+      "reqIds": [
+        "REQ-120"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-125",
+      "summary": "Enhance frontend/src/screens/pro/ProRadarScreen.tsx for desktop: pending booking cards use a 2-column grid on viewport >= 768px; card padding increases to 28px; the 'Radar' title increases to Inter 900 52px on desktop; the Pending/Confirmed/History tabs increase spacing to 32px gap. Demo bookings preserved.",
+      "reqIds": [
+        "REQ-121"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-126",
+      "summary": "Enhance frontend/src/screens/pro/ProWalletScreen.tsx for desktop: on viewport >= 900px, use a two-column layout (left: balance card + transfer button, right: revenue bar chart + transactions); the balance card Inter 900 font increases to 64px; bar chart bars increase in width to 36px with taller max-height (200px); the revenue section title increases to Inter 700 20px. All demo data preserved.",
+      "reqIds": [
+        "REQ-122"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-127",
+      "summary": "Enhance frontend/src/screens/pro/ProBusinessScreen.tsx for desktop: on viewport >= 900px, display the 5 tab pills as a vertical left sidebar (200px) and the active tab content in the right column; ProgressCircle increases to 72px; tab pill text increases to Inter 600 14px; the CTA zone becomes a sticky bottom bar spanning the full right column width. SubscriptionModal overlay is preserved. All existing tab functionality preserved.",
+      "reqIds": [
+        "REQ-123"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-128",
+      "summary": "Enhance frontend/src/screens/pro/tabs/TabProfil.tsx for desktop: on viewport >= 768px, first name and last name inputs display side-by-side in a 2-column row; category 2x2 grid increases card size to 120px height; work location cards display in a 3-column row; city dropdown max-width is 300px. All controlled inputs and validation preserved.",
+      "reqIds": [
+        "REQ-124"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-129",
+      "summary": "Enhance frontend/src/screens/pro/tabs/TabServices.tsx for desktop: service rows use a table-like layout with columns (name, price, duration, status, actions) that display inline at viewport >= 768px instead of stacked; the '+ Add service' button is aligned top-right. All existing service management logic preserved.",
+      "reqIds": [
+        "REQ-125"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-130",
+      "summary": "Enhance frontend/src/screens/pro/tabs/TabTarifs.tsx for desktop: the 7 day pills display in a single full-width row on viewport >= 768px; the Flash mode toggle and supplement stepper display side-by-side; minimum notice pills and cancellation policy pills display in wider rows. All controlled state and onChange preserved.",
+      "reqIds": [
+        "REQ-126"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-131",
+      "summary": "Enhance frontend/src/screens/pro/tabs/TabPaiement.tsx for desktop: TWINT card and IBAN card display side-by-side in a 2-column grid on viewport >= 768px; the financial summary section increases Inter sizes by 2px. All validation logic preserved.",
+      "reqIds": [
+        "REQ-127"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-132",
+      "summary": "Enhance frontend/src/screens/pro/tabs/TabGalerie.tsx for desktop: the 2x2 photo grid becomes a 4-column single row on viewport >= 768px, each slot increasing to 160px height; the mini Explorer preview card increases to 240px width. All FileReader upload logic preserved.",
+      "reqIds": [
+        "REQ-128"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-133",
+      "summary": "Enhance frontend/src/screens/pro/SubscriptionModal.tsx for desktop: on viewport >= 768px, the bottom-anchored sheet increases to max-width 520px centered horizontally (centered modal style instead of full-width sheet); border-radius becomes 28px on all corners; the 5 benefit rows increase to 2 columns at 260px each. All existing CTA logic and fallback preserved.",
+      "reqIds": [
+        "REQ-129"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-134",
+      "summary": "Enhance frontend/src/screens/pro/SuccessScreen.tsx for desktop: on viewport >= 768px, the center block max-width is 480px; confetti particles cover the full viewport width (not clipped to 430px); the animated check circle increases to 120px diameter; title font increases to Inter 800 36px.",
+      "reqIds": [
+        "REQ-130"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-135",
+      "summary": "Enhance all 4 admin screens (AdminDashboardScreen, AdminProsScreen, AdminBookingsScreen, AdminRevenusScreen) for desktop: on viewport >= 900px, KPI cards display in a 4-column row (instead of 2x2); tables use proper column widths with hover row highlight (background rgba(255,255,255,0.02)); bar charts increase bar width to 40px with max-height 200px; all filter pills display in a single non-scrolling row; all existing data, navigation, and tab bar behavior preserved.",
+      "reqIds": [
+        "REQ-131"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-136",
+      "summary": "Enhance frontend/src/components/BtnPrimary.tsx for desktop: on viewport >= 768px, button height increases to 60px (non-small variant); font size increases to 16px; border-radius increases to 16px; the glow-gold shadow intensity slightly increases to 0 8px 32px rgba(242,208,107,0.35). All existing variants (danger, disabled, loading, small) and micro-interactions preserved.",
+      "reqIds": [
+        "REQ-132"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-147",
+      "summary": "Enhance frontend/src/screens/pro/tabs/TabProfil.tsx with deeper visual polish: add smooth reveal animations (slideDown 200ms) when work location sub-fields (slider or address input) appear/disappear on location card selection; the bio textarea auto-expands in height as user types (min-height 100px, max-height 200px, resize none, overflow-y auto); category cards add a category-specific color tint on background when selected (Barber: rgba(91,127,255,0.08), Coiffure: rgba(242,208,107,0.08), Esthetique: rgba(255,61,90,0.08), Massage: rgba(0,217,122,0.08)); the city dropdown uses a styled select with background #0D0D13 and gold chevron icon.",
+      "reqIds": [
+        "REQ-147"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-148",
+      "summary": "Enhance frontend/src/screens/pro/tabs/TabGalerie.tsx with deeper visual polish: empty photo slots pulse with a soft breathe animation on their dashed border (opacity cycles 0.4→1→0.4 over 2s); filled slots add a zoom-on-hover effect (scale 1.04 transition 200ms on the image); the mini Explorer preview card at the bottom adds a 'Preview' label badge (Inter 600 10px #9898B4 uppercase letter-spacing 0.08em) at the top-left corner; add a tips section that collapses/expands with a chevron toggle (default collapsed to save space); the 'Cover' badge on slot 1 uses Inter 700 9px white on background rgba(242,208,107,0.9).",
+      "reqIds": [
+        "REQ-148"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-149",
+      "summary": "Enhance frontend/src/screens/admin/AdminProsScreen.tsx, AdminBookingsScreen.tsx, and AdminRevenusScreen.tsx with deeper visual polish: all three screens add a search input (height 44px, glass-card style, IconSearch #9898B4) below the filter pills that filters the displayed list in real-time as the user types; AdminProsScreen pro rows add a tap-expand detail panel showing phone and email below the row (height 0→auto transition 200ms); AdminRevenusScreen revenue bar chart bars add a tooltip showing the exact amount on hover/press (positioned above the bar, background #0D0D13 border rgba(255,255,255,0.08) Inter 500 12px #F4F4F8 border-radius 8px padding 4px 8px); AdminBookingsScreen rows add a tap-expand showing full booking ID and note if any.",
+      "reqIds": [
+        "REQ-149"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-150",
+      "summary": "Enhance frontend/src/screens/client/LiveStatusScreen.tsx with deeper visual polish: add a live GPS-style animated dot on the map area (a simple SVG pseudo-map placeholder — dark rectangle with grid lines rgba(255,255,255,0.04) and a pulsing gold dot representing the expert's position); the LIVE badge in the header uses a gradient background linear-gradient(135deg, #FF3D5A, rgba(255,61,90,0.7)) with white text and a pulsing dot; the booking details card adds a 'Call expert' button (IconPhone size 16 color #00D97A, label Inter 600 13px #00D97A, background rgba(0,217,122,0.08) border rgba(0,217,122,0.2) border-radius 999px padding 8px 16px) that calls showToast('Calling expert...', 'info') on press.",
+      "reqIds": [
+        "REQ-150"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-151",
+      "summary": "Amélioration globale mise en page mobile et desktop : tout le contenu doit être visible à l'écran sans overflow caché, chaque écran doit s'adapter intelligemment aux deux formats, polish approfondi de chaque détail visuel, micro-interactions, typographie, espacement et navigation sans friction sur tous les écrans",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-161",
+      "summary": "Rewrite frontend/src/screens/client/LiveStatusScreen.tsx for full mobile + desktop polish: root position fixed inset-0 flex flex-col. Header absolute 56px with back arrow. Scroll zone flex-1 overflow-y auto paddingTop 72px. TabBarClient flex-shrink-0 at bottom, no active tab. Countdown Inter 900 64px #F2D06B letter-spacing -0.04em on mobile, 80px on desktop. LIVE badge: gradient background linear-gradient(135deg, #FF3D5A, rgba(255,61,90,0.7)), white text, pulsing dot breathe animation. SVG timeline vertical: 5 steps, 40px circles (completed #00D97A, active #F2D06B with outer ring breathe, pending #1C1C26), animated dashed connecting lines, step labels Inter 600 14px, step 3 'Expert en route' #F2D06B. On desktop >= 900px: two-column layout (left: countdown + LIVE badge, right: timeline + booking details card). Booking details glass-card. Pseudo-map SVG placeholder with grid lines and pulsing gold dot. 'Call expert' button (IconPhone, #00D97A, showToast on press). Polling canister every 30s.",
+      "reqIds": [
+        "REQ-161"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-165",
+      "summary": "Rewrite frontend/src/screens/pro/ProDashboardScreen.tsx for full mobile + desktop polish: root position fixed inset-0 flex flex-col. Header absolute 56px with role='pro', onSwitchRole → go('role'), notifs support. Scroll zone flex-1 overflow-y auto paddingTop 72px. TabBarPro flex-shrink-0 bottom active='dashboard'. Today's date banner Inter 400 13px #54546C at top of scroll zone. Greeting 'Hello [FirstName]' Inter 800 32px #F4F4F8, subtitle 'Welcome back' Inter 400 14px #54546C. Trial badge: 6px pulsing dot #00D97A, 'Free trial active — 7 days left'. Metric cards glass-card with 2px colored top border (bookings #5B7FFF, rating #F2D06B, revenue #00D97A); count-up 1.5s on mount. 'Quick stats' subtitle above cards. Flash toggle card: neon glow border when active, radio-wave ripple CSS animation on dot. Next appointment glass-card with 4px gold left accent, 'View details' → go('pro_radar'). On desktop >= 900px: metric cards 3-column row 120px height, Flash toggle and next appointment side-by-side, greeting Inter 800 40px, scroll content max-width 800px centered.",
+      "reqIds": [
+        "REQ-165"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-166",
+      "summary": "Rewrite frontend/src/screens/pro/ProRadarScreen.tsx for full mobile + desktop polish: root position fixed inset-0 flex flex-col. Scroll zone flex-1 overflow-y auto paddingTop 72px. TabBarPro flex-shrink-0 bottom active='radar'. 'Radar' Inter 900 40px (mobile) / 52px (desktop) with pulsing SVG radar dot animation next to title. Three tabs (Pending / Confirmed / History) with counter badge on Pending tab (red pill). Pending cards glass-card border-radius 20px padding 20px (mobile) / 28px (desktop): service Inter 700 16px, amount Inter 700 18px #F2D06B, client + address Inter 400 13px #9898B4, countdown Inter 800 24px #F4F4F8 (switches to #FF3D5A + breathe at <2min). Priority indicator strip left edge: red <5min, gold <15min. Accept slides card right translateX(100%) opacity 0, Decline slides left translateX(-100%) opacity 0, transition 300ms. On desktop >= 768px: 2-column card grid, tab gap 32px. Demo 2 bookings when canister empty.",
+      "reqIds": [
+        "REQ-166"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-167",
+      "summary": "Rewrite frontend/src/screens/pro/ProWalletScreen.tsx for full mobile + desktop polish: root position fixed inset-0 flex flex-col. Scroll zone flex-1 overflow-y auto paddingTop 72px. TabBarPro flex-shrink-0 bottom active='wallet'. Balance card: shimmer animation, frosted glass border 1px solid rgba(242,208,107,0.12), gold gradient top edge 2px, Inter 900 56px #F4F4F8 for balance, IconLock before escrow text. Escrow animated progress bar (sequestre / (solde+sequestre)) gold fill. Transfer button gold gradient (available) or greyed out (cooldown) with tooltip 'Available in Xh Xmin' on hover. Revenue bars gradient fill #F2D06B→#D4A050, border-radius 6px 6px 0 0, day labels Mon–Sun Inter 500 10px #54546C, animate height from 0 on mount, tooltip on hover showing exact amount. Transaction rows color-coded amount pill, press highlight rgba(255,255,255,0.03). On desktop >= 900px: two-column (left: balance+transfer, right: chart+transactions), balance Inter 900 64px, bar width 36px max-height 200px.",
+      "reqIds": [
+        "REQ-167"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-168",
+      "summary": "Rewrite frontend/src/screens/pro/ProBusinessScreen.tsx for full mobile + desktop polish: root position fixed inset-0 flex flex-col background #050507. Header absolute 56px z-index 100. Tab zone flex-shrink-0 paddingTop 72px padding 0 20px: ProgressCircle 56px (mobile) / 72px (desktop) with glow drop-shadow when >= 80%, title 'My Business' Inter 800 20px #F4F4F8, 5-segment progress bar 4px height. Tab pills Inter 600 13px, active #F2D06B border-bottom 2px #F2D06B, inactive #54546C; each pill has green micro-dot 6px #00D97A when that tab complete. Content zone flex-1 overflow-y auto padding 20px; key prop triggers crossfade opacity 0→1 200ms on tab switch. CTA zone flex-shrink-0 56px button, loading spinner 600ms before advancing tab. TabBarPro flex-shrink-0 bottom active='business'. On desktop >= 900px: 5 tab pills become vertical left sidebar 200px; content in right column; CTA sticky bottom of right column. SubscriptionModal overlay when state.modalOpen.",
+      "reqIds": [
+        "REQ-168"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-169",
+      "summary": "Rewrite frontend/src/screens/pro/tabs/TabProfil.tsx for full mobile + desktop polish: all inputs controlled, 52px height, font-size 16px, background #0D0D13, border 1px solid rgba(255,255,255,0.08), border-radius 14px, focus border rgba(242,208,107,0.4) transition 150ms. Section headers Inter 600 11px #54546C uppercase letter-spacing 0.08em. Bio textarea auto-expands min-height 100px max-height 200px, character counter bottom-right '0/200' in #9898B4. Category 2x2 grid cards with category-specific color tint on selection (Barber rgba(91,127,255,0.08), Coiffure rgba(242,208,107,0.08), Esthetique rgba(255,61,90,0.08), Massage rgba(0,217,122,0.08)) and gold border. Work location cards slideDown reveal animation on sub-field appear. City dropdown: styled select background #0D0D13, gold chevron icon. On desktop >= 768px: first/last name in 2-column row, category cards 120px height, work location 3-column row, city dropdown max-width 300px.",
+      "reqIds": [
+        "REQ-169"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-170",
+      "summary": "Rewrite frontend/src/screens/pro/tabs/TabServices.tsx for full mobile + desktop polish: '+ Add service' button dashed gold border, sets serviceEditorOpen=true. Service list reads from state.proData.services; if empty, pre-populate 5 category defaults. On mobile: each row stacked (name, price, duration, active toggle, edit/delete buttons). On desktop >= 768px: table-like layout with inline columns (name, price CHF, duration min, status toggle, actions) each on one row. Delete shows confirmation. ServiceEditor saves via pushing to state.proData.services and showToast. '+ Add service' button aligned top-right on desktop.",
+      "reqIds": [
+        "REQ-170"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-171",
+      "summary": "Rewrite frontend/src/screens/pro/tabs/ServiceEditor.tsx for full mobile + desktop polish: uses BottomSheet component. Title 'New service' or 'Edit service'. Name field with validation error Inter 400 12px #FF3D5A if submitted empty. Price stepper: 44px circular decrement/increment buttons background #1C1C26. Duration stepper same style. Description textarea. Badge pills border-radius 999px transition 150ms. Mode pills same style. Footer: 'Cancel' background #1C1C26 color #9898B4 flex-1, 'Save' gold gradient flex-2. On desktop >= 768px: BottomSheet renders as centered modal (top 50% left 50% transform translate(-50%,-50%) max-width 560px border-radius 24px max-height 85vh); name field, price stepper, duration stepper in 2-column layout; badge and mode pills use padding 12px 20px.",
+      "reqIds": [
+        "REQ-171"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-172",
+      "summary": "Rewrite frontend/src/screens/pro/tabs/TabTarifs.tsx for full mobile + desktop polish: 7 day pills multi-selectable via toggle; each selected day reveals start/end time inputs with slideDown animation. Flash mode toggle controlled; CHF supplement stepper with +/- buttons revealed when enabled. Minimum notice 5 single-select pills. Cancellation policy 3 single-select pills. On desktop >= 768px: 7 day pills in single full-width row; Flash toggle and supplement stepper side-by-side; notice and policy pills in wider rows with more spacing. All state passed via onChange prop.",
+      "reqIds": [
+        "REQ-172"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-173",
+      "summary": "Rewrite frontend/src/screens/pro/tabs/TabPaiement.tsx for full mobile + desktop polish: TWINT card controlled phone input +41 prefix, real-time Swiss mobile validation, border #00D97A on valid. IBAN card controlled input auto-formats CH XX XXXX XXXX XXXX XXXX X, border #00D97A on valid. Financial summary 4 lines. On desktop >= 768px: TWINT card and IBAN card side-by-side in 2-column grid; financial summary Inter sizes +2px. Gold backgrounds text #050507.",
+      "reqIds": [
+        "REQ-173"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-174",
+      "summary": "Rewrite frontend/src/screens/pro/tabs/TabGalerie.tsx for full mobile + desktop polish: 2x2 grid on mobile; 4-column single row on desktop >= 768px (each slot 160px height). Empty slots pulse breathe animation on dashed border (opacity 0.4→1→0.4 over 2s). Filled slots zoom scale(1.04) on hover/press. Slot 1 has 'Cover' badge Inter 700 9px white on rgba(242,208,107,0.9). Photo counter X/4 with gold progress bar. Warning '3 photos minimum' #alert when count < 3. Tips section collapses/expands with chevron toggle (default collapsed). Mini Explorer preview card 240px desktop, with 'Preview' label badge. FileReader upload logic preserved. 'Activate profile' visible only when count >= 3.",
+      "reqIds": [
+        "REQ-174"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-175",
+      "summary": "Rewrite frontend/src/screens/pro/SubscriptionModal.tsx for full mobile + desktop polish: renders as bottom-anchored overlay on mobile (border-radius 28px 28px 0 0, background #090909) when state.modalOpen is true. On desktop >= 768px: renders as centered modal (max-width 520px, border-radius 28px all corners, centered horizontally, bottom of viewport vertically anchored or centered). Background overlay rgba(5,5,7,0.9) blur(8px). Benefit rows: 28px circle rgba(242,208,107,0.08) with gold SVG checkmark; on desktop 2-column benefit grid at 260px each. '7 DAYS FREE' Inter 900 40px gold-text gradient. CTA full-width 56px. 'TWINT only' with IconTwint. If VITE_PAYREXX_SECRET undefined → update({ proActif: true }) + go('pro_success').",
+      "reqIds": [
+        "REQ-175"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-176",
+      "summary": "Rewrite frontend/src/screens/pro/SuccessScreen.tsx for full mobile + desktop polish: root position fixed inset-0 flex flex-col background var(--void). Progress bar 4px gold gradient at very top (not inside scroll). Center block scaleIn animation on mount, max-width 480px on desktop (centered). Check circle 96px mobile / 120px desktop, border 3px solid #00D97A, background rgba(0,217,122,0.06), SVG checkmark 40px stroke-width 2.5. Title Inter 800 30px #F4F4F8 (36px desktop). Subtitle Inter 400 14px #9898B4. 30 confetti particles across full viewport width (not clipped to 430px), 3 colors #F2D06B #D4A050 rgba(91,127,255,0.8), fall animation random delays. BtnPrimary glow-gold shadow anchored at bottom.",
+      "reqIds": [
+        "REQ-176"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-177",
+      "summary": "Rewrite all 4 admin screens (AdminDashboardScreen, AdminProsScreen, AdminBookingsScreen, AdminRevenusScreen) for full mobile + desktop polish: all share position fixed inset-0 flex flex-col, header 56px absolute, scroll zone flex-1 overflow-y auto paddingTop 72px, TabBarAdmin flex-shrink-0 bottom. On desktop >= 900px: KPI cards display in 4-column row (not 2x2); tables use proper column widths with hover row highlight rgba(255,255,255,0.02); bar charts increase bar width to 40px max-height 200px; filter pills in single non-scrolling row. AdminDashboardScreen: header 'NEXUS ADMIN' text-shadow 0 0 20px rgba(255,61,90,0.4), KPI sparkline SVG polylines, count-up 1.5s, blinking red dot on pending section when count > 0, glass-card KPI with colored icon circles, Approve/Refuse scale(0.95) press. AdminProsScreen + AdminBookingsScreen + AdminRevenusScreen: real-time search input 44px glass-card below filter pills. AdminProsScreen: tap-expand row detail (phone, email). AdminRevenusScreen: bar tooltip on hover. AdminBookingsScreen: tap-expand row full booking ID.",
+      "reqIds": [
+        "REQ-177"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-182",
+      "summary": "Refine frontend/src/styles/globals.css with all missing fixes: (1) add height: 100dvh on the html and body root; (2) add --safe-bottom: env(safe-area-inset-bottom, 8px); (3) .screen-root { position: fixed; inset: 0; display: flex; flex-direction: column; background: var(--void); }; (4) .scroll-zone { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; }; (5) .cta-zone { flex-shrink: 0; padding: 12px 20px calc(12px + var(--safe-bottom)); background: rgba(5,5,7,0.97); border-top: 1px solid rgba(255,255,255,0.04); }; (6) .tab-bar { flex-shrink: 0; }; (7) ensure all keyframe animations (fadeIn, breathe, shimmer, fall, progressFill, scaleIn, slideUp, slideDown, float, spin) are fully defined with correct will-change GPU hints; (8) .glass-card, .gold-text, .glow-gold utility classes correct at all breakpoints; (9) media query breakpoints at 430px, 768px, 900px; (10) body font-size 15px at >= 768px; (11) smooth scroll on html element; (12) overscroll-behavior: contain on all scroll zones.",
+      "reqIds": [
+        "REQ-188"
+      ],
       "status": "pending"
     }
   ],

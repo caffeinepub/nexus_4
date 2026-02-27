@@ -1,243 +1,195 @@
 import React, { useState } from 'react';
-import { useInternetIdentity } from '../../hooks/useInternetIdentity';
-import { IconLock } from '../../components/icons';
-import type { Screen, GlobalState, ToastType } from '../../state/useAppState';
+import { GlobalState, Screen, ToastType } from '../../state/useAppState';
+import BtnPrimary from '../../components/BtnPrimary';
 
-interface LoginScreenProps {
+interface Props {
+  state: GlobalState;
   go: (screen: Screen) => void;
   update: (partial: Partial<GlobalState>) => void;
-  showToast: (msg: string, type?: ToastType, duration?: number) => void;
+  showToast: (message: string, type?: ToastType) => void;
 }
 
-const orbs = [
-  { size: 320, top: '-100px', left: '-80px', color: 'var(--gold)', opacity: 0.10, delay: '0s', duration: '7s' },
-  { size: 220, top: '25%', right: '-60px', color: 'var(--blue)', opacity: 0.08, delay: '1.8s', duration: '9s' },
-  { size: 180, bottom: '22%', left: '5%', color: 'var(--gold)', opacity: 0.06, delay: '0.9s', duration: '8s' },
-  { size: 140, bottom: '-50px', right: '15%', color: 'var(--blue)', opacity: 0.09, delay: '2.4s', duration: '6s' },
-];
+export default function LoginScreen({ state, go, update, showToast }: Props) {
+  const [loading, setLoading] = useState(false);
 
-export default function LoginScreen({ go, update, showToast }: LoginScreenProps) {
-  const { login, isLoggingIn, loginStatus, identity } = useInternetIdentity();
-  const [connecting, setConnecting] = useState(false);
-
-  const handleConnect = async () => {
-    if (connecting || isLoggingIn) return;
-    setConnecting(true);
-    try {
-      await login();
-      update({ isAuthenticated: true });
+  const handleConnect = () => {
+    if (loading) return;
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
       go('role');
-    } catch (err: any) {
-      if (err?.message === 'User is already authenticated') {
-        update({ isAuthenticated: true });
-        go('role');
-      } else {
-        showToast('Erreur de connexion. Veuillez reessayer.', 'error');
-      }
-    } finally {
-      setConnecting(false);
-    }
+    }, 800);
   };
-
-  const isLoading = connecting || isLoggingIn || loginStatus === 'logging-in';
 
   return (
     <div style={{
       position: 'fixed',
       inset: 0,
+      background: '#050507',
       display: 'flex',
       flexDirection: 'column',
-      background: 'var(--void)',
+      alignItems: 'center',
+      justifyContent: 'center',
       overflow: 'hidden',
     }}>
       {/* Animated orbs */}
-      {orbs.map((orb, i) => (
-        <div
-          key={i}
-          style={{
-            position: 'absolute',
-            width: orb.size,
-            height: orb.size,
-            borderRadius: '50%',
-            background: `radial-gradient(circle, ${orb.color} 0%, transparent 70%)`,
-            opacity: orb.opacity,
-            top: (orb as any).top,
-            left: (orb as any).left,
-            right: (orb as any).right,
-            bottom: (orb as any).bottom,
-            filter: 'blur(40px)',
-            animation: `float ${orb.duration} ease-in-out ${orb.delay} infinite`,
-            pointerEvents: 'none',
-            zIndex: 0,
-          }}
-        />
-      ))}
-
-      {/* Main content — centered vertically */}
       <div style={{
-        flex: 1,
-        overflowY: 'auto',
+        position: 'absolute',
+        top: '-20%',
+        left: '-10%',
+        width: 400,
+        height: 400,
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(242,208,107,0.08) 0%, transparent 70%)',
+        animation: 'float 8s ease-in-out infinite',
+        pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '-10%',
+        right: '-10%',
+        width: 350,
+        height: 350,
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(91,127,255,0.06) 0%, transparent 70%)',
+        animation: 'float 10s ease-in-out infinite reverse',
+        pointerEvents: 'none',
+      }} />
+
+      {/* Card */}
+      <div style={{
+        width: '100%',
+        maxWidth: 380,
+        padding: '0 24px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
-        padding: '48px 32px 120px',
+        gap: 32,
         position: 'relative',
         zIndex: 1,
       }}>
         {/* Logo */}
-        <div style={{
-          textAlign: 'center',
-          marginBottom: '10px',
-          animation: 'fadeIn 0.6s ease forwards',
-        }}>
+        <div style={{ textAlign: 'center' }}>
           <div style={{
             fontFamily: 'Inter, sans-serif',
             fontWeight: 900,
-            fontSize: '64px',
-            letterSpacing: '-4px',
+            fontSize: 48,
+            color: '#F4F4F8',
+            letterSpacing: '-0.05em',
             lineHeight: 1,
-            color: 'var(--t1)',
-            display: 'inline-flex',
-            alignItems: 'baseline',
           }}>
-            NEXUS<span style={{ color: 'var(--blue)' }}>.</span>
+            NEXUS<span style={{ color: '#5B7FFF' }}>.</span>
           </div>
-        </div>
-
-        {/* Tagline */}
-        <div style={{
-          fontFamily: 'Inter, sans-serif',
-          fontWeight: 300,
-          fontSize: '16px',
-          color: 'var(--t3)',
-          fontStyle: 'italic',
-          textAlign: 'center',
-          marginBottom: '36px',
-          animation: 'fadeIn 0.6s ease 0.1s both',
-        }}>
-          L excellence a votre porte
-        </div>
-
-        {/* Gold gradient divider */}
-        <div style={{
-          width: '48px',
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent, var(--gold), transparent)',
-          marginBottom: '40px',
-          animation: 'fadeIn 0.6s ease 0.15s both',
-        }} />
-
-        {/* Connect button */}
-        <button
-          onClick={handleConnect}
-          disabled={isLoading}
-          style={{
-            width: '100%',
-            height: '62px',
-            borderRadius: '18px',
-            background: isLoading
-              ? 'var(--d4)'
-              : 'linear-gradient(135deg, var(--gold) 0%, var(--gold2) 100%)',
-            color: '#050507',
+          <p style={{
             fontFamily: 'Inter, sans-serif',
-            fontWeight: 800,
-            fontSize: '16px',
-            letterSpacing: '0.02em',
-            border: 'none',
-            cursor: isLoading ? 'not-allowed' : 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '10px',
-            boxShadow: isLoading ? 'none' : '0 8px 32px rgba(242, 208, 107, 0.28)',
-            transition: 'all 120ms ease',
-            animation: 'fadeIn 0.6s ease 0.2s both',
-          }}
-        >
-          {isLoading ? (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#050507" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite' }}>
-              <line x1="12" y1="2" x2="12" y2="6" />
-              <line x1="12" y1="18" x2="12" y2="22" />
-              <line x1="4.93" y1="4.93" x2="7.76" y2="7.76" />
-              <line x1="16.24" y1="16.24" x2="19.07" y2="19.07" />
-              <line x1="2" y1="12" x2="6" y2="12" />
-              <line x1="18" y1="12" x2="22" y2="12" />
-              <line x1="4.93" y1="19.07" x2="7.76" y2="16.24" />
-              <line x1="16.24" y1="7.76" x2="19.07" y2="4.93" />
-            </svg>
-          ) : (
-            <IconLock size={20} color="#050507" />
-          )}
-          {isLoading ? 'Connexion en cours...' : 'SE CONNECTER'}
-        </button>
-
-        {/* Security sub-text */}
-        <div style={{
-          fontFamily: 'Inter, sans-serif',
-          fontWeight: 400,
-          fontSize: '12px',
-          color: 'var(--t4)',
-          textAlign: 'center',
-          marginTop: '14px',
-          animation: 'fadeIn 0.6s ease 0.3s both',
-        }}>
-          Connexion securisee · Internet Identity
+            fontWeight: 400,
+            fontSize: 15,
+            color: '#9898B4',
+            marginTop: 12,
+            lineHeight: 1.5,
+          }}>
+            La plateforme des professionnels a domicile
+          </p>
         </div>
+
+        {/* Glass card */}
+        <div style={{
+          width: '100%',
+          background: 'rgba(13,13,19,0.8)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          border: '1px solid rgba(255,255,255,0.06)',
+          borderRadius: 24,
+          padding: 28,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 20,
+        }}>
+          <div>
+            <h2 style={{
+              fontFamily: 'Inter, sans-serif',
+              fontWeight: 800,
+              fontSize: 22,
+              color: '#F4F4F8',
+              margin: 0,
+              letterSpacing: '-0.03em',
+            }}>
+              Bienvenue
+            </h2>
+            <p style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: 14,
+              color: '#9898B4',
+              margin: '6px 0 0',
+              lineHeight: 1.5,
+            }}>
+              Connectez-vous pour acceder a votre espace
+            </p>
+          </div>
+
+          <BtnPrimary
+            label="SE CONNECTER"
+            onClick={handleConnect}
+            loading={loading}
+          />
+
+          <button
+            onClick={() => {
+              update({ role: 'admin' });
+              go('admin_login');
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#54546C',
+              fontFamily: 'Inter, sans-serif',
+              fontSize: 13,
+              cursor: 'pointer',
+              textAlign: 'center',
+              padding: '4px 0',
+              transition: 'color 150ms',
+            }}
+          >
+            Acces administration
+          </button>
+        </div>
+
+        {/* Footer */}
+        <p style={{
+          fontFamily: 'Inter, sans-serif',
+          fontSize: 12,
+          color: '#54546C',
+          textAlign: 'center',
+          lineHeight: 1.5,
+        }}>
+          En continuant, vous acceptez nos{' '}
+          <span style={{ color: '#9898B4', textDecoration: 'underline', cursor: 'pointer' }}>
+            conditions d'utilisation
+          </span>
+        </p>
       </div>
 
-      {/* Legal links — absolute bottom */}
+      {/* Attribution */}
       <div style={{
         position: 'absolute',
-        bottom: '24px',
+        bottom: 16,
         left: 0,
         right: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '10px',
-        zIndex: 2,
-        animation: 'fadeIn 0.6s ease 0.4s both',
+        textAlign: 'center',
       }}>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          {['CGV', 'Confidentialite', 'Contact'].map((link, i) => (
-            <React.Fragment key={link}>
-              {i > 0 && <span style={{ color: 'var(--t4)', fontSize: '11px' }}>·</span>}
-              <button style={{
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: 400,
-                fontSize: '11px',
-                color: 'var(--t4)',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-              }}>
-                {link}
-              </button>
-            </React.Fragment>
-          ))}
-        </div>
-        <div style={{
-          fontFamily: 'Inter, sans-serif',
-          fontWeight: 400,
-          fontSize: '10px',
-          color: 'var(--t3)',
-          textAlign: 'center',
-        }}>
-          Built with{' '}
-          <span style={{ color: 'var(--alert)' }}>&#9829;</span>
-          {' '}using{' '}
-          <a
-            href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname || 'nexus-app')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: 'var(--gold)', textDecoration: 'none' }}
-          >
-            caffeine.ai
-          </a>
-          {' '}· {new Date().getFullYear()}
-        </div>
+        <a
+          href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname || 'nexus-app')}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            fontFamily: 'Inter, sans-serif',
+            fontSize: 11,
+            color: '#54546C',
+            textDecoration: 'none',
+          }}
+        >
+          Built with love using caffeine.ai
+        </a>
       </div>
     </div>
   );

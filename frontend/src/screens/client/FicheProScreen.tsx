@@ -1,259 +1,220 @@
 import React, { useEffect, useState } from 'react';
-import { Screen, GlobalState } from '../../state/useAppState';
+import { GlobalState, Screen, ToastType } from '../../state/useAppState';
+import Header from '../../components/Header';
+import BtnPrimary from '../../components/BtnPrimary';
 
-interface FicheProScreenProps {
-  go: (screen: Screen) => void;
+interface Props {
   state: GlobalState;
+  go: (screen: Screen) => void;
   update: (partial: Partial<GlobalState>) => void;
+  showToast: (message: string, type?: ToastType) => void;
 }
 
-function StarIcon({ size = 14 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 12 12" fill="#C9A84C" xmlns="http://www.w3.org/2000/svg">
-      <path d="M6 1l1.39 2.82L10.5 4.27l-2.25 2.19.53 3.09L6 8.02 3.22 9.55l.53-3.09L1.5 4.27l3.11-.45L6 1z"/>
-    </svg>
-  );
-}
-
-function BackIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F4F4F8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M19 12H5"/>
-      <path d="m12 19-7-7 7-7"/>
-    </svg>
-  );
-}
-
-function FlashBadge() {
-  return (
-    <div style={{
-      display: 'inline-flex', alignItems: 'center', gap: 4,
-      background: 'linear-gradient(135deg, #C9A84C, #E8C96D)',
-      borderRadius: 8, padding: '4px 10px',
-      fontSize: 11, fontWeight: 700, color: '#050507',
-      letterSpacing: '0.05em'
-    }}>
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="#050507"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-      FLASH
-    </div>
-  );
-}
-
-const CATEGORY_COLORS: Record<string, string> = {
-  Barber: '#4A9EFF',
-  Coiffure: '#A855F7',
-  Esthetique: '#EC4899',
-  Massage: '#10B981',
-  Onglerie: '#F59E0B',
-  Maquillage: '#EF4444',
-};
-
-export default function FicheProScreen({ go, state, update }: FicheProScreenProps) {
+export default function FicheProScreen({ state, go, update, showToast }: Props) {
+  const [counts, setCounts] = useState({ bookings: 0, rating: 0, reviews: 0 });
   const pro = state.selectedPro;
-  const [imgError, setImgError] = useState(false);
 
   useEffect(() => {
-    if (!pro) {
-      go('explorer');
-    }
-  }, [pro, go]);
+    if (!pro) { go('explorer'); return; }
+    const duration = 1200;
+    const steps = 40;
+    const interval = duration / steps;
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      const progress = step / steps;
+      setCounts({
+        bookings: Math.round(progress * 248),
+        rating: parseFloat((progress * (pro.rating || 4.9)).toFixed(1)),
+        reviews: Math.round(progress * (pro.reviewCount || 127)),
+      });
+      if (step >= steps) clearInterval(timer);
+    }, interval);
+    return () => clearInterval(timer);
+  }, [pro]);
 
   if (!pro) return null;
 
-  const catColor = CATEGORY_COLORS[pro.categorie] || '#C9A84C';
-
-  const mockServices = [
-    { name: 'Coupe classique', duree: 30, prix: pro.prix },
-    { name: 'Coupe + barbe', duree: 45, prix: Math.round(pro.prix * 1.4) },
-    { name: 'Rasage traditionnel', duree: 30, prix: Math.round(pro.prix * 0.8) },
+  const initials = pro.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const services = pro.services && pro.services.length > 0 ? pro.services : [
+    { id: 's1', name: 'Service standard', duree: 60, prix: pro.prix, description: 'Prestation principale', actif: true },
   ];
+  const reviews = pro.reviews && pro.reviews.length > 0 ? pro.reviews : [];
+
+  const handleBook = () => {
+    update({
+      bookingProId: pro.id,
+      bookingServiceId: services[0].id,
+      bookingServiceName: services[0].name,
+      bookingMontant: services[0].prix,
+    });
+    go('booking_1');
+  };
+
+  const handleServiceBook = (service: typeof services[0]) => {
+    update({
+      bookingProId: pro.id,
+      bookingServiceId: service.id,
+      bookingServiceName: service.name,
+      bookingMontant: service.prix,
+    });
+    go('booking_1');
+  };
 
   return (
-    <div style={{
-      position: 'relative',
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100%',
-      overflow: 'hidden',
-      background: '#050507',
-      fontFamily: 'Inter, sans-serif',
-    }}>
-      {/* Scrollable content */}
-      <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        WebkitOverflowScrolling: 'touch' as React.CSSProperties['WebkitOverflowScrolling'],
-      }}>
-        {/* Cover image */}
+    <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', background: '#050507' }}>
+      <Header showBack onBack={() => go('explorer')} />
+
+      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' as any, overscrollBehavior: 'contain', paddingTop: 56 }}>
+        {/* Cover */}
         <div style={{
-          position: 'relative',
-          height: 320,
-          background: 'linear-gradient(135deg, #1A1A2E 0%, #2D2D4E 100%)',
-          flexShrink: 0,
+          height: 200, position: 'relative',
+          background: 'linear-gradient(135deg, rgba(91,127,255,0.25) 0%, rgba(242,208,107,0.15) 100%)',
         }}>
-          {!imgError ? (
-            <img
-              src={pro.image}
-              alt={pro.prenom}
-              onError={() => setImgError(true)}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-            />
-          ) : (
-            <div style={{
-              width: '100%', height: '100%',
-              background: `linear-gradient(135deg, #1A1A2E 0%, ${catColor}33 50%, #1A1A2E 100%)`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 64, fontWeight: 900, color: catColor, opacity: 0.4,
-            }}>
-              {pro.prenom[0]}
-            </div>
-          )}
-          {/* Gradient overlay */}
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent 40%, #050507 100%)' }} />
           <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(to bottom, rgba(5,5,7,0.4) 0%, transparent 40%, rgba(5,5,7,0.8) 100%)'
-          }} />
-          {/* Back button */}
-          <button
-            onClick={() => go('explorer')}
-            style={{
-              position: 'absolute', top: 16, left: 16,
-              width: 40, height: 40, borderRadius: 12,
-              background: 'rgba(5,5,7,0.7)',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer',
-            }}
-          >
-            <BackIcon />
-          </button>
-          {/* Flash badge */}
-          {pro.flash && (
-            <div style={{ position: 'absolute', top: 16, right: 16 }}>
-              <FlashBadge />
-            </div>
-          )}
+            position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 72, fontWeight: 900, color: 'rgba(255,255,255,0.1)',
+          }}>
+            {initials}
+          </div>
         </div>
 
-        {/* Pro info */}
-        <div style={{ padding: '20px 20px 0' }}>
+        <div style={{ padding: '0 20px', marginTop: -40, position: 'relative', zIndex: 1 }}>
+          {/* Avatar */}
+          <div style={{
+            width: 76, height: 76, borderRadius: '50%',
+            background: 'linear-gradient(135deg, rgba(242,208,107,0.2), rgba(242,208,107,0.05))',
+            border: '3px solid #050507', outline: '2px solid #F2D06B',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 28, fontWeight: 900, color: '#F2D06B', marginBottom: 12,
+          }}>
+            {initials}
+          </div>
+
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
             <div>
-              <h1 style={{
-                fontSize: 26, fontWeight: 900, color: '#F4F4F8',
-                margin: 0, marginBottom: 4, lineHeight: 1.1
-              }}>
-                {pro.prenom}
+              <h1 style={{ fontFamily: 'Inter, sans-serif', fontSize: 22, fontWeight: 800, color: '#F4F4F8', margin: 0, letterSpacing: '-0.02em' }}>
+                {pro.name}
               </h1>
-              <div style={{ fontSize: 14, color: '#A0A0B8', marginBottom: 8 }}>
-                {pro.nom}
-              </div>
+              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#9898B4', margin: '4px 0 0' }}>{pro.categorie}</p>
             </div>
             <div style={{
-              padding: '6px 14px', borderRadius: 20,
-              background: `${catColor}22`,
-              border: `1px solid ${catColor}44`,
-              fontSize: 12, fontWeight: 700, color: catColor,
+              background: pro.available ? 'rgba(0,217,122,0.1)' : 'rgba(84,84,108,0.1)',
+              color: pro.available ? '#00D97A' : '#54546C',
+              fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 600,
+              padding: '6px 12px', borderRadius: 999,
+              border: `1px solid ${pro.available ? 'rgba(0,217,122,0.2)' : 'rgba(84,84,108,0.2)'}`,
             }}>
-              {pro.categorie}
+              {pro.available ? 'Disponible' : 'Occupe'}
             </div>
           </div>
 
-          {/* Stats row */}
-          <div style={{
-            display: 'flex', gap: 20, marginBottom: 20,
-            padding: '14px 0',
-            borderTop: '1px solid rgba(255,255,255,0.06)',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
-          }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'center' }}>
-                <StarIcon size={14} />
-                <span style={{ fontSize: 18, fontWeight: 800, color: '#C9A84C' }}>{pro.note}</span>
-              </div>
-              <div style={{ fontSize: 11, color: '#54546C', marginTop: 2 }}>{pro.nbAvis} avis</div>
-            </div>
-            <div style={{ width: 1, background: 'rgba(255,255,255,0.06)' }} />
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 18, fontWeight: 800, color: '#F4F4F8' }}>{pro.reponsMin}min</div>
-              <div style={{ fontSize: 11, color: '#54546C', marginTop: 2 }}>Reponse moy.</div>
-            </div>
-            <div style={{ width: 1, background: 'rgba(255,255,255,0.06)' }} />
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 18, fontWeight: 800, color: '#F4F4F8' }}>{pro.ville}</div>
-              <div style={{ fontSize: 11, color: '#54546C', marginTop: 2 }}>Ville</div>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 16 }}>
+            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#54546C" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+            </svg>
+            <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#54546C' }}>{pro.ville}</span>
+            {pro.distance && (
+              <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#54546C' }}>· {pro.distance}</span>
+            )}
           </div>
 
-          {/* Services */}
-          <div style={{ marginBottom: 24 }}>
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: '#F4F4F8', marginBottom: 12 }}>
-              Services
-            </h2>
-            {mockServices.map((service, idx) => (
-              <div
-                key={idx}
-                style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '14px 16px',
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)',
-                  borderRadius: 12,
-                  marginBottom: 8,
-                }}
-              >
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#F4F4F8', marginBottom: 3 }}>
-                    {service.name}
-                  </div>
-                  <div style={{ fontSize: 12, color: '#54546C' }}>{service.duree} min</div>
-                </div>
-                <div style={{ fontSize: 16, fontWeight: 700, color: '#C9A84C' }}>
-                  {service.prix} CHF
-                </div>
+          {/* Stats */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 24 }}>
+            {[
+              { label: 'Reservations', value: counts.bookings.toString(), color: '#5B7FFF' },
+              { label: 'Note', value: counts.rating.toString(), color: '#F2D06B' },
+              { label: 'Avis', value: counts.reviews.toString(), color: '#00D97A' },
+            ].map(stat => (
+              <div key={stat.label} style={{
+                background: '#0D0D13', border: '1px solid rgba(255,255,255,0.06)',
+                borderRadius: 14, padding: '14px 12px', textAlign: 'center',
+                borderTop: `2px solid ${stat.color}`,
+              }}>
+                <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 20, fontWeight: 800, color: stat.color, marginBottom: 2 }}>{stat.value}</div>
+                <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, color: '#54546C' }}>{stat.label}</div>
               </div>
             ))}
           </div>
 
-          {/* About */}
-          <div style={{ marginBottom: 100 }}>
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: '#F4F4F8', marginBottom: 10 }}>
-              A propos
-            </h2>
-            <p style={{ fontSize: 14, color: '#A0A0B8', lineHeight: 1.6, margin: 0 }}>
-              Expert {pro.categorie.toLowerCase()} base a {pro.ville}, {pro.prenom} propose des prestations
-              de qualite avec une disponibilite rapide. Note moyenne de {pro.note}/5 sur {pro.nbAvis} avis clients.
-            </p>
+          {/* Bio */}
+          {pro.bio && (
+            <div style={{ marginBottom: 24 }}>
+              <h3 style={{ fontFamily: 'Inter, sans-serif', fontSize: 16, fontWeight: 700, marginBottom: 8, color: '#F4F4F8' }}>A propos</h3>
+              <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#9898B4', lineHeight: 1.6 }}>{pro.bio}</p>
+            </div>
+          )}
+
+          {/* Services */}
+          <div style={{ marginBottom: 24 }}>
+            <h3 style={{ fontFamily: 'Inter, sans-serif', fontSize: 16, fontWeight: 700, marginBottom: 12, color: '#F4F4F8' }}>Services</h3>
+            {services.map(service => (
+              <button
+                key={service.id}
+                onClick={() => handleServiceBook(service)}
+                style={{
+                  width: '100%', background: '#0D0D13', border: '1px solid rgba(255,255,255,0.06)',
+                  borderRadius: 14, padding: '14px 16px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  marginBottom: 8, cursor: 'pointer', transition: 'all 150ms', textAlign: 'left',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(242,208,107,0.3)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.06)'; }}
+              >
+                <div>
+                  <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14, color: '#F4F4F8', marginBottom: 2 }}>{service.name}</div>
+                  <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#54546C' }}>{service.duree} min</div>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 15, color: '#F2D06B' }}>{service.prix} CHF</span>
+                  <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="#54546C" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 18l6-6-6-6" />
+                  </svg>
+                </div>
+              </button>
+            ))}
           </div>
+
+          {/* Reviews */}
+          {reviews.length > 0 && (
+            <div style={{ marginBottom: 24 }}>
+              <h3 style={{ fontFamily: 'Inter, sans-serif', fontSize: 16, fontWeight: 700, marginBottom: 12, color: '#F4F4F8' }}>Avis clients</h3>
+              {reviews.map((review, i) => (
+                <div key={i} style={{
+                  background: '#0D0D13', border: '1px solid rgba(255,255,255,0.06)',
+                  borderRadius: 14, padding: '14px 16px', marginBottom: 8,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13, color: '#F4F4F8' }}>{review.author}</span>
+                    <div style={{ display: 'flex', gap: 2 }}>
+                      {Array.from({ length: Math.round(review.note) }).map((_, j) => (
+                        <svg key={j} width={12} height={12} viewBox="0 0 24 24" fill="#F2D06B" stroke="none">
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
+                      ))}
+                    </div>
+                  </div>
+                  <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 13, color: '#9898B4', lineHeight: 1.4, margin: 0 }}>{review.comment}</p>
+                  <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, color: '#54546C', marginTop: 4, display: 'block' }}>{review.date}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div style={{ height: 80 }} />
         </div>
       </div>
 
-      {/* Sticky booking CTA */}
       <div style={{
-        flexShrink: 0,
-        padding: '16px 20px',
-        background: 'rgba(5,5,7,0.96)',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
-        paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
+        flexShrink: 0, padding: '12px 20px calc(12px + env(safe-area-inset-bottom, 8px))',
+        background: 'rgba(5,5,7,0.97)', borderTop: '1px solid rgba(255,255,255,0.04)',
       }}>
-        <button
-          onClick={() => go('booking_1')}
-          style={{
-            width: '100%',
-            height: 56,
-            borderRadius: 16,
-            background: 'linear-gradient(135deg, #C9A84C, #E8C96D)',
-            border: 'none',
-            fontSize: 16, fontWeight: 800,
-            color: '#050507',
-            cursor: 'pointer',
-            fontFamily: 'Inter, sans-serif',
-            letterSpacing: '0.02em',
-          }}
-        >
-          Reserver maintenant — {pro.prix} CHF
-        </button>
+        <BtnPrimary
+          label={`Reserver — a partir de ${services[0].prix} CHF`}
+          onClick={handleBook}
+          disabled={!pro.available}
+        />
       </div>
     </div>
   );

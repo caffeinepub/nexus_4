@@ -7,102 +7,111 @@ interface Props {
   state: GlobalState;
 }
 
-const STATUS_COLORS: Record<string, string> = {
-  pending: 'var(--gold)', confirmed: 'var(--blue)',
-  completed: 'var(--flash)', cancelled: 'var(--t3)', disputed: 'var(--alert)',
-};
+type StatusFilter = 'Tous' | 'pending' | 'confirmed' | 'completed' | 'cancelled';
 
-const STATUS_LABELS: Record<string, string> = {
-  pending: 'EN ATTENTE', confirmed: 'CONFIRME',
-  completed: 'TERMINE', cancelled: 'ANNULE', disputed: 'LITIGE',
-};
-
-const MOCK_BOOKINGS = [
-  { id: 'b001', client: 'Marc D.', pro: 'Jean B.', service: 'Coupe homme', date: '26.02.2026', heure: '14:30', montant: 35, statut: 'confirmed' },
-  { id: 'b002', client: 'Luca M.', pro: 'Sophie L.', service: 'Soin visage', date: '25.02.2026', heure: '10:00', montant: 70, statut: 'completed' },
-  { id: 'b003', client: 'Alex R.', pro: 'Marc T.', service: 'Massage relaxant', date: '24.02.2026', heure: '16:00', montant: 80, statut: 'pending' },
-  { id: 'b004', client: 'Tom B.', pro: 'Jean B.', service: 'Barbe design', date: '23.02.2026', heure: '11:00', montant: 30, statut: 'cancelled' },
-  { id: 'b005', client: 'Sara K.', pro: 'Sophie L.', service: 'Manucure', date: '22.02.2026', heure: '09:30', montant: 40, statut: 'completed' },
-  { id: 'b006', client: 'Paul M.', pro: 'Marc T.', service: 'Dos', date: '21.02.2026', heure: '15:00', montant: 60, statut: 'disputed' },
+const DEMO_BOOKINGS = [
+  { id: 'b001', client: 'Marc Dupont', pro: 'Sophie Laurent', service: 'Coupe + Brushing', date: '26 fev 2026', montant: 65, statut: 'confirmed' },
+  { id: 'b002', client: 'Luca Moretti', pro: 'Amina Benali', service: 'Soin visage', date: '25 fev 2026', montant: 80, statut: 'completed' },
+  { id: 'b003', client: 'Alex Roux', pro: 'Fatima Ouali', service: 'Massage relaxant', date: '24 fev 2026', montant: 90, statut: 'pending' },
+  { id: 'b004', client: 'Tom Bernard', pro: 'Sophie Laurent', service: 'Balayage', date: '23 fev 2026', montant: 120, statut: 'cancelled' },
+  { id: 'b005', client: 'Julie Martin', pro: 'Chloe Martin', service: 'Pose gel', date: '22 fev 2026', montant: 75, statut: 'completed' },
+  { id: 'b006', client: 'Pierre Leroy', pro: 'Isabelle Dupont', service: 'Maquillage soiree', date: '21 fev 2026', montant: 80, statut: 'confirmed' },
 ];
 
-const FILTERS = ['Tous', 'En attente', 'Confirmes', 'Termines', 'Annules'];
+const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+  pending: { label: 'En attente', color: '#F2D06B', bg: 'rgba(242,208,107,0.1)' },
+  confirmed: { label: 'Confirme', color: '#5B7FFF', bg: 'rgba(91,127,255,0.1)' },
+  completed: { label: 'Termine', color: '#00D97A', bg: 'rgba(0,217,122,0.1)' },
+  cancelled: { label: 'Annule', color: '#FF3D5A', bg: 'rgba(255,61,90,0.1)' },
+};
+
+const FILTERS: StatusFilter[] = ['Tous', 'pending', 'confirmed', 'completed', 'cancelled'];
 
 export default function AdminBookingsScreen({ go, state }: Props) {
-  const [filter, setFilter] = useState('Tous');
+  const [filter, setFilter] = useState<StatusFilter>('Tous');
 
-  const filterMap: Record<string, string> = {
-    'Tous': '',
-    'En attente': 'pending',
-    'Confirmes': 'confirmed',
-    'Termines': 'completed',
-    'Annules': 'cancelled',
-  };
-
-  const filtered = MOCK_BOOKINGS.filter(b => {
-    if (filter === 'Tous') return true;
-    return b.statut === filterMap[filter];
-  });
+  const filtered = DEMO_BOOKINGS.filter(b => filter === 'Tous' || b.statut === filter);
 
   return (
-    <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', background: 'var(--void)' }}>
+    <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', background: '#050507' }}>
       {/* Header */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', background: 'rgba(5,5,7,0.95)', backdropFilter: 'blur(12px)', zIndex: 100, borderBottom: '1px solid var(--d3)' }}>
-        <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--alert)', letterSpacing: 1 }}>NEXUS ADMIN</div>
-        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--t2)' }}>Rendez-vous</div>
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: 56,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 20px', background: 'rgba(5,5,7,0.97)',
+        backdropFilter: 'blur(32px)', zIndex: 100,
+        borderBottom: '1px solid rgba(255,255,255,0.04)',
+      }}>
+        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 16, fontWeight: 800, color: '#FF3D5A', letterSpacing: '0.04em' }}>
+          NEXUS ADMIN
+        </div>
+        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 600, color: '#9898B4' }}>Reservations</div>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', paddingTop: 72, paddingBottom: 16 }}>
-        {/* Filters */}
-        <div style={{ display: 'flex', gap: 8, padding: '16px 20px 0', overflowX: 'auto' }}>
-          {FILTERS.map(f => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              style={{
-                flexShrink: 0, padding: '7px 14px', borderRadius: 20, border: 'none', cursor: 'pointer',
-                background: filter === f ? 'var(--alert)' : 'var(--d2)',
-                color: filter === f ? '#fff' : 'var(--t2)',
-                fontSize: 12, fontWeight: 600,
-              }}
-            >
-              {f}
-            </button>
-          ))}
+      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' as any, overscrollBehavior: 'contain', paddingTop: 72, paddingBottom: 16 }}>
+        {/* Filter pills */}
+        <div style={{ display: 'flex', gap: 8, padding: '16px 20px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+          {FILTERS.map(f => {
+            const cfg = f !== 'Tous' ? STATUS_CONFIG[f] : null;
+            const isActive = filter === f;
+            return (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                style={{
+                  flexShrink: 0, padding: '7px 14px', borderRadius: 999,
+                  background: isActive ? (cfg ? cfg.bg : 'rgba(255,61,90,0.12)') : '#0D0D13',
+                  border: isActive ? `1px solid ${cfg ? cfg.color + '44' : 'rgba(255,61,90,0.3)'}` : '1px solid rgba(255,255,255,0.06)',
+                  color: isActive ? (cfg ? cfg.color : '#FF3D5A') : '#9898B4',
+                  fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                }}
+              >
+                {f === 'Tous' ? 'Tous' : STATUS_CONFIG[f].label}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Count */}
-        <div style={{ padding: '12px 20px 0', fontSize: 12, color: 'var(--t3)' }}>
-          {filtered.length} rendez-vous
-        </div>
-
-        {/* List */}
-        <div style={{ padding: '12px 20px 0' }}>
-          {filtered.map(b => (
-            <div key={b.id} style={{ background: 'var(--d2)', borderRadius: 14, padding: '14px', marginBottom: 10 }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--t4)', fontFamily: 'monospace' }}>#{b.id}</span>
-                    <div style={{ padding: '2px 8px', borderRadius: 8, background: STATUS_COLORS[b.statut] + '22' }}>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: STATUS_COLORS[b.statut] }}>{STATUS_LABELS[b.statut]}</span>
-                    </div>
-                  </div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--t1)' }}>{b.service}</div>
-                  <div style={{ fontSize: 12, color: 'var(--t3)', marginTop: 2 }}>{b.client} - {b.pro}</div>
-                  <div style={{ fontSize: 11, color: 'var(--t4)', marginTop: 2 }}>{b.date} · {b.heure}</div>
-                </div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--gold)', flexShrink: 0, marginLeft: 12 }}>
-                  {b.montant} CHF
-                </div>
-              </div>
+        {/* Bookings list */}
+        <div style={{ padding: '0 20px' }}>
+          {filtered.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 0', fontFamily: 'Inter, sans-serif', color: '#54546C', fontSize: 14 }}>
+              Aucune reservation trouvee
             </div>
-          ))}
+          ) : (
+            filtered.map(b => {
+              const cfg = STATUS_CONFIG[b.statut] || { label: b.statut, color: '#9898B4', bg: 'rgba(152,152,180,0.1)' };
+              return (
+                <div key={b.id} style={{
+                  background: '#0D0D13', border: '1px solid rgba(255,255,255,0.06)',
+                  borderRadius: 14, padding: '14px 16px', marginBottom: 10,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <div>
+                      <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, fontWeight: 700, color: '#F4F4F8', marginBottom: 2 }}>{b.service}</div>
+                      <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#9898B4' }}>{b.client} avec {b.pro}</div>
+                    </div>
+                    <span style={{
+                      fontFamily: 'Inter, sans-serif', fontSize: 10, fontWeight: 700,
+                      padding: '3px 8px', borderRadius: 999,
+                      background: cfg.bg, color: cfg.color, flexShrink: 0,
+                    }}>
+                      {cfg.label}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#54546C' }}>{b.date}</span>
+                    <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 14, color: '#F2D06B' }}>{b.montant} CHF</span>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
-        <div style={{ height: 20 }} />
+        <div style={{ height: 16 }} />
       </div>
 
-      <TabBarAdmin active="bookings" go={go} />
+      <TabBarAdmin current="admin_bookings" go={go} />
     </div>
   );
 }

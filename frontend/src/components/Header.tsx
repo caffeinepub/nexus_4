@@ -1,91 +1,174 @@
 import React from 'react';
+import { Role } from '../state/useAppState';
 
 interface HeaderProps {
-  role?: 'client' | 'pro' | 'admin';
-  title?: string;
+  showBack?: boolean;
   onBack?: () => void;
-  onSwitchRole?: () => void;
+  title?: string;
+  role?: Role;
   notifsCount?: number;
   onNotifs?: () => void;
+  onSwitchRole?: () => void;
+  onLogoClick?: () => void;
 }
 
-export default function Header({ role, title, onBack, onSwitchRole, notifsCount = 0, onNotifs }: HeaderProps) {
+export default function Header({
+  showBack = false,
+  onBack,
+  title,
+  role,
+  notifsCount = 0,
+  onNotifs,
+  onSwitchRole,
+  onLogoClick,
+}: HeaderProps) {
+  const switchLabel = role === 'client' ? 'Pro' : role === 'pro' ? 'Client' : null;
+
   return (
-    <div style={{
+    <header style={{
       position: 'absolute',
       top: 0,
       left: 0,
       right: 0,
       height: 56,
+      background: 'rgba(5,5,7,0.97)',
+      backdropFilter: 'blur(32px)',
+      WebkitBackdropFilter: 'blur(32px)',
+      borderBottom: '1px solid rgba(255,255,255,0.04)',
+      zIndex: 100,
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'space-between',
       padding: '0 16px',
-      background: 'rgba(5,5,7,0.92)',
-      backdropFilter: 'blur(20px)',
-      zIndex: 100,
-      borderBottom: '1px solid rgba(255,255,255,0.04)',
+      gap: 12,
     }}>
       {/* Left */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 80 }}>
-        {onBack ? (
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+        {showBack ? (
           <button
             onClick={onBack}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--t2)', display: 'flex', alignItems: 'center', gap: 4, fontSize: 14, padding: 0 }}
+            aria-label="Retour"
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: '50%',
+              background: '#0D0D13',
+              border: '1px solid rgba(255,255,255,0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              flexShrink: 0,
+            }}
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
+            <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#F4F4F8" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 5l-7 7 7 7" />
             </svg>
-            Retour
           </button>
         ) : (
-          <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 900, fontSize: 20, letterSpacing: '-1.5px', color: 'var(--t1)', display: 'inline-flex', alignItems: 'baseline' }}>
-            NEXUS<span style={{ color: 'var(--blue)' }}>.</span>
-          </div>
+          <button
+            onClick={onLogoClick}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 0,
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <span style={{
+              fontFamily: 'Inter, sans-serif',
+              fontWeight: 900,
+              fontSize: 22,
+              color: '#F4F4F8',
+              letterSpacing: '-0.05em',
+            }}>
+              NEXUS<span style={{ color: '#5B7FFF' }}>.</span>
+            </span>
+          </button>
         )}
       </div>
 
-      {/* Center title */}
+      {/* Center */}
       {title && (
-        <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', fontSize: 15, fontWeight: 700, color: 'var(--t1)' }}>
-          {title}
+        <div style={{
+          position: 'absolute',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          animation: 'fadeIn 300ms ease-out',
+        }}>
+          <span style={{
+            fontFamily: 'Inter, sans-serif',
+            fontWeight: 700,
+            fontSize: 16,
+            color: '#F4F4F8',
+            whiteSpace: 'nowrap',
+          }}>
+            {title}
+          </span>
         </div>
       )}
 
       {/* Right */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 80, justifyContent: 'flex-end' }}>
-        {onSwitchRole && (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {switchLabel && onSwitchRole && (
           <button
             onClick={onSwitchRole}
             style={{
-              background: 'var(--d3)', border: '1px solid var(--d4)', borderRadius: 20,
-              color: 'var(--t3)', fontSize: 11, fontWeight: 600, padding: '5px 10px', cursor: 'pointer',
+              height: 32,
+              padding: '0 14px',
+              borderRadius: 999,
+              border: '1px solid rgba(242,208,107,0.3)',
+              background: 'rgba(242,208,107,0.06)',
+              color: '#F2D06B',
+              fontFamily: 'Inter, sans-serif',
+              fontWeight: 600,
+              fontSize: 12,
+              cursor: 'pointer',
+              transition: 'border-color 150ms',
+              letterSpacing: '0.04em',
             }}
           >
-            {role === 'pro' ? 'Client' : 'Pro'}
+            {switchLabel}
           </button>
         )}
         {onNotifs && (
           <button
             onClick={onNotifs}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', position: 'relative', padding: 4, color: 'var(--t2)' }}
+            aria-label="Notifications"
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: '50%',
+              background: '#0D0D13',
+              border: '1px solid rgba(255,255,255,0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              position: 'relative',
+              flexShrink: 0,
+            }}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#F4F4F8" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
               <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
             {notifsCount > 0 && (
-              <div style={{
-                position: 'absolute', top: 0, right: 0, width: 16, height: 16, borderRadius: '50%',
-                background: 'var(--alert)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <span style={{ fontSize: 9, fontWeight: 800, color: '#fff' }}>{notifsCount > 9 ? '9+' : notifsCount}</span>
-              </div>
+              <span style={{
+                position: 'absolute',
+                top: 6,
+                right: 6,
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                background: '#FF3D5A',
+                animation: 'scaleIn 200ms ease-out',
+              }} />
             )}
           </button>
         )}
       </div>
-    </div>
+    </header>
   );
 }

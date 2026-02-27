@@ -52,7 +52,7 @@ export default function SuccessScreen({ go, update }: Props) {
   };
 
   return (
-    <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', background: 'var(--void)', overflow: 'hidden' }}>
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', background: 'var(--void)', overflow: 'hidden' }}>
       {/* Confetti */}
       {confetti.map(c => (
         <div
@@ -78,7 +78,6 @@ export default function SuccessScreen({ go, update }: Props) {
 
       {/* Content */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 24px', position: 'relative', zIndex: 1 }}>
-        {/* Check circle */}
         <div style={{
           width: 80, height: 80, borderRadius: '50%', border: '3px solid var(--flash)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24,
@@ -100,9 +99,7 @@ export default function SuccessScreen({ go, update }: Props) {
 
       {/* CTA */}
       <div style={{ flexShrink: 0, padding: '16px 24px', position: 'relative', zIndex: 1 }}>
-        <BtnPrimary onClick={handleAccess}>
-          Acceder a mon espace pro
-        </BtnPrimary>
+        <BtnPrimary label="Acceder a mon espace pro" onClick={handleAccess} />
       </div>
     </div>
   );

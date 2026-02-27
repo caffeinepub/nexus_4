@@ -1,636 +1,454 @@
-import React, { useState } from 'react';
-import { Screen, GlobalState, ProDemo } from '../../state/useAppState';
+import React, { useState, useEffect } from 'react';
+import { GlobalState, Screen, ToastType, ProDemo } from '../../state/useAppState';
+import Header from '../../components/Header';
+import TabBarClient from '../../components/TabBarClient';
+
+interface Props {
+  state: GlobalState;
+  go: (screen: Screen) => void;
+  update: (partial: Partial<GlobalState>) => void;
+  showToast: (message: string, type?: ToastType) => void;
+}
 
 const PROS_DEMO: ProDemo[] = [
   {
-    id: '1',
-    prenom: 'Alexandre',
-    nom: 'Studio Blade',
-    categorie: 'Barber',
-    ville: 'Geneve',
-    note: 4.9,
-    nbAvis: 127,
-    prix: 35,
-    flash: true,
-    reponsMin: 8,
-    image: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=400&h=500&fit=crop&q=80'
+    id: 'p1', name: 'Sophie Laurent', categorie: 'Coiffure', ville: 'Geneve',
+    rating: 4.9, reviewCount: 127, prix: 65,
+    image: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&q=80',
+    bio: 'Coiffeuse professionnelle avec 10 ans d\'experience.',
+    services: [
+      { id: 's1', name: 'Coupe femme', duree: 60, prix: 65, description: 'Coupe et brushing', actif: true },
+      { id: 's2', name: 'Coloration', duree: 120, prix: 120, description: 'Coloration complete', actif: true },
+    ],
+    distance: '1.2 km', flash: true, available: true,
+    modeTravail: 'domicile', phone: '+41791234567', email: 'sophie@nexus.ch',
+    adresse: 'Rue de Rive 12, Geneve', photos: [],
+    reviews: [
+      { author: 'Marie D.', note: 5, comment: 'Excellente coiffeuse!', date: '15 jan 2026' },
+      { author: 'Julie M.', note: 5, comment: 'Super resultat.', date: '8 jan 2026' },
+      { author: 'Claire B.', note: 4.8, comment: 'Tres satisfaite.', date: '2 jan 2026' },
+    ],
   },
   {
-    id: '2',
-    prenom: 'Karim',
-    nom: 'Karim Cuts',
-    categorie: 'Barber',
-    ville: 'Lausanne',
-    note: 4.8,
-    nbAvis: 89,
-    prix: 40,
-    flash: true,
-    reponsMin: 12,
-    image: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=400&h=500&fit=crop&q=80'
+    id: 'p2', name: 'Amina Benali', categorie: 'Esthetique', ville: 'Lausanne',
+    rating: 4.8, reviewCount: 89, prix: 80,
+    image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&q=80',
+    bio: 'Estheticienne certifiee, specialiste en soins du visage.',
+    services: [
+      { id: 's1', name: 'Soin visage', duree: 60, prix: 80, description: 'Soin hydratant complet', actif: true },
+      { id: 's2', name: 'Epilation jambes', duree: 45, prix: 55, description: 'Epilation a la cire', actif: true },
+    ],
+    distance: '2.5 km', flash: false, available: true,
+    modeTravail: 'both', phone: '+41798765432', email: 'amina@nexus.ch',
+    adresse: 'Avenue de la Gare 5, Lausanne', photos: [],
+    reviews: [
+      { author: 'Sarah K.', note: 5, comment: 'Soin du visage incroyable!', date: '20 jan 2026' },
+      { author: 'Nadia R.', note: 4.8, comment: 'Tres professionnelle.', date: '12 jan 2026' },
+      { author: 'Leila M.', note: 4.7, comment: 'Je reviendrai.', date: '5 jan 2026' },
+    ],
   },
   {
-    id: '3',
-    prenom: 'Elise',
-    nom: 'Elise Coiffure',
-    categorie: 'Coiffure',
-    ville: 'Geneve',
-    note: 4.9,
-    nbAvis: 203,
-    prix: 55,
-    flash: false,
-    reponsMin: 25,
-    image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=400&h=500&fit=crop&q=80'
+    id: 'p3', name: 'Chloe Martin', categorie: 'Onglerie', ville: 'Zurich',
+    rating: 4.9, reviewCount: 203, prix: 55,
+    image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&q=80',
+    bio: 'Nail artist passionnee, creations uniques et durables.',
+    services: [
+      { id: 's1', name: 'Pose gel', duree: 75, prix: 75, description: 'Pose complete gel UV', actif: true },
+      { id: 's2', name: 'Nail art', duree: 90, prix: 90, description: 'Decoration personnalisee', actif: true },
+    ],
+    distance: '0.8 km', flash: true, available: true,
+    modeTravail: 'domicile', phone: '+41791111222', email: 'chloe@nexus.ch',
+    adresse: 'Bahnhofstrasse 20, Zurich', photos: [],
+    reviews: [
+      { author: 'Emma S.', note: 5, comment: 'Nail art magnifique!', date: '18 jan 2026' },
+      { author: 'Lena W.', note: 5, comment: 'Parfait comme toujours.', date: '10 jan 2026' },
+      { author: 'Anna P.', note: 4.9, comment: 'Tres propre et professionnel.', date: '3 jan 2026' },
+    ],
   },
   {
-    id: '4',
-    prenom: 'Nadia',
-    nom: 'Nadia Beauty',
-    categorie: 'Esthetique',
-    ville: 'Lausanne',
-    note: 4.7,
-    nbAvis: 156,
-    prix: 70,
-    flash: true,
-    reponsMin: 5,
-    image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&h=500&fit=crop&q=80'
+    id: 'p4', name: 'Fatima Ouali', categorie: 'Massage', ville: 'Berne',
+    rating: 5.0, reviewCount: 56, prix: 90,
+    image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&q=80',
+    bio: 'Masseuse therapeutique certifiee.',
+    services: [
+      { id: 's1', name: 'Massage suedois', duree: 60, prix: 90, description: 'Massage relaxant complet', actif: true },
+      { id: 's2', name: 'Shiatsu', duree: 75, prix: 110, description: 'Massage energetique japonais', actif: true },
+    ],
+    distance: '3.1 km', flash: false, available: true,
+    modeTravail: 'domicile', phone: '+41793333444', email: 'fatima@nexus.ch',
+    adresse: 'Marktgasse 8, Berne', photos: [],
+    reviews: [
+      { author: 'Thomas B.', note: 5, comment: 'Massage exceptionnel!', date: '22 jan 2026' },
+      { author: 'Pierre L.', note: 5, comment: 'Professionnel et efficace.', date: '14 jan 2026' },
+      { author: 'Marc D.', note: 5, comment: 'Le meilleur massage.', date: '7 jan 2026' },
+    ],
   },
   {
-    id: '5',
-    prenom: 'Marco',
-    nom: 'Zen by Marco',
-    categorie: 'Massage',
-    ville: 'Berne',
-    note: 4.8,
-    nbAvis: 94,
-    prix: 80,
-    flash: false,
-    reponsMin: 30,
-    image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&h=500&fit=crop&q=80'
+    id: 'p5', name: 'Isabelle Dupont', categorie: 'Maquillage', ville: 'Geneve',
+    rating: 4.7, reviewCount: 74, prix: 70,
+    image: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&q=80',
+    bio: 'Maquilleuse professionnelle pour mariages et evenements.',
+    services: [
+      { id: 's1', name: 'Maquillage mariage', duree: 90, prix: 150, description: 'Maquillage longue tenue', actif: true },
+      { id: 's2', name: 'Maquillage soiree', duree: 60, prix: 80, description: 'Look glamour pour soiree', actif: true },
+    ],
+    distance: '1.8 km', flash: false, available: true,
+    modeTravail: 'both', phone: '+41795555666', email: 'isabelle@nexus.ch',
+    adresse: 'Rue du Rhone 30, Geneve', photos: [],
+    reviews: [
+      { author: 'Camille R.', note: 5, comment: 'Maquillage parfait pour mon mariage!', date: '19 jan 2026' },
+      { author: 'Lucie V.', note: 4.8, comment: 'Tres talentueuse.', date: '11 jan 2026' },
+      { author: 'Alice M.', note: 4.5, comment: 'Bon travail.', date: '4 jan 2026' },
+    ],
   },
   {
-    id: '6',
-    prenom: 'Clara',
-    nom: 'Clara Nails',
-    categorie: 'Esthetique',
-    ville: 'Geneve',
-    note: 4.6,
-    nbAvis: 78,
-    prix: 40,
-    flash: true,
-    reponsMin: 15,
-    image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=500&fit=crop&q=80'
-  }
+    id: 'p6', name: 'Nadia Rousseau', categorie: 'Coiffure', ville: 'Lausanne',
+    rating: 4.8, reviewCount: 112, prix: 75,
+    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80',
+    bio: 'Coiffeuse specialisee en cheveux afro et textures.',
+    services: [
+      { id: 's1', name: 'Tresses africaines', duree: 180, prix: 120, description: 'Tresses box braids', actif: true },
+      { id: 's2', name: 'Soin capillaire', duree: 60, prix: 75, description: 'Soin hydratant profond', actif: true },
+    ],
+    distance: '4.2 km', flash: true, available: false,
+    modeTravail: 'domicile', phone: '+41797777888', email: 'nadia@nexus.ch',
+    adresse: 'Place de la Riponne 3, Lausanne', photos: [],
+    reviews: [
+      { author: 'Aisha K.', note: 5, comment: 'Tresses magnifiques!', date: '21 jan 2026' },
+      { author: 'Fatou D.', note: 4.9, comment: 'Tres professionnelle.', date: '13 jan 2026' },
+      { author: 'Mariam S.', note: 4.8, comment: 'Excellent travail.', date: '6 jan 2026' },
+    ],
+  },
 ];
 
-const FILTERS = ['Tous', 'Flash', 'Barber', 'Coiffure', 'Esthetique', 'Massage'];
+const FILTERS = ['Tous', 'Coiffure', 'Esthetique', 'Massage', 'Onglerie', 'Maquillage'];
+const CITIES = ['Toutes', 'Geneve', 'Lausanne', 'Zurich', 'Berne', 'Bale', 'Lucerne'];
 
-interface ExplorerScreenProps {
-  go: (screen: Screen) => void;
-  state: GlobalState;
-  update: (partial: Partial<GlobalState>) => void;
-}
+const CATEGORY_COLORS: Record<string, string> = {
+  Coiffure: '#F2D06B',
+  Esthetique: '#FF3D5A',
+  Massage: '#00D97A',
+  Onglerie: '#5B7FFF',
+  Maquillage: '#FF8C42',
+};
 
-function StarIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="#C9A84C" xmlns="http://www.w3.org/2000/svg">
-      <path d="M6 1l1.39 2.82L10.5 4.27l-2.25 2.19.53 3.09L6 8.02 3.22 9.55l.53-3.09L1.5 4.27l3.11-.45L6 1z"/>
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#54546C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="8"/>
-      <path d="m21 21-4.35-4.35"/>
-    </svg>
-  );
-}
-
-function BellIcon({ count }: { count: number }) {
-  return (
-    <div style={{ position: 'relative', cursor: 'pointer' }}>
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F4F4F8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-      </svg>
-      {count > 0 && (
-        <div style={{
-          position: 'absolute', top: -4, right: -4,
-          width: 16, height: 16, borderRadius: '50%',
-          background: '#FF3D5A',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 9, fontWeight: 700, color: '#fff'
-        }}>
-          {count}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function FlashBadge() {
-  return (
-    <div style={{
-      display: 'inline-flex', alignItems: 'center', gap: 3,
-      background: 'linear-gradient(135deg, #C9A84C, #E8C96D)',
-      borderRadius: 6, padding: '2px 6px',
-      fontSize: 9, fontWeight: 700, color: '#050507',
-      letterSpacing: '0.05em'
-    }}>
-      <svg width="8" height="8" viewBox="0 0 24 24" fill="#050507"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-      FLASH
-    </div>
-  );
-}
-
-function ProCardHorizontal({ pro, onPress }: { pro: ProDemo; onPress: () => void }) {
-  const [imgError, setImgError] = useState(false);
-
-  return (
-    <div
-      onClick={onPress}
-      style={{
-        width: 168, minWidth: 168, height: 228,
-        borderRadius: 16,
-        overflow: 'hidden',
-        position: 'relative',
-        cursor: 'pointer',
-        background: 'linear-gradient(135deg, #1A1A2E, #16213E)',
-        flexShrink: 0,
-      }}
-    >
-      {!imgError ? (
-        <img
-          src={pro.image}
-          alt={pro.prenom}
-          onError={(e) => { e.currentTarget.style.display = 'none'; setImgError(true); }}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-        />
-      ) : (
-        <div style={{
-          width: '100%', height: '100%',
-          background: 'linear-gradient(135deg, #1A1A2E 0%, #2D2D4E 50%, #1A1A2E 100%)'
-        }} />
-      )}
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: 'linear-gradient(to top, rgba(5,5,7,0.92) 0%, rgba(5,5,7,0.3) 50%, transparent 100%)'
-      }} />
-      {pro.flash && (
-        <div style={{ position: 'absolute', top: 10, left: 10 }}>
-          <FlashBadge />
-        </div>
-      )}
-      <div style={{ position: 'absolute', bottom: 12, left: 12, right: 12 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: '#F4F4F8', marginBottom: 2 }}>
-          {pro.prenom}
-        </div>
-        <div style={{ fontSize: 11, color: '#A0A0B8', marginBottom: 6 }}>
-          {pro.categorie} · {pro.ville}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            <StarIcon />
-            <span style={{ fontSize: 11, fontWeight: 600, color: '#C9A84C' }}>{pro.note}</span>
-          </div>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#F4F4F8' }}>dès {pro.prix} CHF</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ProCardVertical({ pro, onPress }: { pro: ProDemo; onPress: () => void }) {
-  const [imgError, setImgError] = useState(false);
-
-  return (
-    <div
-      onClick={onPress}
-      style={{
-        display: 'flex', alignItems: 'center', gap: 14,
-        padding: '14px 0',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-        cursor: 'pointer',
-      }}
-    >
-      <div style={{
-        width: 64, height: 64, borderRadius: 14,
-        overflow: 'hidden', flexShrink: 0,
-        background: 'linear-gradient(135deg, #1A1A2E, #2D2D4E)'
-      }}>
-        {!imgError ? (
-          <img
-            src={pro.image}
-            alt={pro.prenom}
-            onError={(e) => { e.currentTarget.style.display = 'none'; setImgError(true); }}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-          />
-        ) : (
-          <div style={{
-            width: '100%', height: '100%',
-            background: 'linear-gradient(135deg, #1A1A2E 0%, #2D2D4E 100%)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 20, color: '#C9A84C', fontWeight: 700
-          }}>
-            {pro.prenom[0]}
-          </div>
-        )}
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-          <span style={{ fontSize: 14, fontWeight: 700, color: '#F4F4F8' }}>{pro.prenom}</span>
-          {pro.flash && <FlashBadge />}
-        </div>
-        <div style={{ fontSize: 12, color: '#A0A0B8', marginBottom: 4 }}>
-          {pro.categorie} · {pro.ville}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            <StarIcon />
-            <span style={{ fontSize: 12, fontWeight: 600, color: '#C9A84C' }}>{pro.note}</span>
-            <span style={{ fontSize: 11, color: '#54546C' }}>({pro.nbAvis})</span>
-          </div>
-          <span style={{ fontSize: 11, color: '#54546C' }}>·</span>
-          <span style={{ fontSize: 11, color: '#54546C' }}>Rep. {pro.reponsMin}min</span>
-        </div>
-      </div>
-      <div style={{ textAlign: 'right', flexShrink: 0 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: '#F4F4F8' }}>{pro.prix} CHF</div>
-        <div style={{ fontSize: 11, color: '#54546C' }}>/ séance</div>
-      </div>
-    </div>
-  );
-}
-
-export default function ExplorerScreen({ go, state, update }: ExplorerScreenProps) {
+export default function ExplorerScreen({ state, go, update, showToast }: Props) {
+  const [filter, setFilter] = useState('Tous');
   const [search, setSearch] = useState('');
-  const [activeFilter, setActiveFilter] = useState('Tous');
+  const [city, setCity] = useState('Toutes');
+  const [shimmer, setShimmer] = useState(true);
+  const [locating, setLocating] = useState(false);
 
-  const allPros = PROS_DEMO;
+  useEffect(() => {
+    const t = setTimeout(() => setShimmer(false), 800);
+    return () => clearTimeout(t);
+  }, []);
 
-  const filteredPros = allPros.filter(pro => {
-    const matchSearch = search === '' ||
-      pro.prenom.toLowerCase().includes(search.toLowerCase()) ||
-      pro.nom.toLowerCase().includes(search.toLowerCase()) ||
-      pro.categorie.toLowerCase().includes(search.toLowerCase()) ||
-      pro.ville.toLowerCase().includes(search.toLowerCase());
-
-    const matchFilter =
-      activeFilter === 'Tous' ? true :
-      activeFilter === 'Flash' ? pro.flash :
-      pro.categorie.toLowerCase() === activeFilter.toLowerCase();
-
-    return matchSearch && matchFilter;
+  const filtered = PROS_DEMO.filter(p => {
+    const matchFilter = filter === 'Tous' || p.categorie === filter;
+    const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.categorie.toLowerCase().includes(search.toLowerCase());
+    const matchCity = city === 'Toutes' || p.ville === city;
+    return matchFilter && matchSearch && matchCity;
   });
 
-  const flashPros = filteredPros.filter(p => p.flash);
-  const allFiltered = filteredPros;
+  const flashPros = filtered.filter(p => p.flash && p.available);
+  const notifsCount = state.notifications.filter(n => !n.read).length;
 
-  const handleProPress = (pro: ProDemo) => {
+  const handleLocate = () => {
+    setLocating(true);
+    navigator.geolocation?.getCurrentPosition(
+      () => { setLocating(false); showToast('Localisation activee', 'success'); },
+      () => { setLocating(false); showToast('Localisation non disponible', 'error'); }
+    );
+  };
+
+  const handleProClick = (pro: ProDemo) => {
     update({ selectedPro: pro });
     go('fiche_pro');
   };
 
   return (
-    <div style={{
-      position: 'relative',
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100%',
-      overflow: 'hidden',
-      background: '#050507',
-      fontFamily: 'Inter, sans-serif',
-    }}>
-      {/* Header - absolute top */}
-      <div style={{
-        position: 'absolute',
-        top: 0, left: 0, right: 0,
-        height: 56,
-        zIndex: 100,
-        background: 'rgba(5,5,7,0.92)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 20px',
-      }}>
-        {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <span style={{
-            fontSize: 20, fontWeight: 900, color: '#F4F4F8',
-            letterSpacing: '-0.03em'
-          }}>NEXUS</span>
-          <span style={{
-            width: 6, height: 6, borderRadius: '50%',
-            background: '#4A9EFF', display: 'inline-block', marginBottom: 8
-          }} />
-        </div>
+    <div style={{ position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column', background: '#050507' }}>
+      <Header
+        role="client"
+        onSwitchRole={() => { update({ role: 'pro' }); go('pro_dashboard'); }}
+        onNotifs={() => update({ notifsOpen: true })}
+        notifsCount={notifsCount}
+        onLogoClick={() => go('explorer')}
+      />
 
-        {/* Right: switch pill + notifs */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          {state.role === 'client' && (
-            <button
-              onClick={() => go('pro_dashboard')}
-              style={{
-                padding: '5px 14px',
-                borderRadius: 20,
-                border: '1.5px solid #C9A84C',
-                background: 'transparent',
-                color: '#C9A84C',
-                fontSize: 12, fontWeight: 700,
-                cursor: 'pointer',
-                letterSpacing: '0.04em',
-              }}
-            >
-              Pro
-            </button>
-          )}
-          <BellIcon count={state.notifCount} />
-        </div>
-      </div>
-
-      {/* Scrollable content zone */}
-      <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        WebkitOverflowScrolling: 'touch' as any,
-        paddingTop: 72,
-        paddingBottom: 16,
-      }}>
+      <div style={{ flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' as any, overscrollBehavior: 'contain', paddingTop: 56 }}>
         {/* Hero */}
-        <div style={{ padding: '24px 20px 0' }}>
+        <div style={{ padding: '20px 20px 16px' }}>
           <h1 style={{
             fontFamily: 'Inter, sans-serif',
+            fontSize: 'clamp(28px, 7vw, 40px)',
             fontWeight: 900,
-            fontSize: 36,
-            color: '#F4F4F8',
+            letterSpacing: '-0.03em',
             lineHeight: 1.1,
-            margin: 0,
             marginBottom: 6,
+            color: '#F4F4F8',
           }}>
-            Trouvez votre<br />expert
+            Trouvez votre<br />
+            <span style={{ background: 'linear-gradient(135deg, #F2D06B, #D4A050)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              expert
+            </span>
           </h1>
-          <p style={{ fontSize: 14, color: '#54546C', margin: 0, marginBottom: 20 }}>
-            Réservez en quelques secondes
+          <p style={{ fontFamily: 'Inter, sans-serif', fontSize: 14, color: '#9898B4', marginBottom: 16 }}>
+            Des professionnels certifies pres de chez vous
           </p>
 
-          {/* Search bar */}
+          {/* Search */}
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 12,
-            height: 58,
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: 16,
-            padding: '0 18px',
-            marginBottom: 20,
+            display: 'flex', alignItems: 'center', gap: 10,
+            background: '#0D0D13', border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 999, padding: '0 16px', height: 48, marginBottom: 10,
           }}>
-            <SearchIcon />
+            <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#54546C" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
+            </svg>
             <input
               type="text"
-              placeholder="Barber, coiffure, massage..."
               value={search}
               onChange={e => setSearch(e.target.value)}
+              placeholder="Rechercher un expert..."
               style={{
-                flex: 1,
-                background: 'transparent',
-                border: 'none',
-                outline: 'none',
-                fontSize: 15,
-                color: '#F4F4F8',
-                fontFamily: 'Inter, sans-serif',
+                flex: 1, background: 'transparent', border: 'none',
+                fontFamily: 'Inter, sans-serif', fontSize: 15, color: '#F4F4F8',
+                height: '100%', outline: 'none',
               }}
             />
           </div>
 
-          {/* Filter pills */}
-          <div style={{
-            display: 'flex', gap: 8,
-            overflowX: 'auto',
-            WebkitOverflowScrolling: 'touch' as any,
-            paddingBottom: 4,
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-          } as React.CSSProperties}>
-            {FILTERS.map(filter => {
-              const isActive = activeFilter === filter;
-              return (
-                <button
-                  key={filter}
-                  onClick={() => setActiveFilter(filter)}
-                  style={{
-                    flexShrink: 0,
-                    padding: '8px 16px',
-                    borderRadius: 20,
-                    border: isActive ? 'none' : '1px solid rgba(255,255,255,0.12)',
-                    background: isActive
-                      ? 'linear-gradient(135deg, #C9A84C, #E8C96D)'
-                      : 'rgba(255,255,255,0.04)',
-                    color: isActive ? '#050507' : '#A0A0B8',
-                    fontSize: 13, fontWeight: isActive ? 700 : 500,
-                    cursor: 'pointer',
-                    fontFamily: 'Inter, sans-serif',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {filter}
-                </button>
-              );
-            })}
+          {/* Location + city */}
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <button
+              onClick={handleLocate}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '8px 14px', borderRadius: 999,
+                background: locating ? 'rgba(0,217,122,0.1)' : '#0D0D13',
+                border: `1px solid ${locating ? 'rgba(0,217,122,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                color: locating ? '#00D97A' : '#9898B4',
+                fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 500, cursor: 'pointer', flexShrink: 0,
+              }}
+            >
+              <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+              </svg>
+              Autour de moi
+            </button>
+            <select
+              value={city}
+              onChange={e => setCity(e.target.value)}
+              style={{
+                flex: 1, height: 36, background: '#0D0D13',
+                border: '1px solid rgba(255,255,255,0.08)', borderRadius: 999,
+                padding: '0 14px', fontFamily: 'Inter, sans-serif', fontSize: 13,
+                color: '#9898B4', cursor: 'pointer', outline: 'none',
+              }}
+            >
+              {CITIES.map(c => <option key={c} value={c} style={{ background: '#0D0D13' }}>{c}</option>)}
+            </select>
           </div>
         </div>
 
-        {filteredPros.length === 0 ? (
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: '60px 20px',
-            fontFamily: 'Inter, sans-serif',
-            fontWeight: 500,
-            fontSize: 14,
-            color: '#54546C',
-          }}>
-            Aucun expert disponible
-          </div>
-        ) : (
-          <>
-            {/* Flash section - horizontal scroll */}
-            {flashPros.length > 0 && (
-              <div style={{ marginTop: 28 }}>
-                <div style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '0 20px', marginBottom: 14
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#C9A84C"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: '#F4F4F8' }}>Disponibles maintenant</span>
-                  </div>
-                  <span style={{ fontSize: 12, color: '#C9A84C', fontWeight: 600 }}>
-                    {flashPros.length} expert{flashPros.length > 1 ? 's' : ''}
-                  </span>
-                </div>
-                <div style={{
-                  display: 'flex', gap: 12,
-                  overflowX: 'auto',
-                  WebkitOverflowScrolling: 'touch' as any,
-                  padding: '0 20px 8px',
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
-                } as React.CSSProperties}>
-                  {flashPros.map(pro => (
-                    <ProCardHorizontal
-                      key={pro.id}
-                      pro={pro}
-                      onPress={() => handleProPress(pro)}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
+        {/* Filter pills */}
+        <div style={{ display: 'flex', gap: 8, padding: '0 20px 16px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+          {FILTERS.map(f => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              style={{
+                flexShrink: 0, padding: '8px 16px', borderRadius: 999,
+                background: filter === f ? 'rgba(242,208,107,0.12)' : '#0D0D13',
+                border: filter === f ? '1px solid rgba(242,208,107,0.3)' : '1px solid rgba(255,255,255,0.06)',
+                color: filter === f ? '#F2D06B' : '#9898B4',
+                fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: filter === f ? 600 : 400,
+                cursor: 'pointer', transition: 'all 150ms',
+              }}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
 
-            {/* All experts - vertical list */}
-            <div style={{ padding: '0 20px', marginTop: 28 }}>
-              <div style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                marginBottom: 4
-              }}>
-                <span style={{ fontSize: 16, fontWeight: 700, color: '#F4F4F8' }}>
-                  Experts pour vous
-                </span>
-                <span style={{ fontSize: 12, color: '#54546C' }}>
-                  {allFiltered.length} résultat{allFiltered.length > 1 ? 's' : ''}
-                </span>
-              </div>
-              {allFiltered.map(pro => (
-                <ProCardVertical
-                  key={pro.id}
-                  pro={pro}
-                  onPress={() => handleProPress(pro)}
-                />
-              ))}
+        {/* Flash section */}
+        {flashPros.length > 0 && (
+          <div style={{ marginBottom: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 20px 12px' }}>
+              <div style={{ width: 3, height: 18, background: '#F2D06B', borderRadius: 999 }} />
+              <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 16, color: '#F4F4F8' }}>
+                Disponibles maintenant
+              </span>
+              <span style={{ background: 'rgba(0,217,122,0.1)', color: '#00D97A', fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 999 }}>
+                FLASH
+              </span>
             </div>
-          </>
+            <div style={{ display: 'flex', gap: 12, padding: '0 20px', overflowX: 'auto', scrollbarWidth: 'none' }}>
+              {shimmer ? (
+                [1, 2, 3].map(i => (
+                  <div key={i} style={{
+                    flexShrink: 0, width: 160, height: 220, borderRadius: 18,
+                    background: 'linear-gradient(90deg, #0D0D13 25%, #1C1C26 50%, #0D0D13 75%)',
+                    backgroundSize: '200% 100%', animation: 'shimmer 1.5s infinite',
+                  }} />
+                ))
+              ) : (
+                flashPros.map(pro => {
+                  const catColor = CATEGORY_COLORS[pro.categorie] || '#5B7FFF';
+                  const initials = pro.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                  return (
+                    <button
+                      key={pro.id}
+                      onClick={() => handleProClick(pro)}
+                      style={{
+                        flexShrink: 0, width: 160, height: 220, borderRadius: 18,
+                        background: '#0D0D13', border: '1px solid rgba(255,255,255,0.06)',
+                        overflow: 'hidden', cursor: 'pointer', position: 'relative',
+                        display: 'flex', flexDirection: 'column', textAlign: 'left',
+                        transition: 'transform 150ms',
+                      }}
+                      onMouseDown={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.97)'; }}
+                      onMouseUp={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
+                    >
+                      <div style={{
+                        flex: 1, background: `linear-gradient(135deg, ${catColor}22, ${catColor}08)`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 36, fontWeight: 900, color: catColor,
+                      }}>
+                        {initials}
+                      </div>
+                      <div style={{
+                        position: 'absolute', top: 10, right: 10,
+                        background: 'rgba(0,217,122,0.9)', borderRadius: 999,
+                        padding: '3px 8px', fontSize: 10, fontWeight: 700, color: '#050507',
+                      }}>
+                        FLASH
+                      </div>
+                      <div style={{ padding: '10px 12px 12px' }}>
+                        <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 13, color: '#F4F4F8', marginBottom: 2 }}>
+                          {pro.name}
+                        </div>
+                        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, color: '#54546C', marginBottom: 6 }}>{pro.categorie}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                            <svg width={11} height={11} viewBox="0 0 24 24" fill="#F2D06B" stroke="none">
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            </svg>
+                            <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, fontWeight: 600, color: '#F4F4F8' }}>{pro.rating}</span>
+                          </div>
+                          <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 700, color: '#F2D06B' }}>{pro.prix} CHF</span>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </div>
         )}
-      </div>
 
-      {/* Tab bar - in natural flex flow, never fixed */}
-      <div style={{ flexShrink: 0 }}>
-        <ClientTabBar
-          active="explorer"
-          onExplorerClick={() => go('explorer')}
-          onReservationsClick={() => go('client_reservations')}
-          onAlertesClick={() => go('client_alertes')}
-          onProfilClick={() => go('client_profil')}
-        />
-      </div>
-    </div>
-  );
-}
-
-interface ClientTabBarProps {
-  active: string;
-  onExplorerClick: () => void;
-  onReservationsClick: () => void;
-  onAlertesClick: () => void;
-  onProfilClick: () => void;
-}
-
-function ClientTabBar({ active, onExplorerClick, onReservationsClick, onAlertesClick, onProfilClick }: ClientTabBarProps) {
-  const tabs = [
-    {
-      key: 'explorer',
-      label: 'Explorer',
-      onClick: onExplorerClick,
-      icon: (color: string) => (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="11" cy="11" r="8"/>
-          <path d="m21 21-4.35-4.35"/>
-        </svg>
-      ),
-    },
-    {
-      key: 'reservations',
-      label: 'Réservations',
-      onClick: onReservationsClick,
-      icon: (color: string) => (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-          <line x1="16" y1="2" x2="16" y2="6"/>
-          <line x1="8" y1="2" x2="8" y2="6"/>
-          <line x1="3" y1="10" x2="21" y2="10"/>
-        </svg>
-      ),
-    },
-    {
-      key: 'alertes',
-      label: 'Alertes',
-      onClick: onAlertesClick,
-      icon: (color: string) => (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-        </svg>
-      ),
-    },
-    {
-      key: 'profil',
-      label: 'Profil',
-      onClick: onProfilClick,
-      icon: (color: string) => (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-          <circle cx="12" cy="7" r="4"/>
-        </svg>
-      ),
-    },
-  ];
-
-  return (
-    <div style={{
-      display: 'flex',
-      background: 'rgba(5,5,7,0.96)',
-      borderTop: '1px solid rgba(255,255,255,0.06)',
-      paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-    }}>
-      {tabs.map(tab => {
-        const isActive = active === tab.key;
-        const color = isActive ? '#C9A84C' : '#54546C';
-        return (
-          <button
-            key={tab.key}
-            onClick={tab.onClick}
-            style={{
-              flex: 1,
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center',
-              padding: '10px 0 8px',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              position: 'relative',
-            }}
-          >
-            {isActive && (
-              <div style={{
-                position: 'absolute', top: 0, left: '50%',
-                transform: 'translateX(-50%)',
-                width: 32, height: 2,
-                background: 'linear-gradient(90deg, #C9A84C, #E8C96D)',
-                borderRadius: '0 0 2px 2px',
-              }} />
-            )}
-            {tab.icon(color)}
-            <span style={{
-              fontSize: 10, fontWeight: isActive ? 700 : 500,
-              color, marginTop: 3,
-              fontFamily: 'Inter, sans-serif',
-            }}>
-              {tab.label}
+        {/* All pros */}
+        <div style={{ padding: '0 20px 20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+            <div style={{ width: 3, height: 18, background: '#F2D06B', borderRadius: 999 }} />
+            <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 16, color: '#F4F4F8' }}>
+              Experts pour vous
             </span>
-          </button>
-        );
-      })}
+            <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#54546C' }}>({filtered.length})</span>
+          </div>
+
+          {shimmer ? (
+            [1, 2, 3].map(i => (
+              <div key={i} style={{
+                height: 88, borderRadius: 16, marginBottom: 10,
+                background: 'linear-gradient(90deg, #0D0D13 25%, #1C1C26 50%, #0D0D13 75%)',
+                backgroundSize: '200% 100%', animation: 'shimmer 1.5s infinite',
+              }} />
+            ))
+          ) : filtered.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 20px', color: '#54546C', fontFamily: 'Inter, sans-serif', fontSize: 14 }}>
+              Aucun expert trouve pour ces criteres
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {filtered.map(pro => {
+                const catColor = CATEGORY_COLORS[pro.categorie] || '#5B7FFF';
+                const initials = pro.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                return (
+                  <button
+                    key={pro.id}
+                    onClick={() => handleProClick(pro)}
+                    style={{
+                      background: '#0D0D13', border: '1px solid rgba(255,255,255,0.06)',
+                      borderRadius: 16, padding: '14px 16px',
+                      display: 'flex', alignItems: 'center', gap: 14,
+                      cursor: 'pointer', textAlign: 'left', transition: 'all 150ms', width: '100%',
+                    }}
+                    onMouseDown={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.98)'; }}
+                    onMouseUp={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
+                  >
+                    <div style={{
+                      width: 52, height: 52, borderRadius: '50%',
+                      background: `linear-gradient(135deg, ${catColor}33, ${catColor}11)`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 20, fontWeight: 900, color: catColor, flexShrink: 0,
+                      border: `1px solid ${catColor}22`,
+                    }}>
+                      {initials}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                        <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 15, color: '#F4F4F8' }}>
+                          {pro.name}
+                        </span>
+                        {pro.flash && (
+                          <span style={{ background: 'rgba(0,217,122,0.1)', color: '#00D97A', fontSize: 9, fontWeight: 700, padding: '1px 6px', borderRadius: 999 }}>
+                            FLASH
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, color: '#9898B4', marginBottom: 4 }}>
+                        {pro.categorie} · {pro.ville}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                          <svg width={12} height={12} viewBox="0 0 24 24" fill="#F2D06B" stroke="none">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                          </svg>
+                          <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 12, fontWeight: 600, color: '#F4F4F8' }}>{pro.rating}</span>
+                          <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, color: '#54546C' }}>({pro.reviewCount})</span>
+                        </div>
+                        {pro.distance && (
+                          <span style={{ fontFamily: 'Inter, sans-serif', fontSize: 11, color: '#54546C' }}>{pro.distance}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                      <div style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 15, color: '#F2D06B', marginBottom: 4 }}>
+                        {pro.prix} CHF
+                      </div>
+                      <div style={{
+                        fontFamily: 'Inter, sans-serif', fontSize: 10, fontWeight: 600,
+                        padding: '3px 8px', borderRadius: 999,
+                        color: pro.available ? '#00D97A' : '#54546C',
+                        background: pro.available ? 'rgba(0,217,122,0.1)' : 'rgba(84,84,108,0.1)',
+                      }}>
+                        {pro.available ? 'Dispo' : 'Occupe'}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <div style={{ height: 16 }} />
+      </div>
+
+      <TabBarClient current="explorer" go={go} notifsCount={notifsCount} />
     </div>
   );
 }

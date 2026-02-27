@@ -1,229 +1,200 @@
 import React from 'react';
-import { IconUser, IconGrid } from '../../components/icons';
-import type { Screen, GlobalState, ToastType } from '../../state/useAppState';
+import { GlobalState, Screen, ToastType } from '../../state/useAppState';
+import Header from '../../components/Header';
 
-interface RoleScreenProps {
+interface Props {
+  state: GlobalState;
   go: (screen: Screen) => void;
   update: (partial: Partial<GlobalState>) => void;
-  showToast: (msg: string, type?: ToastType, duration?: number) => void;
+  showToast: (message: string, type?: ToastType) => void;
 }
 
-export default function RoleScreen({ go, update }: RoleScreenProps) {
+export default function RoleScreen({ state, go, update, showToast }: Props) {
+  const handleSelect = (role: 'client' | 'pro') => {
+    update({ role });
+    go('otp');
+  };
+
   return (
     <div style={{
-      position: 'absolute',
+      position: 'fixed',
       inset: 0,
+      background: '#050507',
       display: 'flex',
       flexDirection: 'column',
-      background: '#050507',
-      overflow: 'hidden',
     }}>
-      {/* Header — logo only */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '56px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 100,
-        background: 'rgba(5,5,7,0.85)',
-        backdropFilter: 'blur(20px)',
-      }}>
-        <div style={{
-          fontFamily: 'Inter, sans-serif',
-          fontWeight: 900,
-          fontSize: '22px',
-          letterSpacing: '-2px',
-          color: '#F4F4F8',
-          display: 'inline-flex',
-          alignItems: 'baseline',
-        }}>
-          NEXUS<span style={{ color: '#5B7FFF' }}>.</span>
-        </div>
-      </div>
+      <Header
+        showBack
+        onBack={() => go('login')}
+        title="Choisir votre role"
+        onLogoClick={() => go('login')}
+      />
 
-      {/* Content zone */}
       <div style={{
         flex: 1,
         overflowY: 'auto',
+        WebkitOverflowScrolling: 'touch' as any,
+        overscrollBehavior: 'contain',
+        paddingTop: 72,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         padding: '72px 24px 32px',
-        gap: '16px',
       }}>
-        <div style={{
-          fontFamily: 'Inter, sans-serif',
-          fontWeight: 700,
-          fontSize: '22px',
-          color: '#F4F4F8',
-          textAlign: 'center',
-          marginBottom: '8px',
-          animation: 'fadeIn 0.4s ease forwards',
-        }}>
-          Qui etes-vous ?
-        </div>
-        <div style={{
-          fontFamily: 'Inter, sans-serif',
-          fontWeight: 400,
-          fontSize: '14px',
-          color: '#54546C',
-          textAlign: 'center',
-          marginBottom: '24px',
-          animation: 'fadeIn 0.4s ease 0.05s both',
-        }}>
-          Choisissez votre profil pour continuer
-        </div>
-
-        {/* CLIENT card */}
-        <button
-          onClick={() => {
-            update({ role: 'client' });
-            go('otp');
-          }}
-          style={{
-            width: '100%',
-            minHeight: '100px',
-            borderRadius: '20px',
-            background: '#0D0D13',
-            border: '1px solid rgba(255,255,255,0.06)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '20px',
-            padding: '24px 20px',
-            cursor: 'pointer',
-            transition: 'all 180ms ease',
-            animation: 'fadeIn 0.4s ease 0.1s both',
-            textAlign: 'left',
-          }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(91,127,255,0.5)';
-            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(91,127,255,0.06)';
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(255,255,255,0.06)';
-            (e.currentTarget as HTMLButtonElement).style.background = '#0D0D13';
-          }}
-        >
-          <div style={{
-            width: '52px',
-            height: '52px',
-            borderRadius: '16px',
-            background: 'rgba(91,127,255,0.12)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}>
-            <IconUser size={26} color="#5B7FFF" />
-          </div>
-          <div>
-            <div style={{
+        <div style={{ width: '100%', maxWidth: 400 }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <h1 style={{
               fontFamily: 'Inter, sans-serif',
               fontWeight: 800,
-              fontSize: '20px',
+              fontSize: 28,
               color: '#F4F4F8',
-              marginBottom: '4px',
+              margin: 0,
+              letterSpacing: '-0.03em',
             }}>
-              Je suis client
-            </div>
-            <div style={{
+              Qui etes-vous ?
+            </h1>
+            <p style={{
               fontFamily: 'Inter, sans-serif',
-              fontWeight: 400,
-              fontSize: '13px',
-              color: '#54546C',
+              fontSize: 15,
+              color: '#9898B4',
+              marginTop: 10,
+              lineHeight: 1.5,
             }}>
-              Reservez un expert a domicile
-            </div>
+              Selectionnez votre profil pour continuer
+            </p>
           </div>
-        </button>
 
-        {/* PRO card */}
-        <button
-          onClick={() => {
-            update({ role: 'pro' });
-            go('otp');
-          }}
-          style={{
-            width: '100%',
-            minHeight: '100px',
-            borderRadius: '20px',
-            background: '#0D0D13',
-            border: '1px solid rgba(255,255,255,0.06)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '20px',
-            padding: '24px 20px',
-            cursor: 'pointer',
-            transition: 'all 180ms ease',
-            animation: 'fadeIn 0.4s ease 0.15s both',
-            textAlign: 'left',
-          }}
-          onMouseEnter={e => {
-            (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(242,208,107,0.4)';
-            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(242,208,107,0.04)';
-          }}
-          onMouseLeave={e => {
-            (e.currentTarget as HTMLButtonElement).style.border = '1px solid rgba(255,255,255,0.06)';
-            (e.currentTarget as HTMLButtonElement).style.background = '#0D0D13';
-          }}
-        >
-          <div style={{
-            width: '52px',
-            height: '52px',
-            borderRadius: '16px',
-            background: 'rgba(242,208,107,0.10)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}>
-            <IconGrid size={26} color="#F2D06B" />
-          </div>
-          <div>
-            <div style={{
-              fontFamily: 'Inter, sans-serif',
-              fontWeight: 800,
-              fontSize: '20px',
-              color: '#F4F4F8',
-              marginBottom: '4px',
-            }}>
-              Je suis professionnel
-            </div>
-            <div style={{
-              fontFamily: 'Inter, sans-serif',
-              fontWeight: 400,
-              fontSize: '13px',
-              color: '#54546C',
-            }}>
-              Deployez votre activite beaute
-            </div>
-          </div>
-        </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Client card */}
+            <button
+              onClick={() => handleSelect('client')}
+              style={{
+                background: '#0D0D13',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: 18,
+                padding: 24,
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'all 150ms',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 20,
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(242,208,107,0.3)';
+                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(242,208,107,0.04)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.08)';
+                (e.currentTarget as HTMLButtonElement).style.background = '#0D0D13';
+              }}
+              onMouseDown={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.98)'; }}
+              onMouseUp={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
+            >
+              <div style={{
+                width: 56,
+                height: 56,
+                borderRadius: 16,
+                background: 'rgba(242,208,107,0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                <svg width={28} height={28} viewBox="0 0 24 24" fill="none" stroke="#F2D06B" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontWeight: 700,
+                  fontSize: 18,
+                  color: '#F4F4F8',
+                  marginBottom: 4,
+                }}>
+                  Je suis client
+                </div>
+                <div style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: 14,
+                  color: '#9898B4',
+                  lineHeight: 1.4,
+                }}>
+                  Trouvez et reservez des professionnels pres de chez vous
+                </div>
+              </div>
+              <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#54546C" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
 
-        {/* Admin link */}
-        <button
-          onClick={() => go('admin_login')}
-          style={{
-            marginTop: '16px',
-            fontFamily: 'Inter, sans-serif',
-            fontWeight: 400,
-            fontSize: '13px',
-            color: '#2E2E3E',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: '12px 16px',
-            minHeight: '44px',
-            animation: 'fadeIn 0.4s ease 0.2s both',
-          }}
-        >
-          Acces administration
-        </button>
+            {/* Pro card */}
+            <button
+              onClick={() => handleSelect('pro')}
+              style={{
+                background: '#0D0D13',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: 18,
+                padding: 24,
+                cursor: 'pointer',
+                textAlign: 'left',
+                transition: 'all 150ms',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 20,
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(91,127,255,0.3)';
+                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(91,127,255,0.04)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.08)';
+                (e.currentTarget as HTMLButtonElement).style.background = '#0D0D13';
+              }}
+              onMouseDown={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.98)'; }}
+              onMouseUp={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
+            >
+              <div style={{
+                width: 56,
+                height: 56,
+                borderRadius: 16,
+                background: 'rgba(91,127,255,0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                <svg width={28} height={28} viewBox="0 0 24 24" fill="none" stroke="#5B7FFF" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                </svg>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontWeight: 700,
+                  fontSize: 18,
+                  color: '#F4F4F8',
+                  marginBottom: 4,
+                }}>
+                  Je suis professionnel
+                </div>
+                <div style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: 14,
+                  color: '#9898B4',
+                  lineHeight: 1.4,
+                }}>
+                  Developpez votre activite et gerez vos reservations
+                </div>
+              </div>
+              <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#54546C" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
